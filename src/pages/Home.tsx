@@ -137,206 +137,226 @@ const Home = () => {
                   />
                 </div>
                 
-                {/* Floating Elements */}
+                {/* Floating Elements - Clockwise Arrangement (Wider Spread) */}
+                {/* 12시 방향 */}
                 <motion.div
                   id="floating-react-typescript"
                   animate={{ 
-                    y: [0, -10, 0],
-                    rotate: [0, 5, 0]
+                    y: [0, -12, 0],
+                    rotate: [0, 3, 0]
                   }}
                   transition={{ 
                     duration: 3,
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
-                  className="absolute -top-4 -right-4 bg-white rounded-lg p-3 shadow-lg"
+                  className="absolute -top-12 left-32 transform -translate-x-1/2 bg-white rounded-lg p-2 shadow-lg"
                 >
                   <div className="text-blue-600 font-bold text-xs">React & TypeScript</div>
                 </motion.div>
                 
+                {/* 1시 방향 */}
                 <motion.div
                   id="floating-next-vue"
                   animate={{ 
-                    y: [0, 10, 0],
-                    rotate: [0, -5, 0]
-                  }}
-                  transition={{ 
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1
-                  }}
-                  className="absolute -bottom-4 -left-4 bg-white rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-purple-600 font-bold text-xs">Next.js & Vue.js</div>
-                </motion.div>
-                
-                <motion.div
-                  id="floating-tailwind-styled"
-                  animate={{ 
-                    x: [0, 10, 0],
-                    rotate: [0, 3, 0]
-                  }}
-                  transition={{ 
-                    duration: 3.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 2
-                  }}
-                  className="absolute top-1/2 -left-12 bg-white rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-cyan-600 font-bold text-xs">Tailwind & Styled</div>
-                </motion.div>
-
-                <motion.div
-                  id="floating-framer-gsap"
-                  animate={{ 
                     y: [0, -8, 0],
-                    rotate: [0, -3, 0]
+                    x: [0, 8, 0],
+                    rotate: [0, 2, 0]
                   }}
                   transition={{ 
                     duration: 3.2,
                     repeat: Infinity,
                     ease: "easeInOut",
-                    delay: 0.5
+                    delay: 0.3
                   }}
-                  className="absolute top-1/4 -right-16 bg-white rounded-lg p-3 shadow-lg"
+                  className="absolute top-4 right-8 bg-white rounded-lg p-2 shadow-lg"
+                >
+                  <div className="text-purple-600 font-bold text-xs">Next.js & Vue.js</div>
+                </motion.div>
+                
+                {/* 2시 방향 */}
+                <motion.div
+                  id="floating-tailwind-styled"
+                  animate={{ 
+                    y: [0, -6, 0],
+                    x: [0, 12, 0],
+                    rotate: [0, 1, 0]
+                  }}
+                  transition={{ 
+                    duration: 3.4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.6
+                  }}
+                  className="absolute top-1/4 -right-20 bg-white rounded-lg p-2 shadow-lg"
+                >
+                  <div className="text-cyan-600 font-bold text-xs">Tailwind & Styled</div>
+                </motion.div>
+
+                {/* 3시 방향 */}
+                <motion.div
+                  id="floating-framer-gsap"
+                  animate={{ 
+                    x: [0, 16, 0],
+                    rotate: [0, -2, 0]
+                  }}
+                  transition={{ 
+                    duration: 3.6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.9
+                  }}
+                  className="absolute top-1/2 -right-28 bg-white rounded-lg p-2 shadow-lg"
                 >
                   <div className="text-purple-500 font-bold text-xs">Framer & GSAP</div>
                 </motion.div>
 
+                {/* 4시 방향 */}
                 <motion.div
                   id="floating-node-express"
                   animate={{ 
-                    x: [0, -8, 0],
-                    rotate: [0, 4, 0]
+                    y: [0, 6, 0],
+                    x: [0, 12, 0],
+                    rotate: [0, 2, 0]
                   }}
                   transition={{ 
                     duration: 3.8,
                     repeat: Infinity,
                     ease: "easeInOut",
-                    delay: 1.5
+                    delay: 1.2
                   }}
-                  className="absolute bottom-1/4 -right-16 bg-white rounded-lg p-3 shadow-lg"
+                  className="absolute bottom-1/4 -right-20 bg-white rounded-lg p-2 shadow-lg"
                 >
                   <div className="text-green-600 font-bold text-xs">Node.js & Express</div>
                 </motion.div>
 
+                {/* 5시 방향 */}
                 <motion.div
                   id="floating-python-django"
                   animate={{ 
                     y: [0, 8, 0],
+                    x: [0, 8, 0],
+                    rotate: [0, -1, 0]
+                  }}
+                  transition={{ 
+                    duration: 4.0,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1.5
+                  }}
+                  className="absolute bottom-4 right-8 bg-white rounded-lg p-2 shadow-lg"
+                >
+                  <div className="text-yellow-600 font-bold text-xs">Python & Django</div>
+                </motion.div>
+
+                {/* 6시 방향 */}
+                <motion.div
+                  id="floating-postgres-mongo"
+                  animate={{ 
+                    y: [0, 12, 0],
+                    rotate: [0, 3, 0]
+                  }}
+                  transition={{ 
+                    duration: 4.2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1.8
+                  }}
+                  className="absolute -bottom-8 left-28 transform -translate-x-1/2 bg-white rounded-lg p-2 shadow-lg"
+                >
+                  <div className="text-blue-500 font-bold text-xs">PostgreSQL & MongoDB</div>
+                </motion.div>
+
+                {/* 7시 방향 */}
+                <motion.div
+                  id="floating-aws-docker"
+                  animate={{ 
+                    y: [0, 8, 0],
+                    x: [0, -8, 0],
+                    rotate: [0, 2, 0]
+                  }}
+                  transition={{ 
+                    duration: 3.4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.3
+                  }}
+                  className="absolute bottom-4 left-8 bg-white rounded-lg p-2 shadow-lg"
+                >
+                  <div className="text-orange-600 font-bold text-xs">AWS & Docker</div>
+                </motion.div>
+
+                {/* 8시 방향 */}
+                <motion.div
+                  id="floating-git-github"
+                  animate={{ 
+                    y: [0, 6, 0],
+                    x: [0, -16, 0],
+                    rotate: [0, -1, 0]
+                  }}
+                  transition={{ 
+                    duration: 3.6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.6
+                  }}
+                  className="absolute bottom-1/4 -left-20 bg-white rounded-lg p-2 shadow-lg"
+                >
+                  <div className="text-gray-700 font-bold text-xs">Git & GitHub</div>
+                </motion.div>
+
+                {/* 9시 방향 */}
+                <motion.div
+                  id="floating-figma-adobe"
+                  animate={{ 
+                    x: [0, -20, 0],
+                    rotate: [0, 2, 0]
+                  }}
+                  transition={{ 
+                    duration: 3.8,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.9
+                  }}
+                  className="absolute top-1/2 -left-28 bg-white rounded-lg p-2 shadow-lg"
+                >
+                  <div className="text-pink-600 font-bold text-xs">Figma & Adobe XD</div>
+                </motion.div>
+
+                {/* 10시 방향 */}
+                <motion.div
+                  id="floating-jira-notion"
+                  animate={{ 
+                    y: [0, -6, 0],
+                    x: [0, -16, 0],
+                    rotate: [0, 1, 0]
+                  }}
+                  transition={{ 
+                    duration: 4.0,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1.2
+                  }}
+                  className="absolute top-1/4 -left-20 bg-white rounded-lg p-2 shadow-lg"
+                >
+                  <div className="text-blue-700 font-bold text-xs">Jira & Notion</div>
+                </motion.div>
+
+                {/* 11시 방향 */}
+                <motion.div
+                  id="floating-vercel-netlify"
+                  animate={{ 
+                    y: [0, -8, 0],
+                    x: [0, -8, 0],
                     rotate: [0, -2, 0]
                   }}
                   transition={{ 
                     duration: 4.2,
                     repeat: Infinity,
                     ease: "easeInOut",
-                    delay: 2.5
+                    delay: 1.5
                   }}
-                  className="absolute top-1/3 -left-20 bg-white rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-yellow-600 font-bold text-xs">Python & Django</div>
-                </motion.div>
-
-                <motion.div
-                  id="floating-postgres-mongo"
-                  animate={{ 
-                    x: [0, 8, 0],
-                    rotate: [0, 2, 0]
-                  }}
-                  transition={{ 
-                    duration: 3.6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 0.8
-                  }}
-                  className="absolute bottom-1/3 -right-20 bg-white rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-blue-500 font-bold text-xs">PostgreSQL & MongoDB</div>
-                </motion.div>
-
-                <motion.div
-                  id="floating-aws-docker"
-                  animate={{ 
-                    y: [0, -6, 0],
-                    rotate: [0, 3, 0]
-                  }}
-                  transition={{ 
-                    duration: 3.4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1.2
-                  }}
-                  className="absolute top-1/6 -left-24 bg-white rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-orange-600 font-bold text-xs">AWS & Docker</div>
-                </motion.div>
-
-                <motion.div
-                  id="floating-git-github"
-                  animate={{ 
-                    x: [0, -6, 0],
-                    rotate: [0, -3, 0]
-                  }}
-                  transition={{ 
-                    duration: 3.7,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1.8
-                  }}
-                  className="absolute bottom-1/6 -right-24 bg-white rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-gray-700 font-bold text-xs">Git & GitHub</div>
-                </motion.div>
-
-                <motion.div
-                  id="floating-figma-adobe"
-                  animate={{ 
-                    y: [0, 6, 0],
-                    rotate: [0, 2, 0]
-                  }}
-                  transition={{ 
-                    duration: 3.9,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 2.2
-                  }}
-                  className="absolute top-2/3 -left-28 bg-white rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-pink-600 font-bold text-xs">Figma & Adobe XD</div>
-                </motion.div>
-
-                <motion.div
-                  id="floating-jira-notion"
-                  animate={{ 
-                    x: [0, 6, 0],
-                    rotate: [0, -2, 0]
-                  }}
-                  transition={{ 
-                    duration: 4.1,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 0.3
-                  }}
-                  className="absolute bottom-2/3 -right-28 bg-white rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-blue-700 font-bold text-xs">Jira & Notion</div>
-                </motion.div>
-
-                <motion.div
-                  id="floating-vercel-netlify"
-                  animate={{ 
-                    y: [0, -4, 0],
-                    rotate: [0, 1, 0]
-                  }}
-                  transition={{ 
-                    duration: 3.3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1.6
-                  }}
-                  className="absolute top-3/4 -left-32 bg-white rounded-lg p-3 shadow-lg"
+                  className="absolute top-4 left-8 bg-white rounded-lg p-2 shadow-lg"
                 >
                   <div className="text-black font-bold text-xs">Vercel & Netlify</div>
                 </motion.div>
