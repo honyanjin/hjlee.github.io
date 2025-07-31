@@ -138,7 +138,7 @@ const Home = () => {
                 </div>
                 
                 {/* Floating Elements - Clockwise Arrangement (Wider Spread) */}
-                {/* 12시 방향 */}
+                {/* 12시 방향 - 메인 스킬 (큰 크기) */}
                 <motion.div
                   id="floating-react-typescript"
                   animate={{ 
@@ -150,12 +150,12 @@ const Home = () => {
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
-                  className="absolute -top-12 left-32 transform -translate-x-1/2 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute -top-12 left-32 transform -translate-x-1/2 bg-white rounded-lg p-3 shadow-lg"
                 >
-                  <div className="text-blue-600 font-bold text-xs">React & TypeScript</div>
+                  <div className="text-blue-600 font-bold text-sm">React & TypeScript</div>
                 </motion.div>
                 
-                {/* 1시 방향 */}
+                {/* 1시 방향 - 중간 크기 */}
                 <motion.div
                   id="floating-next-vue"
                   animate={{ 
@@ -174,7 +174,7 @@ const Home = () => {
                   <div className="text-purple-600 font-bold text-xs">Next.js & Vue.js</div>
                 </motion.div>
                 
-                {/* 2시 방향 */}
+                {/* 2시 방향 - 작은 크기 */}
                 <motion.div
                   id="floating-tailwind-styled"
                   animate={{ 
@@ -188,12 +188,12 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 0.6
                   }}
-                  className="absolute top-1/4 -right-20 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute top-1/4 -right-20 bg-white rounded-lg p-1.5 shadow-lg"
                 >
                   <div className="text-cyan-600 font-bold text-xs">Tailwind & Styled</div>
                 </motion.div>
 
-                {/* 3시 방향 */}
+                {/* 3시 방향 - 중간 크기 */}
                 <motion.div
                   id="floating-framer-gsap"
                   animate={{ 
@@ -211,7 +211,7 @@ const Home = () => {
                   <div className="text-purple-500 font-bold text-xs">Framer & GSAP</div>
                 </motion.div>
 
-                {/* 4시 방향 */}
+                {/* 4시 방향 - 큰 크기 */}
                 <motion.div
                   id="floating-node-express"
                   animate={{ 
@@ -225,12 +225,12 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.2
                   }}
-                  className="absolute bottom-1/4 -right-20 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute bottom-1/4 -right-20 bg-white rounded-lg p-3 shadow-lg"
                 >
-                  <div className="text-green-600 font-bold text-xs">Node.js & Express</div>
+                  <div className="text-green-600 font-bold text-sm">Node.js & Express</div>
                 </motion.div>
 
-                {/* 5시 방향 */}
+                {/* 5시 방향 - 작은 크기 */}
                 <motion.div
                   id="floating-python-django"
                   animate={{ 
@@ -244,12 +244,12 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.5
                   }}
-                  className="absolute bottom-4 right-8 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute bottom-4 right-8 bg-white rounded-lg p-1.5 shadow-lg"
                 >
                   <div className="text-yellow-600 font-bold text-xs">Python & Django</div>
                 </motion.div>
 
-                {/* 6시 방향 */}
+                {/* 6시 방향 - 메인 스킬 (큰 크기) */}
                 <motion.div
                   id="floating-postgres-mongo"
                   animate={{ 
@@ -262,12 +262,12 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.8
                   }}
-                  className="absolute -bottom-8 left-28 transform -translate-x-1/2 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute -bottom-8 left-28 transform -translate-x-1/2 bg-white rounded-lg p-3 shadow-lg"
                 >
-                  <div className="text-blue-500 font-bold text-xs">PostgreSQL & MongoDB</div>
+                  <div className="text-blue-500 font-bold text-sm">PostgreSQL & MongoDB</div>
                 </motion.div>
 
-                {/* 7시 방향 */}
+                {/* 7시 방향 - 중간 크기 */}
                 <motion.div
                   id="floating-aws-docker"
                   animate={{ 
@@ -286,7 +286,7 @@ const Home = () => {
                   <div className="text-orange-600 font-bold text-xs">AWS & Docker</div>
                 </motion.div>
 
-                {/* 8시 방향 */}
+                {/* 8시 방향 - 작은 크기 */}
                 <motion.div
                   id="floating-git-github"
                   animate={{ 
@@ -300,12 +300,12 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 0.6
                   }}
-                  className="absolute bottom-1/4 -left-20 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute bottom-1/4 -left-20 bg-white rounded-lg p-1.5 shadow-lg"
                 >
                   <div className="text-gray-700 font-bold text-xs">Git & GitHub</div>
                 </motion.div>
 
-                {/* 9시 방향 */}
+                {/* 9시 방향 - 중간 크기 */}
                 <motion.div
                   id="floating-figma-adobe"
                   animate={{ 
@@ -323,7 +323,7 @@ const Home = () => {
                   <div className="text-pink-600 font-bold text-xs">Figma & Adobe XD</div>
                 </motion.div>
 
-                {/* 10시 방향 */}
+                {/* 10시 방향 - 작은 크기 */}
                 <motion.div
                   id="floating-jira-notion"
                   animate={{ 
@@ -337,12 +337,12 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.2
                   }}
-                  className="absolute top-1/4 -left-20 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute top-1/4 -left-20 bg-white rounded-lg p-1.5 shadow-lg"
                 >
                   <div className="text-blue-700 font-bold text-xs">Jira & Notion</div>
                 </motion.div>
 
-                {/* 11시 방향 */}
+                {/* 11시 방향 - 중간 크기 */}
                 <motion.div
                   id="floating-vercel-netlify"
                   animate={{ 
