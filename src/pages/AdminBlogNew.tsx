@@ -12,11 +12,13 @@ import {
   X,
   Calendar,
   Tag,
-  User
+  User,
+  Image
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import type { BlogPost } from '../lib/supabase'
+import ImageUpload from '../components/ImageUpload'
 
 const postSchema = z.object({
   title: z.string().min(1, '제목을 입력해주세요'),
@@ -34,6 +36,7 @@ const AdminBlogNew = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [previewMode, setPreviewMode] = useState(false)
+  const [imageUrl, setImageUrl] = useState('')
   
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -71,6 +74,7 @@ const AdminBlogNew = () => {
         category: data.category,
         author: user?.email || 'Unknown',
         tags,
+        image_url: imageUrl,
         is_published: data.is_published,
         published_at: data.is_published ? new Date().toISOString() : null
       }
@@ -231,6 +235,17 @@ const AdminBlogNew = () => {
                   id="tags"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   placeholder="태그를 쉼표로 구분하여 입력하세요 (예: React, TypeScript, Frontend)"
+                />
+              </div>
+
+              {/* Featured Image */}
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  대표 이미지
+                </label>
+                <ImageUpload
+                  onImageUpload={setImageUrl}
+                  currentImage={imageUrl}
                 />
               </div>
             </div>
