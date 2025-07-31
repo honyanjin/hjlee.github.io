@@ -120,6 +120,12 @@ const Blog = () => {
     }
   }
 
+  // 배경 이미지용 클래스 (이미지가 없을 때)
+  const getBackgroundClass = (post: BlogPost) => {
+    if (post.image_url) return ""
+    return getCategoryClass(post.category || '')
+  }
+
   const featuredPost = posts[0]
 
   return (
@@ -223,7 +229,7 @@ const Blog = () => {
                   ) : (
                     <div 
                       id="featured-post-image"
-                      {...getPostImageProps(featuredPost)}
+                      className={`w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300 ${getBackgroundClass(featuredPost)}`}
                     >
                       <div className="text-white text-center">
                         <div className="text-4xl font-bold mb-2">{featuredPost.category?.toUpperCase()}</div>
@@ -330,8 +336,7 @@ const Blog = () => {
                     ) : (
                       <div 
                         id={`blog-post-image-${post.id}`}
-                        {...getPostImageProps(post)}
-                        className="w-full h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300"
+                        className={`w-full h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300 ${getBackgroundClass(post)}`}
                       >
                         <div className="text-white text-center">
                           <div className="text-2xl font-bold mb-1">{post.category?.toUpperCase()}</div>
