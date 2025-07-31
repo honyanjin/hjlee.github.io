@@ -11,7 +11,7 @@ const Home = () => {
       id: 1,
       title: 'E-Commerce Platform',
       category: 'web',
-      image: 'https://via.placeholder.com/400x300/3B82F6/FFFFFF?text=E-Commerce',
+      image: '/src/content/pic_projects/Project_Temp_0.jpg',
       description: 'React와 Node.js로 개발한 풀스택 이커머스 플랫폼',
       tags: ['React', 'Node.js', 'MongoDB']
     },
@@ -19,7 +19,7 @@ const Home = () => {
       id: 2,
       title: 'Task Management App',
       category: 'app',
-      image: 'https://via.placeholder.com/400x300/10B981/FFFFFF?text=Task+App',
+      image: '/src/content/pic_projects/Project_Temp_1.jpg',
       description: 'TypeScript와 Firebase를 활용한 실시간 태스크 관리 앱',
       tags: ['TypeScript', 'Firebase', 'Tailwind']
     },
@@ -27,7 +27,7 @@ const Home = () => {
       id: 3,
       title: 'Portfolio Website',
       category: 'web',
-      image: 'https://via.placeholder.com/400x300/8B5CF6/FFFFFF?text=Portfolio',
+      image: '/src/content/pic_projects/Project_Temp_2.jpg',
       description: 'React와 Tailwind CSS로 제작한 반응형 포트폴리오',
       tags: ['React', 'Tailwind', 'Framer Motion']
     },
@@ -35,7 +35,7 @@ const Home = () => {
       id: 4,
       title: 'Weather Dashboard',
       category: 'app',
-      image: 'https://via.placeholder.com/400x300/F59E0B/FFFFFF?text=Weather',
+      image: '/src/content/pic_projects/Project_Temp_3.jpg',
       description: 'OpenWeather API를 활용한 날씨 대시보드',
       tags: ['JavaScript', 'API', 'CSS3']
     }
