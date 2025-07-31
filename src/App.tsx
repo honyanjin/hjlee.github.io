@@ -7,13 +7,15 @@ import Contact from './pages/Contact'
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/projects" element={<Projects />} />
-      <Route path="/blog" element={<Blog />} />
-      <Route path="/contact" element={<Contact />} />
-    </Routes>
+    <div id="app">
+      <Routes>
+        <Route id="home-route" path="/" element={<Home />} />
+        <Route id="about-route" path="/about" element={<About />} />
+        <Route id="projects-route" path="/projects" element={<Projects />} />
+        <Route id="blog-route" path="/blog" element={<Blog />} />
+        <Route id="contact-route" path="/contact" element={<Contact />} />
+      </Routes>
+    </div>
   )
 }
 

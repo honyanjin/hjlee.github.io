@@ -34,68 +34,71 @@ const About = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div id="about-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
+      <section id="about-hero" className="pt-32 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="about-hero-content"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h1 id="about-hero-title" className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
               About Me
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p id="about-hero-description" className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다.
               깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다.
             </p>
           </motion.div>
 
           {/* Profile Section */}
-          <div className="grid lg:grid-cols-3 gap-12">
+          <div id="profile-section" className="grid lg:grid-cols-3 gap-12">
             {/* Profile Image */}
             <motion.div
+              id="profile-image-section"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="lg:col-span-1"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                <div className="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-lg">
+              <div id="profile-card" className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                <div id="profile-image-container" className="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-lg">
                   <img 
+                    id="profile-image"
                     src="/src/content/pic_profile/hjlee_Profile_0.JPG" 
                     alt="HJLEE Profile" 
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-4">
+                <h2 id="profile-name" className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-4">
                   HJLEE
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+                <p id="profile-title" className="text-gray-600 dark:text-gray-300 text-center mb-6">
                   풀스택 개발자 & UI/UX 디자이너
                 </p>
                 
                 {/* Contact Info */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
+                <div id="contact-info" className="space-y-3">
+                  <div id="contact-email" className="flex items-center gap-3">
                     <Mail size={20} className="text-blue-600" />
                     <span className="text-gray-700 dark:text-gray-300">email@example.com</span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div id="contact-location" className="flex items-center gap-3">
                     <MapPin size={20} className="text-blue-600" />
                     <span className="text-gray-700 dark:text-gray-300">서울, 대한민국</span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div id="contact-birth" className="flex items-center gap-3">
                     <Calendar size={20} className="text-blue-600" />
                     <span className="text-gray-700 dark:text-gray-300">1995년생</span>
                   </div>
                 </div>
 
-                <button className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                <button id="download-resume-btn" className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
                   <Download size={20} />
                   이력서 다운로드
                 </button>
@@ -104,16 +107,17 @@ const About = () => {
 
             {/* About Content */}
             <motion.div
+              id="about-content-section"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="lg:col-span-2"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <div id="about-intro-card" className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
+                <h3 id="about-intro-title" className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                   자기소개
                 </h3>
-                <div className="space-y-4 text-gray-600 dark:text-gray-300">
+                <div id="about-intro-content" className="space-y-4 text-gray-600 dark:text-gray-300">
                   <p>
                     안녕하세요! 저는 3년차 풀스택 개발자입니다. React, TypeScript, Node.js를 주로 사용하며,
                     사용자 경험을 중시하는 웹 애플리케이션을 개발하는 것을 좋아합니다.
@@ -130,15 +134,15 @@ const About = () => {
               </div>
 
               {/* Skills */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <div id="skills-card" className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
+                <h3 id="skills-title" className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                   기술 스택
                 </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Frontend</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
+                <div id="skills-grid" className="grid md:grid-cols-2 gap-6">
+                  <div id="frontend-skills">
+                    <h4 id="frontend-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Frontend</h4>
+                    <div id="frontend-skills-list" className="space-y-2">
+                      <div id="react-skill" className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-300">React</span>
                         <span className="text-blue-600">90%</span>
                       </div>
@@ -146,7 +150,7 @@ const About = () => {
                         <div className="bg-blue-600 h-2 rounded-full" style={{ width: '90%' }}></div>
                       </div>
                       
-                      <div className="flex justify-between">
+                      <div id="typescript-skill" className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-300">TypeScript</span>
                         <span className="text-blue-600">85%</span>
                       </div>
@@ -154,7 +158,7 @@ const About = () => {
                         <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div>
                       </div>
                       
-                      <div className="flex justify-between">
+                      <div id="tailwind-skill" className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-300">Tailwind CSS</span>
                         <span className="text-blue-600">80%</span>
                       </div>
@@ -164,10 +168,10 @@ const About = () => {
                     </div>
                   </div>
                   
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Backend</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
+                  <div id="backend-skills">
+                    <h4 id="backend-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Backend</h4>
+                    <div id="backend-skills-list" className="space-y-2">
+                      <div id="nodejs-skill" className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-300">Node.js</span>
                         <span className="text-blue-600">85%</span>
                       </div>
@@ -175,7 +179,7 @@ const About = () => {
                         <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div>
                       </div>
                       
-                      <div className="flex justify-between">
+                      <div id="postgresql-skill" className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-300">PostgreSQL</span>
                         <span className="text-blue-600">75%</span>
                       </div>
@@ -183,7 +187,7 @@ const About = () => {
                         <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
                       </div>
                       
-                      <div className="flex justify-between">
+                      <div id="docker-skill" className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-300">Docker</span>
                         <span className="text-blue-600">70%</span>
                       </div>
@@ -200,27 +204,29 @@ const About = () => {
       </section>
 
       {/* Experience Section */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800">
+      <section id="experience-section" className="py-20 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="experience-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="experience-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               경력 사항
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="experience-description" className="text-xl text-gray-600 dark:text-gray-300">
               지금까지의 경력을 소개합니다
             </p>
           </motion.div>
 
-          <div className="space-y-8">
+          <div id="experience-list" className="space-y-8">
             {experiences.map((exp, index) => (
               <motion.div
                 key={index}
+                id={`experience-item-${index}`}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
@@ -233,17 +239,17 @@ const About = () => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-2">
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      <h3 id={`experience-title-${index}`} className="text-xl font-semibold text-gray-900 dark:text-white">
                         {exp.title}
                       </h3>
-                      <span className="text-sm text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full">
+                      <span id={`experience-year-${index}`} className="text-sm text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full">
                         {exp.year}
                       </span>
                     </div>
-                    <p className="text-lg text-gray-600 dark:text-gray-300 mb-2">
+                    <p id={`experience-company-${index}`} className="text-lg text-gray-600 dark:text-gray-300 mb-2">
                       {exp.company}
                     </p>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p id={`experience-description-${index}`} className="text-gray-600 dark:text-gray-400">
                       {exp.description}
                     </p>
                   </div>
@@ -255,27 +261,29 @@ const About = () => {
       </section>
 
       {/* Education Section */}
-      <section className="py-20 px-4">
+      <section id="education-section" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="education-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="education-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               학력 사항
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="education-description" className="text-xl text-gray-600 dark:text-gray-300">
               교육 배경을 소개합니다
             </p>
           </motion.div>
 
-          <div className="space-y-8">
+          <div id="education-list" className="space-y-8">
             {education.map((edu, index) => (
               <motion.div
                 key={index}
+                id={`education-item-${index}`}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
@@ -290,17 +298,17 @@ const About = () => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-2">
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      <h3 id={`education-degree-${index}`} className="text-xl font-semibold text-gray-900 dark:text-white">
                         {edu.degree}
                       </h3>
-                      <span className="text-sm text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full">
+                      <span id={`education-year-${index}`} className="text-sm text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full">
                         {edu.year}
                       </span>
                     </div>
-                    <p className="text-lg text-gray-600 dark:text-gray-300 mb-2">
+                    <p id={`education-school-${index}`} className="text-lg text-gray-600 dark:text-gray-300 mb-2">
                       {edu.school}
                     </p>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p id={`education-description-${index}`} className="text-gray-600 dark:text-gray-400">
                       {edu.description}
                     </p>
                   </div>

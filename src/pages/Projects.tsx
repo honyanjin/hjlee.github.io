@@ -82,32 +82,34 @@ const Projects = () => {
   const featuredProjects = projects.filter(project => project.featured)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div id="projects-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
+      <section id="projects-hero" className="pt-32 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="projects-hero-content"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h1 id="projects-hero-title" className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
               My Projects
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p id="projects-hero-description" className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               지금까지 작업한 프로젝트들을 소개합니다. 
               각 프로젝트는 사용자 경험을 중시하며, 최신 기술 스택을 활용하여 개발되었습니다.
             </p>
           </motion.div>
 
           {/* Filter Buttons */}
-          <div className="flex justify-center gap-4 mb-12">
+          <div id="project-filters" className="flex justify-center gap-4 mb-12">
             {['all', 'web', 'app'].map((filter) => (
               <button
                 key={filter}
+                id={`filter-${filter}`}
                 onClick={() => setActiveFilter(filter)}
                 className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                   activeFilter === filter
@@ -123,27 +125,29 @@ const Projects = () => {
       </section>
 
       {/* Featured Projects */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800">
+      <section id="featured-projects-section" className="py-20 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="featured-projects-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="featured-projects-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Featured Projects
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="featured-projects-description" className="text-xl text-gray-600 dark:text-gray-300">
               대표 프로젝트들을 소개합니다
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div id="featured-projects-grid" className="grid lg:grid-cols-2 gap-8">
             {featuredProjects.map((project, index) => (
               <motion.div
                 key={project.id}
+                id={`featured-project-${project.id}`}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
@@ -152,12 +156,14 @@ const Projects = () => {
               >
                 <div className="relative overflow-hidden">
                   <img 
+                    id={`featured-project-image-${project.id}`}
                     src={project.image} 
                     alt={project.title}
                     className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-4 right-4 flex gap-2">
                     <a 
+                      id={`featured-project-live-${project.id}`}
                       href={project.liveUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
@@ -166,6 +172,7 @@ const Projects = () => {
                       <ExternalLink size={16} />
                     </a>
                     <a 
+                      id={`featured-project-github-${project.id}`}
                       href={project.githubUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
@@ -176,13 +183,13 @@ const Projects = () => {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+                  <h3 id={`featured-project-title-${project.id}`} className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
                     {project.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  <p id={`featured-project-description-${project.id}`} className="text-gray-600 dark:text-gray-300 mb-4">
                     {project.description}
                   </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div id={`featured-project-tags-${project.id}`} className="flex flex-wrap gap-2 mb-4">
                     {project.tags.map((tag) => (
                       <span 
                         key={tag}
@@ -192,8 +199,9 @@ const Projects = () => {
                       </span>
                     ))}
                   </div>
-                  <div className="flex gap-4">
+                  <div id={`featured-project-buttons-${project.id}`} className="flex gap-4">
                     <a 
+                      id={`featured-project-live-btn-${project.id}`}
                       href={project.liveUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
@@ -203,6 +211,7 @@ const Projects = () => {
                       Live Demo
                     </a>
                     <a 
+                      id={`featured-project-source-btn-${project.id}`}
                       href={project.githubUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
@@ -220,27 +229,29 @@ const Projects = () => {
       </section>
 
       {/* All Projects */}
-      <section className="py-20 px-4">
+      <section id="all-projects-section" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="all-projects-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="all-projects-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               All Projects
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="all-projects-description" className="text-xl text-gray-600 dark:text-gray-300">
               모든 프로젝트를 확인해보세요
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div id="all-projects-grid" className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map((project, index) => (
               <motion.div
                 key={project.id}
+                id={`project-${project.id}`}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
@@ -249,6 +260,7 @@ const Projects = () => {
               >
                 <div className="relative overflow-hidden">
                   <img 
+                    id={`project-image-${project.id}`}
                     src={project.image} 
                     alt={project.title}
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
@@ -256,6 +268,7 @@ const Projects = () => {
                   <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
                     <div className="flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
                       <a 
+                        id={`project-live-${project.id}`}
                         href={project.liveUrl} 
                         target="_blank" 
                         rel="noopener noreferrer"
@@ -264,6 +277,7 @@ const Projects = () => {
                         <ExternalLink size={16} />
                       </a>
                       <a 
+                        id={`project-github-${project.id}`}
                         href={project.githubUrl} 
                         target="_blank" 
                         rel="noopener noreferrer"
@@ -275,13 +289,13 @@ const Projects = () => {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 id={`project-title-${project.id}`} className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                     {project.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                  <p id={`project-description-${project.id}`} className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
                     {project.description}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div id={`project-tags-${project.id}`} className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                       <span 
                         key={tag}

@@ -46,65 +46,191 @@ const Home = () => {
     : projects.filter(project => project.category === activeFilter)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div id="home-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600">
-        <div className="text-center text-white z-10">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-6xl font-bold mb-4"
-          >
-            HJLEE
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl mb-8"
-          >
-            풀스택 개발자 & UI/UX 디자이너
-          </motion.p>
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex justify-center gap-4"
-          >
-            <button className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2">
-              <Download size={20} />
-              이력서 다운로드
-            </button>
-            <button className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
-              프로젝트 보기
-            </button>
-          </motion.div>
-        </div>
-        
+      <section id="hero-section" className="relative h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 overflow-hidden">
         {/* Background Animation */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div id="hero-background" className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-10 rounded-full"></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white opacity-10 rounded-full"></div>
+          <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white opacity-5 rounded-full"></div>
+          <div className="absolute bottom-1/4 right-1/3 w-24 h-24 bg-white opacity-5 rounded-full"></div>
         </div>
+
+        <div id="hero-content" className="relative z-10 max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Text Content */}
+            <motion.div
+              id="hero-text"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-white text-center lg:text-left"
+            >
+              <motion.h1 
+                id="hero-title"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-5xl lg:text-6xl font-bold mb-4"
+              >
+                안녕하세요!<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
+                  HJLEE
+                </span>입니다
+              </motion.h1>
+              <motion.p 
+                id="hero-subtitle"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="text-xl lg:text-2xl mb-8 text-blue-100"
+              >
+                풀스택 개발자 & UI/UX 디자이너
+              </motion.p>
+              <motion.p 
+                id="hero-description"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="text-lg mb-8 text-blue-100 max-w-lg"
+              >
+                사용자 경험을 중시하는 웹 애플리케이션을 개발합니다.
+                React, TypeScript, Node.js를 주로 사용하며,
+                깔끔하고 직관적인 솔루션을 제공합니다.
+              </motion.p>
+              <motion.div 
+                id="hero-buttons"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              >
+                <button id="download-resume-btn" className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
+                  <Download size={20} />
+                  이력서 다운로드
+                </button>
+                <button id="view-projects-btn" className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                  프로젝트 보기
+                </button>
+              </motion.div>
+            </motion.div>
+
+            {/* Profile Image */}
+            <motion.div
+              id="hero-profile"
+              initial={{ opacity: 0, x: 50, scale: 0.8 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex justify-center lg:justify-end"
+            >
+              <div className="relative">
+                {/* Main Profile Image */}
+                <div id="profile-image-container" className="relative w-80 h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl border-4 border-white/20">
+                  <img 
+                    id="profile-image"
+                    src="/src/content/pic_profile/hjlee_Profile_0.JPG" 
+                    alt="HJLEE Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                {/* Floating Elements */}
+                <motion.div
+                  id="floating-react"
+                  animate={{ 
+                    y: [0, -10, 0],
+                    rotate: [0, 5, 0]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute -top-4 -right-4 bg-white rounded-lg p-3 shadow-lg"
+                >
+                  <div className="text-blue-600 font-bold text-sm">React</div>
+                </motion.div>
+                
+                <motion.div
+                  id="floating-typescript"
+                  animate={{ 
+                    y: [0, 10, 0],
+                    rotate: [0, -5, 0]
+                  }}
+                  transition={{ 
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1
+                  }}
+                  className="absolute -bottom-4 -left-4 bg-white rounded-lg p-3 shadow-lg"
+                >
+                  <div className="text-purple-600 font-bold text-sm">TypeScript</div>
+                </motion.div>
+                
+                <motion.div
+                  id="floating-nodejs"
+                  animate={{ 
+                    x: [0, 10, 0],
+                    rotate: [0, 3, 0]
+                  }}
+                  transition={{ 
+                    duration: 3.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 2
+                  }}
+                  className="absolute top-1/2 -left-8 bg-white rounded-lg p-3 shadow-lg"
+                >
+                  <div className="text-green-600 font-bold text-sm">Node.js</div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          id="scroll-indicator"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1.5 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        >
+          <motion.div
+            id="scroll-indicator-container"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-6 h-10 border-2 border-white rounded-full flex justify-center"
+          >
+            <motion.div
+              id="scroll-indicator-dot"
+              animate={{ y: [0, 12, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-1 h-3 bg-white rounded-full mt-2"
+            />
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* About Section */}
-      <section className="py-20 px-4">
+      <section id="about-section" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div 
+            id="about-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="about-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               About Me
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p id="about-description" className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다. 
               React, TypeScript, Node.js를 주로 사용하며, 
               깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다.
@@ -112,8 +238,9 @@ const Home = () => {
           </motion.div>
 
           {/* Skills Grid */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div id="skills-grid" className="grid md:grid-cols-3 gap-8 mb-16">
             <motion.div 
+              id="frontend-skills"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
@@ -130,6 +257,7 @@ const Home = () => {
             </motion.div>
 
             <motion.div 
+              id="backend-skills"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -146,6 +274,7 @@ const Home = () => {
             </motion.div>
 
             <motion.div 
+              id="tools-skills"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -165,28 +294,30 @@ const Home = () => {
       </section>
 
       {/* Projects Section */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800">
+      <section id="projects-section" className="py-20 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-6xl mx-auto">
           <motion.div 
+            id="projects-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="projects-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               My Projects
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="projects-description" className="text-xl text-gray-600 dark:text-gray-300">
               최근 작업한 프로젝트들을 소개합니다
             </p>
           </motion.div>
 
           {/* Filter Buttons */}
-          <div className="flex justify-center gap-4 mb-12">
+          <div id="project-filters" className="flex justify-center gap-4 mb-12">
             {['all', 'web', 'app'].map((filter) => (
               <button
                 key={filter}
+                id={`filter-${filter}`}
                 onClick={() => setActiveFilter(filter)}
                 className={`px-6 py-2 rounded-lg font-medium transition-colors ${
                   activeFilter === filter
@@ -200,10 +331,11 @@ const Home = () => {
           </div>
 
           {/* Projects Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+          <div id="projects-grid" className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
             {filteredProjects.map((project, index) => (
               <motion.div
                 key={project.id}
+                id={`project-${project.id}`}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
@@ -212,24 +344,25 @@ const Home = () => {
               >
                 <div className="relative overflow-hidden">
                   <img 
+                    id={`project-image-${project.id}`}
                     src={project.image} 
                     alt={project.title}
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                    <button className="bg-white text-gray-900 px-4 py-2 rounded-lg opacity-0 hover:opacity-100 transition-opacity">
+                    <button id={`project-view-btn-${project.id}`} className="bg-white text-gray-900 px-4 py-2 rounded-lg opacity-0 hover:opacity-100 transition-opacity">
                       자세히 보기
                     </button>
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 id={`project-title-${project.id}`} className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                     {project.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  <p id={`project-description-${project.id}`} className="text-gray-600 dark:text-gray-300 mb-4">
                     {project.description}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div id={`project-tags-${project.id}`} className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                       <span 
                         key={tag}
@@ -247,30 +380,31 @@ const Home = () => {
       </section>
 
       {/* Contact Section */}
-      <section className="py-20 px-4">
+      <section id="contact-section" className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div 
+            id="contact-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="contact-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Get In Touch
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+            <p id="contact-description" className="text-xl text-gray-600 dark:text-gray-300 mb-8">
               프로젝트나 협업에 관심이 있으시다면 언제든 연락주세요!
             </p>
-            <div className="flex justify-center gap-6">
-              <a href="mailto:email@example.com" className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            <div id="contact-buttons" className="flex justify-center gap-6">
+              <a id="email-contact-btn" href="mailto:email@example.com" className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
                 <Mail size={20} />
                 이메일 보내기
               </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition-colors">
+              <a id="github-contact-btn" href="https://github.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition-colors">
                 <Github size={20} />
                 GitHub
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors">
+              <a id="linkedin-contact-btn" href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors">
                 <Linkedin size={20} />
                 LinkedIn
               </a>

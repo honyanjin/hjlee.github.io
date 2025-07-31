@@ -98,32 +98,34 @@ const Blog = () => {
   const featuredPost = blogPosts[0]
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div id="blog-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
+      <section id="blog-hero" className="pt-32 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="blog-hero-content"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h1 id="blog-hero-title" className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Blog
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p id="blog-hero-description" className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               개발 경험과 기술적인 내용을 공유하는 블로그입니다. 
               새로운 기술을 배우고 적용하는 과정에서 얻은 인사이트를 나눕니다.
             </p>
           </motion.div>
 
           {/* Category Filter */}
-          <div className="flex justify-center gap-4 mb-12">
+          <div id="blog-category-filters" className="flex justify-center gap-4 mb-12">
             {categories.map((category) => (
               <button
                 key={category.id}
+                id={`category-filter-${category.id}`}
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeCategory === category.id
@@ -139,24 +141,26 @@ const Blog = () => {
       </section>
 
       {/* Featured Post */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800">
+      <section id="featured-post-section" className="py-20 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="featured-post-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="featured-post-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Featured Post
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="featured-post-description" className="text-xl text-gray-600 dark:text-gray-300">
               최신 블로그 포스트를 확인해보세요
             </p>
           </motion.div>
 
           <motion.div
+            id="featured-post-card"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -166,6 +170,7 @@ const Blog = () => {
             <div className="grid lg:grid-cols-2">
               <div className="relative overflow-hidden">
                 <img 
+                  id="featured-post-image"
                   src={featuredPost.image} 
                   alt={featuredPost.title}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
@@ -173,30 +178,30 @@ const Blog = () => {
               </div>
               <div className="p-8">
                 <div className="flex items-center gap-4 mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
+                  <span id="featured-post-category" className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
                     {featuredPost.category}
                   </span>
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                     <Calendar size={16} />
-                    <span className="text-sm">{featuredPost.date}</span>
+                    <span id="featured-post-date" className="text-sm">{featuredPost.date}</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                     <Clock size={16} />
-                    <span className="text-sm">{featuredPost.readTime}</span>
+                    <span id="featured-post-read-time" className="text-sm">{featuredPost.readTime}</span>
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <h3 id="featured-post-title-text" className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                   {featuredPost.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                <p id="featured-post-excerpt" className="text-gray-600 dark:text-gray-300 mb-6">
                   {featuredPost.excerpt}
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                     <User size={16} />
-                    <span className="text-sm">{featuredPost.author}</span>
+                    <span id="featured-post-author" className="text-sm">{featuredPost.author}</span>
                   </div>
-                  <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                  <button id="featured-post-read-more" className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
                     <span>자세히 보기</span>
                     <ArrowRight size={16} />
                   </button>
@@ -208,27 +213,29 @@ const Blog = () => {
       </section>
 
       {/* All Posts */}
-      <section className="py-20 px-4">
+      <section id="all-posts-section" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
+            id="all-posts-header"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="all-posts-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               All Posts
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="all-posts-description" className="text-xl text-gray-600 dark:text-gray-300">
               모든 블로그 포스트를 확인해보세요
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div id="all-posts-grid" className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post, index) => (
               <motion.div
                 key={post.id}
+                id={`blog-post-${post.id}`}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
@@ -237,12 +244,13 @@ const Blog = () => {
               >
                 <div className="relative overflow-hidden">
                   <img 
+                    id={`blog-post-image-${post.id}`}
                     src={post.image} 
                     alt={post.title}
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-blue-600 text-white text-sm rounded-full">
+                    <span id={`blog-post-category-${post.id}`} className="px-3 py-1 bg-blue-600 text-white text-sm rounded-full">
                       {post.category}
                     </span>
                   </div>
@@ -251,20 +259,20 @@ const Blog = () => {
                   <div className="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-1">
                       <Calendar size={14} />
-                      <span>{post.date}</span>
+                      <span id={`blog-post-date-${post.id}`}>{post.date}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock size={14} />
-                      <span>{post.readTime}</span>
+                      <span id={`blog-post-read-time-${post.id}`}>{post.readTime}</span>
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                  <h3 id={`blog-post-title-${post.id}`} className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                     {post.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                  <p id={`blog-post-excerpt-${post.id}`} className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
                     {post.excerpt}
                   </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div id={`blog-post-tags-${post.id}`} className="flex flex-wrap gap-2 mb-4">
                     {post.tags.map((tag) => (
                       <span 
                         key={tag}
@@ -277,9 +285,9 @@ const Blog = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                       <User size={14} />
-                      <span className="text-sm">{post.author}</span>
+                      <span id={`blog-post-author-${post.id}`} className="text-sm">{post.author}</span>
                     </div>
-                    <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                    <button id={`blog-post-read-more-${post.id}`} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
                       <span className="text-sm">자세히 보기</span>
                       <ArrowRight size={14} />
                     </button>
