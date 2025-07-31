@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Calendar, User, ArrowLeft, Tag, Clock } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
 import Navbar from '../components/Navbar'
 import { supabase } from '../lib/supabase'
 import type { BlogPost } from '../lib/supabase'
@@ -171,10 +174,84 @@ const BlogPost = () => {
               )}
 
               {/* Content */}
-              <div className="prose prose-lg max-w-none dark:prose-invert">
-                <div className="whitespace-pre-wrap text-gray-700 dark:text-gray-300 leading-relaxed">
+              <div className="prose prose-lg max-w-none dark:prose-invert markdown-content">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight]}
+                  components={{
+                    // 코드 블록 스타일링
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || '')
+                      return !inline && match ? (
+                        <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        </pre>
+                      ) : (
+                        <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm" {...props}>
+                          {children}
+                        </code>
+                      )
+                    },
+                    // 링크 스타일링
+                    a({ children, href, ...props }) {
+                      return (
+                        <a 
+                          href={href} 
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          {...props}
+                        >
+                          {children}
+                        </a>
+                      )
+                    },
+                    // 이미지 스타일링
+                    img({ src, alt, ...props }) {
+                      return (
+                        <img 
+                          src={src} 
+                          alt={alt}
+                          className="max-w-full h-auto rounded-lg shadow-md"
+                          onError={(e) => {
+                            // 이미지 로드 실패 시 기본 이미지로 대체
+                            const target = e.target as HTMLImageElement
+                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNjE2MTYxIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imqLvuI88L3RleHQ+PC9zdmc+'
+                          }}
+                          {...props}
+                        />
+                      )
+                    },
+                    // 테이블 스타일링
+                    table({ children, ...props }) {
+                      return (
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600" {...props}>
+                            {children}
+                          </table>
+                        </div>
+                      )
+                    },
+                    th({ children, ...props }) {
+                      return (
+                        <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 font-semibold" {...props}>
+                          {children}
+                        </th>
+                      )
+                    },
+                    td({ children, ...props }) {
+                      return (
+                        <td className="border border-gray-300 dark:border-gray-600 px-4 py-2" {...props}>
+                          {children}
+                        </td>
+                      )
+                    }
+                  }}
+                >
                   {post.content}
-                </div>
+                </ReactMarkdown>
               </div>
             </div>
           </motion.div>
