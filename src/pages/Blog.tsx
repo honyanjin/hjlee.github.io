@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { Calendar, Clock, User, ArrowRight, Search, Tag } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { supabase } from '../lib/supabase'
 import type { BlogPost } from '../lib/supabase'
 
 const Blog = () => {
+  const navigate = useNavigate()
   const [activeCategory, setActiveCategory] = useState('all')
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -270,7 +272,11 @@ const Blog = () => {
                       <User size={16} />
                       <span id="featured-post-author" className="text-sm">{featuredPost.author}</span>
                     </div>
-                    <button id="featured-post-read-more" className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                    <button 
+                      id="featured-post-read-more" 
+                      onClick={() => navigate(`/blog/${featuredPost.id}`)}
+                      className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                    >
                       <span>자세히 보기</span>
                       <ArrowRight size={16} />
                     </button>
@@ -382,7 +388,11 @@ const Blog = () => {
                         <User size={14} />
                         <span id={`blog-post-author-${post.id}`} className="text-sm">{post.author}</span>
                       </div>
-                      <button id={`blog-post-read-more-${post.id}`} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
+                      <button 
+                        id={`blog-post-read-more-${post.id}`} 
+                        onClick={() => navigate(`/blog/${post.id}`)}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                      >
                         <span className="text-sm">자세히 보기</span>
                         <ArrowRight size={14} />
                       </button>
