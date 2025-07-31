@@ -1,7 +1,25 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ExternalLink, Github, Eye } from 'lucide-react'
 import Navbar from '../components/Navbar'
+
+// Intersection Observer 커스텀 훅
+function useInView(threshold = 0.2) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new window.IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold }
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, inView] as const;
+}
 
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState('all')
@@ -127,9 +145,8 @@ const Projects = () => {
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
             className="text-center mb-16"
           >
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -141,80 +158,83 @@ const Projects = () => {
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-8">
-            {featuredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-4 right-4 flex gap-2">
-                    <a 
-                      href={project.liveUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <ExternalLink size={16} />
-                    </a>
-                    <a 
-                      href={project.githubUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <Github size={16} />
-                    </a>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-                    {project.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    {project.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tags.map((tag) => (
-                      <span 
-                        key={tag}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200"
+            {featuredProjects.map((project, index) => {
+              const [ref, inView] = useInView(0.2);
+              return (
+                <motion.div
+                  ref={ref}
+                  key={project.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+                  transition={{ duration: 0.8, delay: index * 0.2 }}
+                  className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={project.image} 
+                      alt={project.title}
+                      className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      <a 
+                        href={project.liveUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                       >
-                        {tag}
-                      </span>
-                    ))}
+                        <ExternalLink size={16} />
+                      </a>
+                      <a 
+                        href={project.githubUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <Github size={16} />
+                      </a>
+                    </div>
                   </div>
-                  <div className="flex gap-4">
-                    <a 
-                      href={project.liveUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Eye size={16} />
-                      Live Demo
-                    </a>
-                    <a 
-                      href={project.githubUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition-colors"
-                    >
-                      <Github size={16} />
-                      Source Code
-                    </a>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+                      {project.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.tags.map((tag) => (
+                        <span 
+                          key={tag}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-4">
+                      <a 
+                        href={project.liveUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <Eye size={16} />
+                        Live Demo
+                      </a>
+                      <a 
+                        href={project.githubUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition-colors"
+                      >
+                        <Github size={16} />
+                        Source Code
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
