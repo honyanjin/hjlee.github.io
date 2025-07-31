@@ -29,8 +29,31 @@ export interface BlogPost {
   is_published: boolean
 }
 
+export interface Comment {
+  id: string
+  post_id: string
+  author_name: string
+  author_email: string
+  content: string
+  created_at: string
+  updated_at: string
+}
+
+export interface CommentLimit {
+  id: string
+  post_id: string
+  daily_count: number
+  last_reset_date: string
+  is_blocked: boolean
+  blocked_until: string | null
+  created_at: string
+  updated_at: string
+}
+
 export type BlogPostInsert = Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>
 export type BlogPostUpdate = Partial<Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>>
+export type CommentInsert = Omit<Comment, 'id' | 'created_at' | 'updated_at'>
+export type CommentLimitInsert = Omit<CommentLimit, 'id' | 'created_at' | 'updated_at'>
 
 export interface Database {
   public: {
@@ -39,6 +62,16 @@ export interface Database {
         Row: BlogPost
         Insert: BlogPostInsert
         Update: BlogPostUpdate
+      }
+      comments: {
+        Row: Comment
+        Insert: CommentInsert
+        Update: Partial<Omit<Comment, 'id' | 'created_at' | 'updated_at'>>
+      }
+      comment_limits: {
+        Row: CommentLimit
+        Insert: CommentLimitInsert
+        Update: Partial<Omit<CommentLimit, 'id' | 'created_at' | 'updated_at'>>
       }
     }
   }

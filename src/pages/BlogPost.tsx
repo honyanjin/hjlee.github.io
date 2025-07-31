@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import Navbar from '../components/Navbar'
+import Comments from '../components/Comments'
 import { supabase } from '../lib/supabase'
 import type { BlogPost } from '../lib/supabase'
 
@@ -255,6 +256,13 @@ const BlogPost = () => {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Comments Section */}
+      <section className="px-4 pb-20">
+        <div className="max-w-4xl mx-auto">
+          <Comments postId={post.id} />
         </div>
       </section>
     </div>
