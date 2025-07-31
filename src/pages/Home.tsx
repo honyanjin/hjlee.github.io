@@ -143,14 +143,21 @@ const Home = () => {
                   id="floating-react-typescript"
                   animate={{ 
                     y: [0, -12, 0],
-                    rotate: [0, 3, 0]
+                    rotate: [0, 3, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.2,
+                    y: -20,
+                    rotate: 5,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 3,
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
-                  className="absolute -top-12 left-32 transform -translate-x-1/2 bg-white rounded-lg p-3 shadow-lg"
+                  className="absolute -top-12 left-32 transform -translate-x-1/2 bg-white rounded-lg p-3 shadow-lg cursor-pointer"
                 >
                   <div className="text-blue-600 font-bold text-sm">React & TypeScript</div>
                 </motion.div>
@@ -161,7 +168,15 @@ const Home = () => {
                   animate={{ 
                     y: [0, -8, 0],
                     x: [0, 8, 0],
-                    rotate: [0, 2, 0]
+                    rotate: [0, 2, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.15,
+                    y: -15,
+                    x: 15,
+                    rotate: 3,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 3.2,
@@ -169,7 +184,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 0.3
                   }}
-                  className="absolute top-4 right-8 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute top-4 right-8 bg-white rounded-lg p-2 shadow-lg cursor-pointer"
                 >
                   <div className="text-purple-600 font-bold text-xs">Next.js & Vue.js</div>
                 </motion.div>
@@ -180,7 +195,15 @@ const Home = () => {
                   animate={{ 
                     y: [0, -6, 0],
                     x: [0, 12, 0],
-                    rotate: [0, 1, 0]
+                    rotate: [0, 1, 0],
+                    scale: [1, 1.03, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.1,
+                    y: -10,
+                    x: 20,
+                    rotate: 2,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 3.4,
@@ -188,7 +211,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 0.6
                   }}
-                  className="absolute top-1/4 -right-20 bg-white rounded-lg p-1.5 shadow-lg"
+                  className="absolute top-1/4 -right-20 bg-white rounded-lg p-1.5 shadow-lg cursor-pointer"
                 >
                   <div className="text-cyan-600 font-bold text-xs">Tailwind & Styled</div>
                 </motion.div>
@@ -198,7 +221,14 @@ const Home = () => {
                   id="floating-framer-gsap"
                   animate={{ 
                     x: [0, 16, 0],
-                    rotate: [0, -2, 0]
+                    rotate: [0, -2, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.15,
+                    x: 25,
+                    rotate: -3,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 3.6,
@@ -206,7 +236,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 0.9
                   }}
-                  className="absolute top-1/2 -right-28 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute top-1/2 -right-28 bg-white rounded-lg p-2 shadow-lg cursor-pointer"
                 >
                   <div className="text-purple-500 font-bold text-xs">Framer & GSAP</div>
                 </motion.div>
@@ -217,7 +247,15 @@ const Home = () => {
                   animate={{ 
                     y: [0, 6, 0],
                     x: [0, 12, 0],
-                    rotate: [0, 2, 0]
+                    rotate: [0, 2, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.2,
+                    y: 15,
+                    x: 20,
+                    rotate: 4,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 3.8,
@@ -225,7 +263,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.2
                   }}
-                  className="absolute bottom-1/4 -right-20 bg-white rounded-lg p-3 shadow-lg"
+                  className="absolute bottom-1/4 -right-20 bg-white rounded-lg p-3 shadow-lg cursor-pointer"
                 >
                   <div className="text-green-600 font-bold text-sm">Node.js & Express</div>
                 </motion.div>
@@ -236,7 +274,15 @@ const Home = () => {
                   animate={{ 
                     y: [0, 8, 0],
                     x: [0, 8, 0],
-                    rotate: [0, -1, 0]
+                    rotate: [0, -1, 0],
+                    scale: [1, 1.03, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.1,
+                    y: 12,
+                    x: 12,
+                    rotate: -2,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 4.0,
@@ -244,7 +290,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.5
                   }}
-                  className="absolute bottom-4 right-8 bg-white rounded-lg p-1.5 shadow-lg"
+                  className="absolute bottom-4 right-8 bg-white rounded-lg p-1.5 shadow-lg cursor-pointer"
                 >
                   <div className="text-yellow-600 font-bold text-xs">Python & Django</div>
                 </motion.div>
@@ -254,7 +300,14 @@ const Home = () => {
                   id="floating-postgres-mongo"
                   animate={{ 
                     y: [0, 12, 0],
-                    rotate: [0, 3, 0]
+                    rotate: [0, 3, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.2,
+                    y: 20,
+                    rotate: 5,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 4.2,
@@ -262,7 +315,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.8
                   }}
-                  className="absolute -bottom-8 left-28 transform -translate-x-1/2 bg-white rounded-lg p-3 shadow-lg"
+                  className="absolute -bottom-8 left-28 transform -translate-x-1/2 bg-white rounded-lg p-3 shadow-lg cursor-pointer"
                 >
                   <div className="text-blue-500 font-bold text-sm">PostgreSQL & MongoDB</div>
                 </motion.div>
@@ -273,7 +326,15 @@ const Home = () => {
                   animate={{ 
                     y: [0, 8, 0],
                     x: [0, -8, 0],
-                    rotate: [0, 2, 0]
+                    rotate: [0, 2, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.15,
+                    y: 12,
+                    x: -12,
+                    rotate: 3,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 3.4,
@@ -281,7 +342,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 0.3
                   }}
-                  className="absolute bottom-4 left-8 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute bottom-4 left-8 bg-white rounded-lg p-2 shadow-lg cursor-pointer"
                 >
                   <div className="text-orange-600 font-bold text-xs">AWS & Docker</div>
                 </motion.div>
@@ -292,7 +353,15 @@ const Home = () => {
                   animate={{ 
                     y: [0, 6, 0],
                     x: [0, -16, 0],
-                    rotate: [0, -1, 0]
+                    rotate: [0, -1, 0],
+                    scale: [1, 1.03, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.1,
+                    y: 10,
+                    x: -25,
+                    rotate: -2,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 3.6,
@@ -300,7 +369,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 0.6
                   }}
-                  className="absolute bottom-1/4 -left-20 bg-white rounded-lg p-1.5 shadow-lg"
+                  className="absolute bottom-1/4 -left-20 bg-white rounded-lg p-1.5 shadow-lg cursor-pointer"
                 >
                   <div className="text-gray-700 font-bold text-xs">Git & GitHub</div>
                 </motion.div>
@@ -310,7 +379,14 @@ const Home = () => {
                   id="floating-figma-adobe"
                   animate={{ 
                     x: [0, -20, 0],
-                    rotate: [0, 2, 0]
+                    rotate: [0, 2, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.15,
+                    x: -30,
+                    rotate: 3,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 3.8,
@@ -318,7 +394,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 0.9
                   }}
-                  className="absolute top-1/2 -left-28 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute top-1/2 -left-28 bg-white rounded-lg p-2 shadow-lg cursor-pointer"
                 >
                   <div className="text-pink-600 font-bold text-xs">Figma & Adobe XD</div>
                 </motion.div>
@@ -329,7 +405,15 @@ const Home = () => {
                   animate={{ 
                     y: [0, -6, 0],
                     x: [0, -16, 0],
-                    rotate: [0, 1, 0]
+                    rotate: [0, 1, 0],
+                    scale: [1, 1.03, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.1,
+                    y: -10,
+                    x: -25,
+                    rotate: 2,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 4.0,
@@ -337,7 +421,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.2
                   }}
-                  className="absolute top-1/4 -left-20 bg-white rounded-lg p-1.5 shadow-lg"
+                  className="absolute top-1/4 -left-20 bg-white rounded-lg p-1.5 shadow-lg cursor-pointer"
                 >
                   <div className="text-blue-700 font-bold text-xs">Jira & Notion</div>
                 </motion.div>
@@ -348,7 +432,15 @@ const Home = () => {
                   animate={{ 
                     y: [0, -8, 0],
                     x: [0, -8, 0],
-                    rotate: [0, -2, 0]
+                    rotate: [0, -2, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  whileHover={{ 
+                    scale: 1.15,
+                    y: -15,
+                    x: -12,
+                    rotate: -3,
+                    transition: { duration: 0.3 }
                   }}
                   transition={{ 
                     duration: 4.2,
@@ -356,7 +448,7 @@ const Home = () => {
                     ease: "easeInOut",
                     delay: 1.5
                   }}
-                  className="absolute top-4 left-8 bg-white rounded-lg p-2 shadow-lg"
+                  className="absolute top-4 left-8 bg-white rounded-lg p-2 shadow-lg cursor-pointer"
                 >
                   <div className="text-black font-bold text-xs">Vercel & Netlify</div>
                 </motion.div>
