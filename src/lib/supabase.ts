@@ -113,6 +113,48 @@ export interface CategoryUpdate {
   icon?: string
 }
 
+export interface Project {
+  id: string
+  title: string
+  description: string
+  category: string
+  image_url?: string
+  tags: string[]
+  live_url?: string
+  github_url?: string
+  featured: boolean
+  sort_order: number
+  is_published: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectInsert {
+  title: string
+  description: string
+  category: string
+  image_url?: string
+  tags: string[]
+  live_url?: string
+  github_url?: string
+  featured?: boolean
+  sort_order?: number
+  is_published?: boolean
+}
+
+export interface ProjectUpdate {
+  title?: string
+  description?: string
+  category?: string
+  image_url?: string
+  tags?: string[]
+  live_url?: string
+  github_url?: string
+  featured?: boolean
+  sort_order?: number
+  is_published?: boolean
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -135,6 +177,11 @@ export interface Database {
         Row: Category
         Insert: CategoryInsert
         Update: CategoryUpdate
+      }
+      projects: {
+        Row: Project
+        Insert: ProjectInsert
+        Update: ProjectUpdate
       }
     }
   }

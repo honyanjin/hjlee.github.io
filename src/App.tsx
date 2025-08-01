@@ -12,6 +12,9 @@ import AdminBlog from './pages/AdminBlog'
 import AdminBlogNew from './pages/AdminBlogNew'
 import AdminBlogEdit from './pages/AdminBlogEdit'
 import AdminCategories from './pages/AdminCategories'
+import AdminProjects from './pages/AdminProjects'
+import AdminProjectNew from './pages/AdminProjectNew'
+import AdminProjectEdit from './pages/AdminProjectEdit'
 
 function App() {
   return (
@@ -60,6 +63,33 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <AdminCategories />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            id="admin-projects-route" 
+            path="/admin/projects" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminProjects />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            id="admin-project-new-route" 
+            path="/admin/projects/new" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminProjectNew />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            id="admin-project-edit-route" 
+            path="/admin/projects/edit/:id" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminProjectEdit />
               </ProtectedRoute>
             } 
           />
