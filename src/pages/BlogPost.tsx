@@ -97,71 +97,51 @@ const BlogPost = () => {
     )
   }
 
-  // 카테고리별 CSS 클래스
-  const getCategoryClass = (category: string) => {
-    // 기본 색상 (카테고리를 찾을 수 없는 경우)
-    const defaultColors: Record<string, string> = {
-      'react': 'bg-gradient-to-br from-blue-400 to-blue-600',
-      'typescript': 'bg-gradient-to-br from-blue-500 to-blue-700',
-      'javascript': 'bg-gradient-to-br from-yellow-400 to-yellow-600',
-      'css': 'bg-gradient-to-br from-blue-600 to-blue-800',
-      'backend': 'bg-gradient-to-br from-green-500 to-green-700',
-      'database': 'bg-gradient-to-br from-blue-700 to-blue-900',
-      'git': 'bg-gradient-to-br from-orange-500 to-orange-700',
-      'default': 'bg-gradient-to-br from-gray-500 to-gray-700'
-    }
-    
-    // 카테고리가 없거나 빈 문자열인 경우 기본값 반환
-    if (!category || category.trim() === '') {
-      return defaultColors['default']
-    }
-    
-    // 먼저 기본 색상에서 찾기
-    const defaultResult = defaultColors[category.toLowerCase()]
-    if (defaultResult) {
-      return defaultResult
-    }
-    
-    // 동적 카테고리에서 찾기
+  // 동적 배경 스타일 생성
+  const getBackgroundStyle = (category: string) => {
     const foundCategory = categories.find(cat => 
-      cat.id === category || 
       cat.slug === category || 
-      cat.name.toLowerCase() === category.toLowerCase()
+      cat.id === category || 
+      cat.name.toLowerCase() === category?.toLowerCase()
     )
     
     if (foundCategory) {
-      // 색상에 따른 기본 그라데이션 매핑
-      const colorToGradient: Record<string, string> = {
-        '#61DAFB': 'bg-gradient-to-br from-blue-400 to-blue-600', // React
-        '#3178C6': 'bg-gradient-to-br from-blue-500 to-blue-700', // TypeScript
-        '#F7DF1E': 'bg-gradient-to-br from-yellow-400 to-yellow-600', // JavaScript
-        '#1572B6': 'bg-gradient-to-br from-blue-600 to-blue-800', // CSS
-        '#4CAF50': 'bg-gradient-to-br from-green-500 to-green-700', // Backend
-        '#2196F3': 'bg-gradient-to-br from-blue-700 to-blue-900', // Database
-        '#F05032': 'bg-gradient-to-br from-orange-500 to-orange-700', // Git
-        '#FF6B6B': 'bg-gradient-to-br from-red-400 to-red-600', // Red
-        '#4ECDC4': 'bg-gradient-to-br from-teal-400 to-teal-600', // Teal
-        '#45B7D1': 'bg-gradient-to-br from-cyan-400 to-cyan-600', // Cyan
-        '#96CEB4': 'bg-gradient-to-br from-emerald-400 to-emerald-600', // Emerald
-        '#FFEAA7': 'bg-gradient-to-br from-amber-400 to-amber-600', // Amber
-        '#DDA0DD': 'bg-gradient-to-br from-purple-400 to-purple-600', // Purple
-        '#98D8C8': 'bg-gradient-to-br from-green-400 to-green-600', // Green
-        '#F7DC6F': 'bg-gradient-to-br from-yellow-400 to-yellow-600', // Yellow
-        '#BB8FCE': 'bg-gradient-to-br from-violet-400 to-violet-600', // Violet
-        '#85C1E9': 'bg-gradient-to-br from-sky-400 to-sky-600', // Sky
-        '#F8C471': 'bg-gradient-to-br from-orange-400 to-orange-600', // Orange
-        '#82E0AA': 'bg-gradient-to-br from-emerald-400 to-emerald-600', // Emerald
-        '#F1948A': 'bg-gradient-to-br from-rose-400 to-rose-600', // Rose
-        '#FF69B4': 'bg-gradient-to-br from-pink-400 to-pink-600', // Pink
-        '#FF1493': 'bg-gradient-to-br from-pink-500 to-pink-700', // Deep Pink
-        '#FFB6C1': 'bg-gradient-to-br from-pink-300 to-pink-500', // Light Pink
-        '#FFC0CB': 'bg-gradient-to-br from-pink-200 to-pink-400', // Pink
+      console.log('Found category:', foundCategory.name, 'Color:', foundCategory.color, 'Category input:', category)
+      
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null
       }
       
-      return colorToGradient[foundCategory.color] || defaultColors['default']
+      const rgb = hexToRgb(foundCategory.color)
+      if (rgb) {
+        const darkerRgb = {
+          r: Math.max(0, rgb.r - 40),
+          g: Math.max(0, rgb.g - 40),
+          b: Math.max(0, rgb.b - 40)
+        }
+        
+        const darkerHex = `#${darkerRgb.r.toString(16).padStart(2, '0')}${darkerRgb.g.toString(16).padStart(2, '0')}${darkerRgb.b.toString(16).padStart(2, '0')}`
+        
+        const gradientStyle = `linear-gradient(to bottom right, ${foundCategory.color}, ${darkerHex})`
+        console.log('Generated gradient style:', gradientStyle)
+        return {
+          background: gradientStyle
+        }
+      }
+      
+      console.log('Color conversion failed for:', foundCategory.color)
     }
     
-    return defaultColors['default']
+    console.log('Category not found for:', category, 'Available categories:', categories.map(c => ({ name: c.name, slug: c.slug, id: c.id })))
+    
+    return {
+      background: 'linear-gradient(to bottom right, #6B7280, #374151)'
+    }
   }
 
   return (
@@ -217,7 +197,10 @@ const BlogPost = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className={`w-full h-full flex items-center justify-center ${getCategoryClass(post.category || '')}`}>
+                <div 
+                  className="w-full h-full flex items-center justify-center"
+                  style={getBackgroundStyle(post.category || '')}
+                >
                   <div className="text-white text-center">
                     <div className="text-6xl font-bold mb-4">
                       {(() => {

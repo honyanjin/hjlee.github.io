@@ -128,44 +128,48 @@ const Blog = () => {
       return defaultResult
     }
     
-    // 동적 카테고리에서 찾기
+    // 동적 카테고리에서 찾기 (post.category는 category.slug를 저장)
     const foundCategory = categories.find(cat => 
-      cat.id === category || 
       cat.slug === category || 
+      cat.id === category || 
       cat.name.toLowerCase() === category.toLowerCase()
     )
     
     if (foundCategory) {
-      // 색상에 따른 기본 그라데이션 매핑
-      const colorToGradient: Record<string, string> = {
-        '#61DAFB': 'bg-gradient-to-br from-blue-400 to-blue-600', // React
-        '#3178C6': 'bg-gradient-to-br from-blue-500 to-blue-700', // TypeScript
-        '#F7DF1E': 'bg-gradient-to-br from-yellow-400 to-yellow-600', // JavaScript
-        '#1572B6': 'bg-gradient-to-br from-blue-600 to-blue-800', // CSS
-        '#4CAF50': 'bg-gradient-to-br from-green-500 to-green-700', // Backend
-        '#2196F3': 'bg-gradient-to-br from-blue-700 to-blue-900', // Database
-        '#F05032': 'bg-gradient-to-br from-orange-500 to-orange-700', // Git
-        '#FF6B6B': 'bg-gradient-to-br from-red-400 to-red-600', // Red
-        '#4ECDC4': 'bg-gradient-to-br from-teal-400 to-teal-600', // Teal
-        '#45B7D1': 'bg-gradient-to-br from-cyan-400 to-cyan-600', // Cyan
-        '#96CEB4': 'bg-gradient-to-br from-emerald-400 to-emerald-600', // Emerald
-        '#FFEAA7': 'bg-gradient-to-br from-amber-400 to-amber-600', // Amber
-        '#DDA0DD': 'bg-gradient-to-br from-purple-400 to-purple-600', // Purple
-        '#98D8C8': 'bg-gradient-to-br from-green-400 to-green-600', // Green
-        '#F7DC6F': 'bg-gradient-to-br from-yellow-400 to-yellow-600', // Yellow
-        '#BB8FCE': 'bg-gradient-to-br from-violet-400 to-violet-600', // Violet
-        '#85C1E9': 'bg-gradient-to-br from-sky-400 to-sky-600', // Sky
-        '#F8C471': 'bg-gradient-to-br from-orange-400 to-orange-600', // Orange
-        '#82E0AA': 'bg-gradient-to-br from-emerald-400 to-emerald-600', // Emerald
-        '#F1948A': 'bg-gradient-to-br from-rose-400 to-rose-600', // Rose
-        '#FF69B4': 'bg-gradient-to-br from-pink-400 to-pink-600', // Pink
-        '#FF1493': 'bg-gradient-to-br from-pink-500 to-pink-700', // Deep Pink
-        '#FFB6C1': 'bg-gradient-to-br from-pink-300 to-pink-500', // Light Pink
-        '#FFC0CB': 'bg-gradient-to-br from-pink-200 to-pink-400', // Pink
+      console.log('Found category:', foundCategory.name, 'Color:', foundCategory.color, 'Category input:', category)
+      
+      // 동적으로 입력된 색상을 사용하여 그라데이션 생성
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null
       }
       
-      return colorToGradient[foundCategory.color] || defaultColors['default']
+      const rgb = hexToRgb(foundCategory.color)
+      if (rgb) {
+        // 더 어두운 색상 생성 (그라데이션 끝 색상)
+        const darkerRgb = {
+          r: Math.max(0, rgb.r - 40),
+          g: Math.max(0, rgb.g - 40),
+          b: Math.max(0, rgb.b - 40)
+        }
+        
+        const darkerHex = `#${darkerRgb.r.toString(16).padStart(2, '0')}${darkerRgb.g.toString(16).padStart(2, '0')}${darkerRgb.b.toString(16).padStart(2, '0')}`
+        
+        const gradientClass = `bg-gradient-to-br from-[${foundCategory.color}] to-[${darkerHex}]`
+        console.log('Generated gradient class:', gradientClass)
+        return gradientClass
+      }
+      
+      // 색상 변환에 실패한 경우 기본 색상 사용
+      console.log('Color conversion failed for:', foundCategory.color)
+      return defaultColors['default']
     }
+    
+    console.log('Category not found for:', category, 'Available categories:', categories.map(c => ({ name: c.name, slug: c.slug, id: c.id })))
     
     return defaultColors['default']
   }
@@ -179,7 +183,7 @@ const Blog = () => {
       }
     }
     return {
-      className: `${getCategoryClass(post.category || '')} w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300`
+      className: "w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300"
     }
   }
 
@@ -187,6 +191,47 @@ const Blog = () => {
   const getBackgroundClass = (post: BlogPost) => {
     if (post.image_url) return ""
     return getCategoryClass(post.category || '')
+  }
+
+  // 동적 배경 스타일 생성
+  const getBackgroundStyle = (post: BlogPost) => {
+    if (post.image_url) return {}
+    
+    const foundCategory = categories.find(cat => 
+      cat.slug === post.category || 
+      cat.id === post.category || 
+      cat.name.toLowerCase() === post.category?.toLowerCase()
+    )
+    
+    if (foundCategory) {
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null
+      }
+      
+      const rgb = hexToRgb(foundCategory.color)
+      if (rgb) {
+        const darkerRgb = {
+          r: Math.max(0, rgb.r - 40),
+          g: Math.max(0, rgb.g - 40),
+          b: Math.max(0, rgb.b - 40)
+        }
+        
+        const darkerHex = `#${darkerRgb.r.toString(16).padStart(2, '0')}${darkerRgb.g.toString(16).padStart(2, '0')}${darkerRgb.b.toString(16).padStart(2, '0')}`
+        
+        return {
+          background: `linear-gradient(to bottom right, ${foundCategory.color}, ${darkerHex})`
+        }
+      }
+    }
+    
+    return {
+      background: 'linear-gradient(to bottom right, #6B7280, #374151)'
+    }
   }
 
   const featuredPost = posts[0]
@@ -305,17 +350,18 @@ const Blog = () => {
                       {...getPostImageProps(featuredPost)}
                       alt={featuredPost.title}
                     />
-                  ) : (
-                    <div 
-                      id="featured-post-image"
-                      className={`w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300 ${getBackgroundClass(featuredPost)}`}
-                    >
-                      <div className="text-white text-center">
-                        <div className="text-4xl font-bold mb-2">{featuredPost.category?.toUpperCase()}</div>
-                        <div className="text-lg opacity-90">Blog Post</div>
+                                      ) : (
+                      <div 
+                        id="featured-post-image"
+                        className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300"
+                        style={getBackgroundStyle(featuredPost)}
+                      >
+                        <div className="text-white text-center">
+                          <div className="text-4xl font-bold mb-2">{featuredPost.category?.toUpperCase()}</div>
+                          <div className="text-lg opacity-90">Blog Post</div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
                 <div className="p-8">
                   <div className="flex items-center gap-4 mb-4">
@@ -419,7 +465,8 @@ const Blog = () => {
                     ) : (
                       <div 
                         id={`blog-post-image-${post.id}`}
-                        className={`w-full h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300 ${getBackgroundClass(post)}`}
+                        className="w-full h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300"
+                        style={getBackgroundStyle(post)}
                       >
                         <div className="text-white text-center">
                           <div className="text-2xl font-bold mb-1">
