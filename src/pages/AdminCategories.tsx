@@ -263,6 +263,7 @@ const AdminCategories = () => {
                           {...register('color')}
                           type="color"
                           className="w-12 h-10 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer"
+                          onChange={(e) => setValue('color', e.target.value)}
                         />
                         <input
                           {...register('color')}
