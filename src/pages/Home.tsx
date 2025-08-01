@@ -1,50 +1,84 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Download } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
+import { supabase, testSupabaseConnection } from '../lib/supabase'
+
+// Project 타입 정의
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  image_url?: string;
+  tags: string[];
+  live_url?: string;
+  github_url?: string;
+  featured: boolean;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 const Home = () => {
   const [activeFilter, setActiveFilter] = useState('all')
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const projects = [
-    {
-      id: 1,
-      title: 'E-Commerce Platform',
-      category: 'web',
-      image: '/src/content/pic_projects/Project_Temp_0.jpg',
-      description: 'React와 Node.js로 개발한 풀스택 이커머스 플랫폼',
-      tags: ['React', 'Node.js', 'MongoDB']
-    },
-    {
-      id: 2,
-      title: 'Task Management App',
-      category: 'app',
-      image: '/src/content/pic_projects/Project_Temp_1.jpg',
-      description: 'TypeScript와 Firebase를 활용한 실시간 태스크 관리 앱',
-      tags: ['TypeScript', 'Firebase', 'Tailwind']
-    },
-    {
-      id: 3,
-      title: 'Portfolio Website',
-      category: 'web',
-      image: '/src/content/pic_projects/Project_Temp_2.jpg',
-      description: 'React와 Tailwind CSS로 제작한 반응형 포트폴리오',
-      tags: ['React', 'Tailwind', 'Framer Motion']
-    },
-    {
-      id: 4,
-      title: 'Weather Dashboard',
-      category: 'app',
-      image: '/src/content/pic_projects/Project_Temp_3.jpg',
-      description: 'OpenWeather API를 활용한 날씨 대시보드',
-      tags: ['JavaScript', 'API', 'CSS3']
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        console.log('홈페이지 프로젝트 데이터를 가져오는 중...')
+        
+        // 먼저 연결 테스트
+        const isConnected = await testSupabaseConnection()
+        if (!isConnected) {
+          throw new Error('Supabase 연결에 실패했습니다.')
+        }
+        
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('is_published', true)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: false })
+          .limit(4) // 홈페이지에서는 최대 4개만 표시
+
+        console.log('Supabase 응답:', { data, error })
+
+        if (error) {
+          console.error('Supabase 에러:', error)
+          throw error
+        }
+
+        console.log('가져온 프로젝트 수:', data?.length || 0)
+        setProjects(data || [])
+      } catch (err: any) {
+        console.error('프로젝트를 불러오는 중 오류가 발생했습니다:', err)
+        console.error('에러 상세 정보:', {
+          message: err.message,
+          code: err.code,
+          details: err.details,
+          hint: err.hint
+        })
+        setError(`프로젝트를 불러오는데 실패했습니다: ${err.message}`)
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    fetchProjects()
+  }, [])
 
   const filteredProjects = activeFilter === 'all' 
     ? projects 
-    : projects.filter(project => project.category === activeFilter)
+    : projects.filter(project => project.category.toLowerCase() === activeFilter)
 
   return (
     <div id="home-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -602,52 +636,88 @@ const Home = () => {
             ))}
           </div>
 
-          {/* Projects Grid */}
-          <div id="projects-grid" className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                id={`project-${project.id}`}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">프로젝트를 불러오는 중...</p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12">
+              <div className="text-red-600 dark:text-red-400 text-xl mb-4">
+                {error}
+              </div>
+              <button 
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
               >
-                <div className="relative overflow-hidden">
-                  <img 
-                    id={`project-image-${project.id}`}
-                    src={project.image} 
-                    alt={project.title}
-                    className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                    <button id={`project-view-btn-${project.id}`} className="bg-white text-gray-900 px-4 py-2 rounded-lg opacity-0 hover:opacity-100 transition-opacity">
-                      자세히 보기
-                    </button>
+                다시 시도
+              </button>
+            </div>
+          )}
+
+          {/* Projects Grid */}
+          {!loading && !error && (
+            <div id="projects-grid" className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+              {filteredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  id={`project-${project.id}`}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+                >
+                  <div className="relative overflow-hidden">
+                    <img 
+                      id={`project-image-${project.id}`}
+                      src={project.image_url || '/src/content/pic_projects/Project_Temp_0.jpg'} 
+                      alt={project.title}
+                      className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                      <button id={`project-view-btn-${project.id}`} className="bg-white text-gray-900 px-4 py-2 rounded-lg opacity-0 hover:opacity-100 transition-opacity">
+                        자세히 보기
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="p-6">
-                  <h3 id={`project-title-${project.id}`} className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    {project.title}
-                  </h3>
-                  <p id={`project-description-${project.id}`} className="text-gray-600 dark:text-gray-300 mb-4">
-                    {project.description}
-                  </p>
-                  <div id={`project-tags-${project.id}`} className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span 
-                        key={tag}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                  <div className="p-6">
+                    <h3 id={`project-title-${project.id}`} className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      {project.title}
+                    </h3>
+                    <p id={`project-description-${project.id}`} className="text-gray-600 dark:text-gray-300 mb-4">
+                      {project.description}
+                    </p>
+                    <div id={`project-tags-${project.id}`} className="flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span 
+                          key={tag}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && filteredProjects.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400">
+                {activeFilter !== 'all' 
+                  ? '해당 카테고리의 프로젝트가 없습니다.' 
+                  : '아직 프로젝트가 없습니다.'}
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

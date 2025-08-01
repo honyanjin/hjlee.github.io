@@ -1,17 +1,53 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key'
+// 환경 변수 로딩 개선
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // 개발 환경에서만 경고 출력
 if (import.meta.env.DEV) {
-  if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-    console.warn('⚠️ Supabase environment variables are not set. Please check your .env.local file.')
-    console.warn('Required variables: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY')
+  console.log('🔧 Supabase 설정 확인:')
+  console.log('URL:', supabaseUrl)
+  console.log('Anon Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'NOT SET')
+  console.log('모든 환경 변수:', import.meta.env)
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('❌ Supabase environment variables are not set!')
+    console.error('Required variables: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY')
+    console.error('Please check your .env.local file.')
+  } else {
+    console.log('✅ Supabase 환경 변수가 정상적으로 설정되었습니다.')
   }
 }
 
+// 환경 변수가 없으면 에러 발생
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Supabase 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인해주세요.')
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// 연결 테스트 함수
+export const testSupabaseConnection = async () => {
+  try {
+    console.log('🔍 Supabase 연결 테스트 중...')
+    const { data, error } = await supabase
+      .from('projects')
+      .select('count')
+      .limit(1)
+    
+    if (error) {
+      console.error('❌ Supabase 연결 실패:', error)
+      return false
+    }
+    
+    console.log('✅ Supabase 연결 성공')
+    return true
+  } catch (err) {
+    console.error('❌ Supabase 연결 테스트 실패:', err)
+    return false
+  }
+}
 
 // 데이터베이스 스키마 타입 정의
 export interface BlogPost {
@@ -113,10 +149,41 @@ export interface CategoryUpdate {
   icon?: string
 }
 
+export interface ProjectCategory {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  color: string
+  icon?: string
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectCategoryInsert {
+  name: string
+  slug: string
+  description?: string
+  color: string
+  icon?: string
+  sort_order?: number
+}
+
+export interface ProjectCategoryUpdate {
+  name?: string
+  slug?: string
+  description?: string
+  color?: string
+  icon?: string
+  sort_order?: number
+}
+
 export interface Project {
   id: string
   title: string
   description: string
+  category_id?: string
   category: string
   image_url?: string
   tags: string[]
@@ -132,6 +199,7 @@ export interface Project {
 export interface ProjectInsert {
   title: string
   description: string
+  category_id?: string
   category: string
   image_url?: string
   tags: string[]
@@ -145,6 +213,7 @@ export interface ProjectInsert {
 export interface ProjectUpdate {
   title?: string
   description?: string
+  category_id?: string
   category?: string
   image_url?: string
   tags?: string[]

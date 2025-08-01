@@ -144,6 +144,13 @@ const AdminProjects = () => {
             </div>
             <div className="flex items-center gap-4">
               <button
+                onClick={() => navigate('/admin/projects/categories')}
+                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Tag size={16} />
+                카테고리 관리
+              </button>
+              <button
                 onClick={() => navigate('/admin/projects/new')}
                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >

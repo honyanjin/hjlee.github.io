@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ExternalLink, Github, Eye } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
+import { supabase, testSupabaseConnection } from '../lib/supabase'
 
 // Intersection Observer 커스텀 훅
 function useInView(threshold = 0.2) {
@@ -22,19 +23,26 @@ function useInView(threshold = 0.2) {
   return [ref, inView] as const;
 }
 
+// Project 타입 정의
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  image_url?: string;
+  tags: string[];
+  live_url?: string;
+  github_url?: string;
+  featured: boolean;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // Project Card 컴포넌트
 interface ProjectCardProps {
-  project: {
-    id: number;
-    title: string;
-    category: string;
-    image: string;
-    description: string;
-    tags: string[];
-    liveUrl: string;
-    githubUrl: string;
-    featured: boolean;
-  };
+  project: Project;
   index: number;
 }
 
@@ -51,27 +59,31 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
     >
       <div className="relative overflow-hidden">
         <img 
-          src={project.image} 
+          src={project.image_url || '/src/content/pic_projects/Project_Temp_0.jpg'} 
           alt={project.title}
           className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 flex gap-2">
-          <a 
-            href={project.liveUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <ExternalLink size={16} />
-          </a>
-          <a 
-            href={project.githubUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <Github size={16} />
-          </a>
+          {project.live_url && (
+            <a 
+              href={project.live_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <ExternalLink size={16} />
+            </a>
+          )}
+          {project.github_url && (
+            <a 
+              href={project.github_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <Github size={16} />
+            </a>
+          )}
         </div>
       </div>
       <div className="p-6">
@@ -92,24 +104,28 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
           ))}
         </div>
         <div className="flex gap-4">
-          <a 
-            href={project.liveUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Eye size={16} />
-            Live Demo
-          </a>
-          <a 
-            href={project.githubUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition-colors"
-          >
-            <Github size={16} />
-            Source Code
-          </a>
+          {project.live_url && (
+            <a 
+              href={project.live_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Eye size={16} />
+              Live Demo
+            </a>
+          )}
+          {project.github_url && (
+            <a 
+              href={project.github_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition-colors"
+            >
+              <Github size={16} />
+              Source Code
+            </a>
+          )}
         </div>
       </div>
     </motion.div>
@@ -118,81 +134,97 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
 
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState('all')
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const projects = [
-    {
-      id: 1,
-      title: 'E-Commerce Platform',
-      category: 'web',
-      image: '/src/content/pic_projects/Project_Temp_0.jpg',
-      description: 'React와 Node.js로 개발한 풀스택 이커머스 플랫폼입니다. 사용자 인증, 상품 관리, 결제 시스템을 포함한 완전한 온라인 쇼핑몰입니다.',
-      tags: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-      liveUrl: 'https://example.com',
-      githubUrl: 'https://github.com/example',
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Task Management App',
-      category: 'app',
-      image: '/src/content/pic_projects/Project_Temp_1.jpg',
-      description: 'TypeScript와 Firebase를 활용한 실시간 태스크 관리 앱입니다. 팀 협업과 실시간 업데이트 기능을 제공합니다.',
-      tags: ['TypeScript', 'Firebase', 'Tailwind', 'React'],
-      liveUrl: 'https://example.com',
-      githubUrl: 'https://github.com/example',
-      featured: true
-    },
-    {
-      id: 3,
-      title: 'Portfolio Website',
-      category: 'web',
-      image: '/src/content/pic_projects/Project_Temp_2.jpg',
-      description: 'React와 Tailwind CSS로 제작한 반응형 포트폴리오 웹사이트입니다. 모던한 디자인과 부드러운 애니메이션을 특징으로 합니다.',
-      tags: ['React', 'Tailwind', 'Framer Motion'],
-      liveUrl: 'https://example.com',
-      githubUrl: 'https://github.com/example',
-      featured: false
-    },
-    {
-      id: 4,
-      title: 'Weather Dashboard',
-      category: 'app',
-      image: '/src/content/pic_projects/Project_Temp_3.jpg',
-      description: 'OpenWeather API를 활용한 날씨 대시보드입니다. 현재 날씨와 7일 예보를 제공하며, 위치 기반 서비스를 지원합니다.',
-      tags: ['JavaScript', 'API', 'CSS3', 'HTML5'],
-      liveUrl: 'https://example.com',
-      githubUrl: 'https://github.com/example',
-      featured: false
-    },
-    {
-      id: 5,
-      title: 'Blog Platform',
-      category: 'web',
-      image: '/src/content/pic_projects/Project_Temp_0.jpg',
-      description: 'Next.js와 Prisma를 사용한 블로그 플랫폼입니다. 마크다운 지원, 댓글 시스템, 관리자 패널을 포함합니다.',
-      tags: ['Next.js', 'Prisma', 'PostgreSQL', 'TypeScript'],
-      liveUrl: 'https://example.com',
-      githubUrl: 'https://github.com/example',
-      featured: false
-    },
-    {
-      id: 6,
-      title: 'Chat Application',
-      category: 'app',
-      image: '/src/content/pic_projects/Project_Temp_1.jpg',
-      description: 'Socket.io를 활용한 실시간 채팅 애플리케이션입니다. 개인 메시지, 그룹 채팅, 파일 공유 기능을 제공합니다.',
-      tags: ['Socket.io', 'Express', 'React', 'MongoDB'],
-      liveUrl: 'https://example.com',
-      githubUrl: 'https://github.com/example',
-      featured: false
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        console.log('프로젝트 데이터를 가져오는 중...')
+        
+        // 먼저 연결 테스트
+        const isConnected = await testSupabaseConnection()
+        if (!isConnected) {
+          throw new Error('Supabase 연결에 실패했습니다.')
+        }
+        
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('is_published', true)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: false })
+
+        console.log('Supabase 응답:', { data, error })
+
+        if (error) {
+          console.error('Supabase 에러:', error)
+          throw error
+        }
+
+        console.log('가져온 프로젝트 수:', data?.length || 0)
+        setProjects(data || [])
+      } catch (err: any) {
+        console.error('프로젝트를 불러오는 중 오류가 발생했습니다:', err)
+        console.error('에러 상세 정보:', {
+          message: err.message,
+          code: err.code,
+          details: err.details,
+          hint: err.hint
+        })
+        setError(`프로젝트를 불러오는데 실패했습니다: ${err.message}`)
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    fetchProjects()
+  }, [])
 
   const filteredProjects = activeFilter === 'all' 
     ? projects 
-    : projects.filter(project => project.category === activeFilter)
+    : projects.filter(project => project.category.toLowerCase() === activeFilter)
 
   const featuredProjects = projects.filter(project => project.featured)
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="pt-32 pb-20 px-4">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">프로젝트를 불러오는 중...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="pt-32 pb-20 px-4">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="text-red-600 dark:text-red-400 text-xl mb-4">
+              {error}
+            </div>
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -242,29 +274,31 @@ const Projects = () => {
       </section>
 
       {/* Featured Projects */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Featured Projects
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
-              대표 프로젝트들을 소개합니다
-            </p>
-          </motion.div>
+      {featuredProjects.length > 0 && (
+        <section className="py-20 px-4 bg-white dark:bg-gray-800">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                Featured Projects
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-300">
+                대표 프로젝트들을 소개합니다
+              </p>
+            </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {featuredProjects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
-            ))}
+            <div className="grid lg:grid-cols-2 gap-8">
+              {featuredProjects.map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* All Projects */}
       <section className="py-20 px-4">
@@ -284,64 +318,76 @@ const Projects = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                    <div className="flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
-                      <a 
-                        href={project.liveUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        <ExternalLink size={16} />
-                      </a>
-                      <a 
-                        href={project.githubUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        <Github size={16} />
-                      </a>
+          {filteredProjects.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 dark:text-gray-300 text-lg">
+                해당 카테고리의 프로젝트가 없습니다.
+              </p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+                >
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={project.image_url || '/src/content/pic_projects/Project_Temp_0.jpg'} 
+                      alt={project.title}
+                      className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                      <div className="flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
+                        {project.live_url && (
+                          <a 
+                            href={project.live_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                          >
+                            <ExternalLink size={16} />
+                          </a>
+                        )}
+                        {project.github_url && (
+                          <a 
+                            href={project.github_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-white text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                          >
+                            <Github size={16} />
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    {project.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                    {project.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span 
-                        key={tag}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full dark:bg-blue-900 dark:text-blue-200"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      {project.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span 
+                          key={tag}
+                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full dark:bg-blue-900 dark:text-blue-200"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

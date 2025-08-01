@@ -15,6 +15,7 @@ import AdminCategories from './pages/AdminCategories'
 import AdminProjects from './pages/AdminProjects'
 import AdminProjectNew from './pages/AdminProjectNew'
 import AdminProjectEdit from './pages/AdminProjectEdit'
+import AdminProjectCategories from './pages/AdminProjectCategories'
 
 function App() {
   return (
@@ -90,6 +91,15 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <AdminProjectEdit />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            id="admin-project-categories-route" 
+            path="/admin/projects/categories" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminProjectCategories />
               </ProtectedRoute>
             } 
           />

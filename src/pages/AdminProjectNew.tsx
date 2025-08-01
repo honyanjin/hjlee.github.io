@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import type { ProjectInsert } from '../lib/supabase'
+import type { ProjectInsert, ProjectCategory } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
 
 const projectSchema = z.object({
@@ -37,9 +37,29 @@ const AdminProjectNew = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [categories, setCategories] = useState<ProjectCategory[]>([])
   
   const { user } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('project_categories')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('name', { ascending: true })
+
+      if (error) throw error
+      setCategories(data || [])
+    } catch (err: any) {
+      console.error('Error fetching categories:', err)
+    }
+  }
 
   const {
     register,
@@ -172,14 +192,11 @@ const AdminProjectNew = () => {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">카테고리 선택</option>
-                  <option value="Web Development">Web Development</option>
-                  <option value="Mobile App">Mobile App</option>
-                  <option value="Desktop App">Desktop App</option>
-                  <option value="API">API</option>
-                  <option value="Library">Library</option>
-                  <option value="Tool">Tool</option>
-                  <option value="Game">Game</option>
-                  <option value="Other">Other</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
                 {errors.category && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">
