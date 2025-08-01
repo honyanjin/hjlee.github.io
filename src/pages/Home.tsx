@@ -51,9 +51,10 @@ const Home = () => {
             project_category:project_categories(*)
           `)
           .eq('is_published', true)
+          .order('featured', { ascending: false }) // featured 프로젝트를 먼저
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: false })
-          .limit(4) // 홈페이지에서는 최대 4개만 표시
+          .limit(8) // 홈페이지에서는 최대 8개 (featured + 일반 프로젝트)
 
         console.log('Supabase 응답:', { data, error })
 
@@ -84,6 +85,9 @@ const Home = () => {
   const filteredProjects = activeFilter === 'all' 
     ? projects 
     : projects.filter(project => project.project_category?.slug === activeFilter)
+
+  const featuredProjects = projects.filter(project => project.featured)
+  const nonFeaturedProjects = projects.filter(project => !project.featured)
 
   return (
     <div id="home-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -604,8 +608,77 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Projects Section */}
-      <section id="projects-section" className="py-20 px-4 bg-white dark:bg-gray-800">
+      {/* Featured Projects Section */}
+      {featuredProjects.length > 0 && (
+        <section id="featured-projects-section" className="py-20 px-4 bg-white dark:bg-gray-800">
+          <div className="max-w-6xl mx-auto">
+            <motion.div 
+              id="featured-projects-header"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 id="featured-projects-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                Featured Projects
+              </h2>
+              <p id="featured-projects-description" className="text-xl text-gray-600 dark:text-gray-300">
+                대표 프로젝트들을 소개합니다
+              </p>
+            </motion.div>
+
+            <div id="featured-projects-grid" className="grid md:grid-cols-2 gap-8">
+              {featuredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  id={`featured-project-${project.id}`}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+                >
+                  <div className="relative overflow-hidden">
+                    <img 
+                      id={`featured-project-image-${project.id}`}
+                      src={project.image_url || '/src/content/pic_projects/Project_Temp_0.jpg'} 
+                      alt={project.title}
+                      className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                      <button id={`featured-project-view-btn-${project.id}`} className="bg-white text-gray-900 px-4 py-2 rounded-lg opacity-0 hover:opacity-100 transition-opacity">
+                        자세히 보기
+                      </button>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 id={`featured-project-title-${project.id}`} className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      {project.title}
+                    </h3>
+                    <p id={`featured-project-description-${project.id}`} className="text-gray-600 dark:text-gray-300 mb-4">
+                      {project.description}
+                    </p>
+                    <div id={`featured-project-tags-${project.id}`} className="flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span 
+                          key={tag}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* All Projects Section */}
+      <section id="projects-section" className="py-20 px-4 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <motion.div 
             id="projects-header"
@@ -616,10 +689,10 @@ const Home = () => {
             className="text-center mb-16"
           >
             <h2 id="projects-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              My Projects
+              All Projects
             </h2>
             <p id="projects-description" className="text-xl text-gray-600 dark:text-gray-300">
-              최근 작업한 프로젝트들을 소개합니다
+              모든 프로젝트를 확인해보세요
             </p>
           </motion.div>
 
