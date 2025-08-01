@@ -34,10 +34,19 @@ const AdminBlog = () => {
       const { data, error } = await supabase
         .from('blog_posts')
         .select('*')
+        .order('published_at', { ascending: false })
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setPosts(data || [])
+      
+      // published_at이 null인 경우를 고려하여 정렬
+      const sortedPosts = (data || []).sort((a, b) => {
+        const aDate = a.published_at ? new Date(a.published_at) : new Date(a.created_at)
+        const bDate = b.published_at ? new Date(b.published_at) : new Date(b.created_at)
+        return bDate.getTime() - aDate.getTime() // 최신순 정렬
+      })
+      
+      setPosts(sortedPosts)
     } catch (err: any) {
       setError('포스트를 불러오는데 실패했습니다.')
       console.error('Error fetching posts:', err)

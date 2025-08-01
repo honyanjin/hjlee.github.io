@@ -45,9 +45,18 @@ const Blog = () => {
         .select('*')
         .eq('is_published', true)
         .order('published_at', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
-      setPosts(data || [])
+      
+      // published_at이 null인 경우를 고려하여 정렬
+      const sortedPosts = (data || []).sort((a, b) => {
+        const aDate = a.published_at ? new Date(a.published_at) : new Date(a.created_at)
+        const bDate = b.published_at ? new Date(b.published_at) : new Date(b.created_at)
+        return bDate.getTime() - aDate.getTime() // 최신순 정렬
+      })
+      
+      setPosts(sortedPosts)
     } catch (err: any) {
       setError('포스트를 불러오는데 실패했습니다.')
       console.error('Error fetching posts:', err)
@@ -357,7 +366,12 @@ const Blog = () => {
                         style={getBackgroundStyle(featuredPost)}
                       >
                         <div className="text-white text-center">
-                          <div className="text-4xl font-bold mb-2">{featuredPost.category?.toUpperCase()}</div>
+                          <div className="text-4xl font-bold mb-2">
+                            {(() => {
+                              const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
+                              return foundCategory ? foundCategory.name.toUpperCase() : (featuredPost.category?.toUpperCase() || 'BLOG')
+                            })()}
+                          </div>
                           <div className="text-lg opacity-90">Blog Post</div>
                         </div>
                       </div>
@@ -366,7 +380,10 @@ const Blog = () => {
                 <div className="p-8">
                   <div className="flex items-center gap-4 mb-4">
                     <span id="featured-post-category" className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
-                      {featuredPost.category}
+                      {(() => {
+                        const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
+                        return foundCategory ? foundCategory.name : featuredPost.category
+                      })()}
                     </span>
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                       <Calendar size={16} />
