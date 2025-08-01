@@ -4,9 +4,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
 import { 
   Save, 
   Eye, 
+  EyeOff,
   ArrowLeft, 
   Loader2,
   Calendar,
@@ -202,15 +206,7 @@ const AdminBlogEdit = () => {
                 포스트 편집
               </h1>
             </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setPreviewMode(!previewMode)}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                {previewMode ? <Eye size={16} /> : <Eye size={16} />}
-                {previewMode ? '편집 모드' : '미리보기'}
-              </button>
-            </div>
+
           </div>
         </div>
       </header>
@@ -353,17 +349,107 @@ const AdminBlogEdit = () => {
 
           {/* Content */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 내용
               </h2>
+              <button
+                type="button"
+                onClick={() => setPreviewMode(!previewMode)}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                {previewMode ? (
+                  <>
+                    <EyeOff size={16} />
+                    편집 모드
+                  </>
+                ) : (
+                  <>
+                    <Eye size={16} />
+                    미리보기
+                  </>
+                )}
+              </button>
             </div>
             
             {previewMode ? (
               <div className="p-6">
-                <div className="prose dark:prose-invert max-w-none">
-                  <h1>{watchedTitle || '제목 없음'}</h1>
-                  <div className="whitespace-pre-wrap">{watchedContent || '내용을 입력하세요'}</div>
+                <div className="prose prose-lg max-w-none dark:prose-invert markdown-content">
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+                    {watchedTitle || '제목 없음'}
+                  </h1>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                    components={{
+                      // 코드 블록 스타일링
+                      code({ node, inline, className, children, ...props }) {
+                        const match = /language-(\w+)/.exec(className || '')
+                        return !inline && match ? (
+                          <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
+                            <code className={className} {...props}>
+                              {children}
+                            </code>
+                          </pre>
+                        ) : (
+                          <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm" {...props}>
+                            {children}
+                          </code>
+                        )
+                      },
+                      // 링크 스타일링
+                      a({ children, href, ...props }) {
+                        return (
+                          <a 
+                            href={href} 
+                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            {...props}
+                          >
+                            {children}
+                          </a>
+                        )
+                      },
+                      // 이미지 스타일링
+                      img({ src, alt, ...props }) {
+                        return (
+                          <img 
+                            src={src} 
+                            alt={alt}
+                            className="max-w-full h-auto rounded-lg shadow-md"
+                            {...props}
+                          />
+                        )
+                      },
+                      // 테이블 스타일링
+                      table({ children, ...props }) {
+                        return (
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600" {...props}>
+                              {children}
+                            </table>
+                          </div>
+                        )
+                      },
+                      th({ children, ...props }) {
+                        return (
+                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 font-semibold" {...props}>
+                            {children}
+                          </th>
+                        )
+                      },
+                      td({ children, ...props }) {
+                        return (
+                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2" {...props}>
+                            {children}
+                          </td>
+                        )
+                      }
+                    }}
+                  >
+                    {watchedContent || '내용을 입력하세요'}
+                  </ReactMarkdown>
                 </div>
               </div>
             ) : (
