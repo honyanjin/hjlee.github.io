@@ -15,10 +15,10 @@ interface SEOProps {
 }
 
 const SEO: React.FC<SEOProps> = ({
-  title = '이현재 포트폴리오',
-  description = '프론트엔드 개발자 이현재의 포트폴리오 사이트입니다.',
+  title = '이호진 포트폴리오',
+  description = '프론트엔드 개발자 이호진의 포트폴리오 사이트입니다.',
   keywords = '프론트엔드, React, TypeScript, 개발자, 포트폴리오',
-  author = '이현재',
+  author = '이호진',
   image = '/og-image.jpg',
   url = window.location.href,
   type = 'website',
@@ -78,7 +78,7 @@ const SEO: React.FC<SEOProps> = ({
     updateOGTag('og:type', type)
     updateOGTag('og:url', url)
     updateOGTag('og:image', image)
-    updateOGTag('og:site_name', '이현재 포트폴리오')
+    updateOGTag('og:site_name', '이호진 포트폴리오')
 
     // Twitter Card 태그
     updateTwitterTag('twitter:card', 'summary_large_image')

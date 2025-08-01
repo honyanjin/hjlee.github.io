@@ -37,9 +37,9 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO 
-        title="About - 이현재 포트폴리오"
-        description="프론트엔드 개발자 이현재에 대해 알아보세요. 경력, 기술 스택, 교육 배경을 확인할 수 있습니다."
-        keywords="About, 소개, 경력, 기술스택, 개발자, 이현재"
+        title="About - 이호진 포트폴리오"
+        description="프론트엔드 개발자 이호진에 대해 알아보세요. 경력, 기술 스택, 교육 배경을 확인할 수 있습니다."
+        keywords="About, 소개, 경력, 기술스택, 개발자, 이호진"
         type="website"
       />
       <Navbar />

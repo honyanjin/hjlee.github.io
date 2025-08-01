@@ -85,10 +85,10 @@ const BlogPost = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {post && (
         <SEO 
-          title={`${post.title} - 이현재 블로그`}
+          title={`${post.title} - 이호진 블로그`}
           description={post.excerpt}
           keywords={post.tags?.join(', ') || ''}
-          author={post.author || '이현재'}
+          author={post.author || '이호진'}
           image={post.image_url || '/og-image.jpg'}
           url={window.location.href}
           type="article"
