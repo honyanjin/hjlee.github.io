@@ -11,6 +11,7 @@ import Login from './pages/Login'
 import AdminBlog from './pages/AdminBlog'
 import AdminBlogNew from './pages/AdminBlogNew'
 import AdminBlogEdit from './pages/AdminBlogEdit'
+import AdminCategories from './pages/AdminCategories'
 
 function App() {
   return (
@@ -50,6 +51,15 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <AdminBlogEdit />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            id="admin-categories-route" 
+            path="/admin/categories" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminCategories />
               </ProtectedRoute>
             } 
           />

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import type { BlogPost } from '../lib/supabase'
+import type { BlogPost, Category } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
 
 const postSchema = z.object({
@@ -38,6 +38,7 @@ const AdminBlogEdit = () => {
   const [previewMode, setPreviewMode] = useState(false)
   const [post, setPost] = useState<BlogPost | null>(null)
   const [imageUrl, setImageUrl] = useState('')
+  const [categories, setCategories] = useState<Category[]>([])
   
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -60,7 +61,22 @@ const AdminBlogEdit = () => {
     if (id) {
       fetchPost()
     }
+    fetchCategories()
   }, [id])
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true })
+
+      if (error) throw error
+      setCategories(data || [])
+    } catch (err: any) {
+      console.error('Error fetching categories:', err)
+    }
+  }
 
   const fetchPost = async () => {
     try {
@@ -137,15 +153,7 @@ const AdminBlogEdit = () => {
     }
   }
 
-  const categories = [
-    { id: 'react', name: 'React' },
-    { id: 'typescript', name: 'TypeScript' },
-    { id: 'css', name: 'CSS' },
-    { id: 'backend', name: 'Backend' },
-    { id: 'database', name: 'Database' },
-    { id: 'git', name: 'Git' },
-    { id: 'general', name: '일반' }
-  ]
+
 
   if (isLoading) {
     return (
@@ -285,7 +293,7 @@ const AdminBlogEdit = () => {
                 >
                   <option value="">카테고리 선택</option>
                   {categories.map(category => (
-                    <option key={category.id} value={category.id}>
+                    <option key={category.id} value={category.slug}>
                       {category.name}
                     </option>
                   ))}

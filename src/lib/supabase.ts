@@ -19,14 +19,38 @@ export interface BlogPost {
   title: string
   content: string
   excerpt: string
-  category: string
   author: string
-  published_at: string | null
-  created_at: string
-  updated_at: string
+  category: string
   tags: string[]
   image_url?: string
   is_published: boolean
+  created_at: string
+  updated_at: string
+  published_at: string | null
+}
+
+export interface BlogPostInsert {
+  title: string
+  content: string
+  excerpt: string
+  author: string
+  category: string
+  tags: string[]
+  image_url?: string
+  is_published: boolean
+  published_at?: string | null
+}
+
+export interface BlogPostUpdate {
+  title?: string
+  content?: string
+  excerpt?: string
+  author?: string
+  category?: string
+  tags?: string[]
+  image_url?: string
+  is_published?: boolean
+  published_at?: string | null
 }
 
 export interface Comment {
@@ -36,24 +60,58 @@ export interface Comment {
   author_email: string
   content: string
   created_at: string
-  updated_at: string
+}
+
+export interface CommentInsert {
+  post_id: string
+  author_name: string
+  author_email: string
+  content: string
 }
 
 export interface CommentLimit {
   id: string
   post_id: string
   daily_count: number
-  last_reset_date: string
   is_blocked: boolean
   blocked_until: string | null
+  last_reset_date: string
+}
+
+export interface CommentLimitInsert {
+  post_id: string
+  daily_count: number
+  is_blocked: boolean
+  blocked_until?: string | null
+  last_reset_date: string
+}
+
+export interface Category {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  color: string
+  icon?: string
   created_at: string
   updated_at: string
 }
 
-export type BlogPostInsert = Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>
-export type BlogPostUpdate = Partial<Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>>
-export type CommentInsert = Omit<Comment, 'id' | 'created_at' | 'updated_at'>
-export type CommentLimitInsert = Omit<CommentLimit, 'id' | 'created_at' | 'updated_at'>
+export interface CategoryInsert {
+  name: string
+  slug: string
+  description?: string
+  color: string
+  icon?: string
+}
+
+export interface CategoryUpdate {
+  name?: string
+  slug?: string
+  description?: string
+  color?: string
+  icon?: string
+}
 
 export interface Database {
   public: {
@@ -66,12 +124,17 @@ export interface Database {
       comments: {
         Row: Comment
         Insert: CommentInsert
-        Update: Partial<Omit<Comment, 'id' | 'created_at' | 'updated_at'>>
+        Update: Comment
       }
       comment_limits: {
         Row: CommentLimit
         Insert: CommentLimitInsert
-        Update: Partial<Omit<CommentLimit, 'id' | 'created_at' | 'updated_at'>>
+        Update: CommentLimit
+      }
+      categories: {
+        Row: Category
+        Insert: CategoryInsert
+        Update: CategoryUpdate
       }
     }
   }
