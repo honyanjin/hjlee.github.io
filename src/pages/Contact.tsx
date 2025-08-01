@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Navbar from '../components/Navbar'
+import SEO from '../components/SEO'
 
 const contactSchema = z.object({
   name: z.string().min(2, '이름은 2글자 이상이어야 합니다'),
@@ -88,6 +89,12 @@ const Contact = () => {
 
   return (
     <div id="contact-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title="Contact - 이현재 포트폴리오"
+        description="프론트엔드 개발자 이현재에게 연락하세요. 이메일, 전화번호, 소셜 미디어를 통해 언제든지 문의해주세요."
+        keywords="Contact, 연락처, 문의, 이메일, 전화번호, 소셜미디어, 개발자 연락"
+        type="website"
+      />
       <Navbar />
       
       {/* Hero Section */}

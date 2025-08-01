@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Download } from 'lucide-react'
 import Navbar from '../components/Navbar'
+import SEO from '../components/SEO'
 
 const Home = () => {
   const [activeFilter, setActiveFilter] = useState('all')
@@ -47,6 +48,12 @@ const Home = () => {
 
   return (
     <div id="home-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title="이현재 포트폴리오 - 프론트엔드 개발자"
+        description="프론트엔드 개발자 이현재의 포트폴리오 사이트입니다. React, TypeScript, Node.js를 활용한 웹 개발 프로젝트들을 확인하세요."
+        keywords="프론트엔드, React, TypeScript, 개발자, 포트폴리오, 웹개발, UI/UX"
+        type="website"
+      />
       <Navbar />
       
       {/* Hero Section */}

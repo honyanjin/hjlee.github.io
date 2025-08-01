@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Calendar, Clock, User, ArrowRight, Search, Tag } from 'lucide-react'
 import Navbar from '../components/Navbar'
+import SEO from '../components/SEO'
+import ShareButtons from '../components/ShareButtons'
 import { supabase } from '../lib/supabase'
 import type { BlogPost } from '../lib/supabase'
 
@@ -132,6 +134,12 @@ const Blog = () => {
 
   return (
     <div id="blog-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title="블로그 - 이현재 포트폴리오"
+        description="프론트엔드 개발자 이현재의 기술 블로그입니다. React, TypeScript, 웹 개발 관련 글들을 확인하세요."
+        keywords="블로그, 기술블로그, React, TypeScript, 웹개발, 프론트엔드"
+        type="website"
+      />
       <Navbar />
       
       {/* Hero Section */}
@@ -388,14 +396,22 @@ const Blog = () => {
                         <User size={14} />
                         <span id={`blog-post-author-${post.id}`} className="text-sm">{post.author}</span>
                       </div>
-                      <button 
-                        id={`blog-post-read-more-${post.id}`} 
-                        onClick={() => navigate(`/blog/${post.id}`)}
-                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                      >
-                        <span className="text-sm">자세히 보기</span>
-                        <ArrowRight size={14} />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <ShareButtons 
+                          title={post.title}
+                          url={`${window.location.origin}/blog/${post.id}`}
+                          description={post.excerpt}
+                          size="sm"
+                        />
+                        <button 
+                          id={`blog-post-read-more-${post.id}`} 
+                          onClick={() => navigate(`/blog/${post.id}`)}
+                          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                        >
+                          <span className="text-sm">자세히 보기</span>
+                          <ArrowRight size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

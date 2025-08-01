@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ExternalLink, Github, Eye } from 'lucide-react'
 import Navbar from '../components/Navbar'
+import SEO from '../components/SEO'
 
 // Intersection Observer 커스텀 훅
 function useInView(threshold = 0.2) {
@@ -195,6 +196,12 @@ const Projects = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <SEO 
+        title="Projects - 이현재 포트폴리오"
+        description="프론트엔드 개발자 이현재의 프로젝트들을 확인하세요. React, TypeScript, Node.js를 활용한 다양한 웹 애플리케이션들을 소개합니다."
+        keywords="프로젝트, 포트폴리오, 웹개발, React, TypeScript, Node.js, 프로젝트 갤러리"
+        type="website"
+      />
       <Navbar />
       
       {/* Hero Section */}

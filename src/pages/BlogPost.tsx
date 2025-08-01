@@ -6,6 +6,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import Navbar from '../components/Navbar'
+import SEO from '../components/SEO'
+import ShareButtons from '../components/ShareButtons'
 import Comments from '../components/Comments'
 import { supabase } from '../lib/supabase'
 import type { BlogPost } from '../lib/supabase'
@@ -81,6 +83,21 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {post && (
+        <SEO 
+          title={`${post.title} - 이현재 블로그`}
+          description={post.excerpt}
+          keywords={post.tags?.join(', ') || ''}
+          author={post.author || '이현재'}
+          image={post.image_url || '/og-image.jpg'}
+          url={window.location.href}
+          type="article"
+          publishedTime={post.published_at || post.created_at}
+          modifiedTime={post.updated_at}
+          section={post.category}
+          tags={post.tags || []}
+        />
+      )}
       <Navbar />
       
       {/* Back Button */}
@@ -173,6 +190,21 @@ const BlogPost = () => {
                   </div>
                 </div>
               )}
+
+              {/* Share Buttons */}
+              <div className="flex items-center justify-between mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Clock size={16} className="text-gray-600 dark:text-gray-400" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    읽는 시간: 약 {Math.ceil(post.content.split(' ').length / 200)}분
+                  </span>
+                </div>
+                <ShareButtons 
+                  title={post.title}
+                  url={window.location.href}
+                  description={post.excerpt}
+                />
+              </div>
 
               {/* Content */}
               <div className="prose prose-lg max-w-none dark:prose-invert markdown-content">
