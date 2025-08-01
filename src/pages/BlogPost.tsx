@@ -212,6 +212,14 @@ const BlogPost = () => {
                   </div>
                 </div>
               )}
+              <div className="absolute top-4 right-4">
+                <ShareButtons 
+                  title={post.title}
+                  url={window.location.href}
+                  description={post.excerpt}
+                  size="sm"
+                />
+              </div>
             </div>
 
             {/* Post Content */}
@@ -265,19 +273,12 @@ const BlogPost = () => {
                 </div>
               )}
 
-              {/* Share Buttons */}
-              <div className="flex items-center justify-between mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Clock size={16} className="text-gray-600 dark:text-gray-400" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    읽는 시간: 약 {Math.ceil(post.content.split(' ').length / 200)}분
-                  </span>
-                </div>
-                <ShareButtons 
-                  title={post.title}
-                  url={window.location.href}
-                  description={post.excerpt}
-                />
+              {/* Reading Time */}
+              <div className="flex items-center gap-2 mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <Clock size={16} className="text-gray-600 dark:text-gray-400" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  읽는 시간: 약 {Math.ceil(post.content.split(' ').length / 200)}분
+                </span>
               </div>
 
               {/* Content */}

@@ -359,23 +359,31 @@ const Blog = () => {
                       {...getPostImageProps(featuredPost)}
                       alt={featuredPost.title}
                     />
-                                      ) : (
-                      <div 
-                        id="featured-post-image"
-                        className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300"
-                        style={getBackgroundStyle(featuredPost)}
-                      >
-                        <div className="text-white text-center">
-                          <div className="text-4xl font-bold mb-2">
-                            {(() => {
-                              const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
-                              return foundCategory ? foundCategory.name.toUpperCase() : (featuredPost.category?.toUpperCase() || 'BLOG')
-                            })()}
-                          </div>
-                          <div className="text-lg opacity-90">Blog Post</div>
+                  ) : (
+                    <div 
+                      id="featured-post-image"
+                      className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300"
+                      style={getBackgroundStyle(featuredPost)}
+                    >
+                      <div className="text-white text-center">
+                        <div className="text-4xl font-bold mb-2">
+                          {(() => {
+                            const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
+                            return foundCategory ? foundCategory.name.toUpperCase() : (featuredPost.category?.toUpperCase() || 'BLOG')
+                          })()}
                         </div>
+                        <div className="text-lg opacity-90">Blog Post</div>
                       </div>
-                    )}
+                    </div>
+                  )}
+                  <div className="absolute top-4 right-4">
+                    <ShareButtons 
+                      title={featuredPost.title}
+                      url={`${window.location.origin}/blog/${featuredPost.id}`}
+                      description={featuredPost.excerpt}
+                      size="sm"
+                    />
+                  </div>
                 </div>
                 <div className="p-8">
                   <div className="flex items-center gap-4 mb-4">
@@ -504,6 +512,14 @@ const Blog = () => {
                         })()}
                       </span>
                     </div>
+                    <div className="absolute top-4 right-4">
+                      <ShareButtons 
+                        title={post.title}
+                        url={`${window.location.origin}/blog/${post.id}`}
+                        description={post.excerpt}
+                        size="sm"
+                      />
+                    </div>
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
@@ -537,22 +553,14 @@ const Blog = () => {
                         <User size={14} />
                         <span id={`blog-post-author-${post.id}`} className="text-sm">{post.author}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <ShareButtons 
-                          title={post.title}
-                          url={`${window.location.origin}/blog/${post.id}`}
-                          description={post.excerpt}
-                          size="sm"
-                        />
-                        <button 
-                          id={`blog-post-read-more-${post.id}`} 
-                          onClick={() => navigate(`/blog/${post.id}`)}
-                          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-                        >
-                          <span className="text-sm">자세히 보기</span>
-                          <ArrowRight size={14} />
-                        </button>
-                      </div>
+                      <button 
+                        id={`blog-post-read-more-${post.id}`} 
+                        onClick={() => navigate(`/blog/${post.id}`)}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                      >
+                        <span className="text-sm">자세히 보기</span>
+                        <ArrowRight size={14} />
+                      </button>
                     </div>
                   </div>
                 </motion.div>
