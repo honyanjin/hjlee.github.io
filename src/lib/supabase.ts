@@ -247,6 +247,11 @@ export interface Database {
         Insert: CategoryInsert
         Update: CategoryUpdate
       }
+      project_categories: {
+        Row: ProjectCategory
+        Insert: ProjectCategoryInsert
+        Update: ProjectCategoryUpdate
+      }
       projects: {
         Row: Project
         Insert: ProjectInsert

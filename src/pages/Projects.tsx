@@ -4,6 +4,7 @@ import { ExternalLink, Github, Eye } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
+import type { Project, ProjectCategory } from '../lib/supabase'
 
 // Intersection Observer 커스텀 훅
 function useInView(threshold = 0.2) {
@@ -23,26 +24,14 @@ function useInView(threshold = 0.2) {
   return [ref, inView] as const;
 }
 
-// Project 타입 정의
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  image_url?: string;
-  tags: string[];
-  live_url?: string;
-  github_url?: string;
-  featured: boolean;
-  sort_order: number;
-  is_published: boolean;
-  created_at: string;
-  updated_at: string;
+// Project 타입 정의 (카테고리 정보 포함)
+interface ProjectWithCategory extends Project {
+  project_category?: ProjectCategory;
 }
 
 // Project Card 컴포넌트
 interface ProjectCardProps {
-  project: Project;
+  project: ProjectWithCategory;
   index: number;
 }
 
@@ -134,12 +123,13 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
 
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState('all')
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<ProjectWithCategory[]>([])
+  const [categories, setCategories] = useState<ProjectCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
         setError(null)
@@ -152,9 +142,25 @@ const Projects = () => {
           throw new Error('Supabase 연결에 실패했습니다.')
         }
         
+        // 프로젝트 카테고리 가져오기
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('project_categories')
+          .select('*')
+          .order('sort_order', { ascending: true })
+
+        if (categoriesError) {
+          console.error('카테고리 로딩 에러:', categoriesError)
+        } else {
+          setCategories(categoriesData || [])
+        }
+        
+        // 프로젝트 데이터 가져오기 (카테고리 정보 포함)
         const { data, error } = await supabase
           .from('projects')
-          .select('*')
+          .select(`
+            *,
+            project_category:project_categories(*)
+          `)
           .eq('is_published', true)
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: false })
@@ -182,12 +188,12 @@ const Projects = () => {
       }
     }
 
-    fetchProjects()
+    fetchData()
   }, [])
 
   const filteredProjects = activeFilter === 'all' 
     ? projects 
-    : projects.filter(project => project.category.toLowerCase() === activeFilter)
+    : projects.filter(project => project.project_category?.slug === activeFilter)
 
   const featuredProjects = projects.filter(project => project.featured)
 
@@ -256,17 +262,27 @@ const Projects = () => {
 
           {/* Filter Buttons */}
           <div className="flex justify-center gap-4 mb-12">
-            {['all', 'web', 'app'].map((filter) => (
+            <button
+              onClick={() => setActiveFilter('all')}
+              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                activeFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+              }`}
+            >
+              전체
+            </button>
+            {categories.map((category) => (
               <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
+                key={category.id}
+                onClick={() => setActiveFilter(category.slug)}
                 className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                  activeFilter === filter
+                  activeFilter === category.slug
                     ? 'bg-blue-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
-                {filter === 'all' ? '전체' : filter === 'web' ? '웹' : '앱'}
+                {category.name}
               </button>
             ))}
           </div>

@@ -4,32 +4,22 @@ import { Github, Linkedin, Mail, Download } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
+import type { Project, ProjectCategory } from '../lib/supabase'
 
-// Project 타입 정의
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  image_url?: string;
-  tags: string[];
-  live_url?: string;
-  github_url?: string;
-  featured: boolean;
-  sort_order: number;
-  is_published: boolean;
-  created_at: string;
-  updated_at: string;
+// Project 타입 정의 (카테고리 정보 포함)
+interface ProjectWithCategory extends Project {
+  project_category?: ProjectCategory;
 }
 
 const Home = () => {
   const [activeFilter, setActiveFilter] = useState('all')
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<ProjectWithCategory[]>([])
+  const [categories, setCategories] = useState<ProjectCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
         setError(null)
@@ -42,9 +32,24 @@ const Home = () => {
           throw new Error('Supabase 연결에 실패했습니다.')
         }
         
+        // 프로젝트 카테고리 가져오기
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('project_categories')
+          .select('*')
+          .order('sort_order', { ascending: true })
+
+        if (categoriesError) {
+          console.error('카테고리 로딩 에러:', categoriesError)
+        } else {
+          setCategories(categoriesData || [])
+        }
+        
         const { data, error } = await supabase
           .from('projects')
-          .select('*')
+          .select(`
+            *,
+            project_category:project_categories(*)
+          `)
           .eq('is_published', true)
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: false })
@@ -73,12 +78,12 @@ const Home = () => {
       }
     }
 
-    fetchProjects()
+    fetchData()
   }, [])
 
   const filteredProjects = activeFilter === 'all' 
     ? projects 
-    : projects.filter(project => project.category.toLowerCase() === activeFilter)
+    : projects.filter(project => project.project_category?.slug === activeFilter)
 
   return (
     <div id="home-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -620,18 +625,29 @@ const Home = () => {
 
           {/* Filter Buttons */}
           <div id="project-filters" className="flex justify-center gap-4 mb-12">
-            {['all', 'web', 'app'].map((filter) => (
+            <button
+              id="filter-all"
+              onClick={() => setActiveFilter('all')}
+              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                activeFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              전체
+            </button>
+            {categories.map((category) => (
               <button
-                key={filter}
-                id={`filter-${filter}`}
-                onClick={() => setActiveFilter(filter)}
+                key={category.id}
+                id={`filter-${category.slug}`}
+                onClick={() => setActiveFilter(category.slug)}
                 className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                  activeFilter === filter
+                  activeFilter === category.slug
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
-                {filter === 'all' ? '전체' : filter === 'web' ? '웹' : '앱'}
+                {category.name}
               </button>
             ))}
           </div>
