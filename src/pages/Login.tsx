@@ -37,7 +37,7 @@ const Login = () => {
     try {
       // 로그인 로직만 실행
       await signIn(data.email, data.password)
-      navigate('/admin/blog')
+      navigate('/admin')
     } catch (err: any) {
       setError(err.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.')
     } finally {

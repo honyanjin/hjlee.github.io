@@ -16,6 +16,8 @@ import AdminProjects from './pages/AdminProjects'
 import AdminProjectNew from './pages/AdminProjectNew'
 import AdminProjectEdit from './pages/AdminProjectEdit'
 import AdminProjectCategories from './pages/AdminProjectCategories'
+import AdminDashboard from './pages/AdminDashboard'
+import AdminComments from './pages/AdminComments'
 
 function App() {
   return (
@@ -31,6 +33,15 @@ function App() {
           <Route id="login-route" path="/login" element={<Login />} />
           
           {/* Admin Routes */}
+          <Route 
+            id="admin-dashboard-route" 
+            path="/admin" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             id="admin-blog-route" 
             path="/admin/blog" 
@@ -100,6 +111,15 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <AdminProjectCategories />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            id="admin-comments-route" 
+            path="/admin/comments" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminComments />
               </ProtectedRoute>
             } 
           />

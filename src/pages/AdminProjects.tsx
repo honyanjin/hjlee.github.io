@@ -12,7 +12,9 @@ import {
   Tag,
   ExternalLink,
   Github,
-  Star
+  Star,
+  BarChart3,
+  FileText
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -130,19 +132,29 @@ const AdminProjects = () => {
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/admin/blog')}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                <Tag size={16} />
-                블로그 관리
-              </button>
+            <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 프로젝트 관리
               </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                안녕하세요, {user?.email}님
+              </p>
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate('/admin')}
+                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <BarChart3 size={16} />
+                대시보드
+              </button>
+              <button
+                onClick={() => navigate('/admin/blog')}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <FileText size={16} />
+                블로그 관리
+              </button>
               <button
                 onClick={() => navigate('/admin/projects/categories')}
                 className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
@@ -152,14 +164,14 @@ const AdminProjects = () => {
               </button>
               <button
                 onClick={() => navigate('/admin/projects/new')}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
               >
                 <Plus size={16} />
                 새 프로젝트
               </button>
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 <LogOut size={16} />
                 로그아웃

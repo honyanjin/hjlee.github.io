@@ -89,6 +89,14 @@ const Navbar = () => {
 
           {/* Right side buttons */}
           <div id="navbar-actions" className="flex items-center space-x-4">
+            {/* Admin Login Link */}
+            <Link
+              to="/login"
+              className="hidden md:block text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors"
+            >
+              관리자
+            </Link>
+            
             {/* Dark mode toggle */}
             <button
               id="dark-mode-toggle"
@@ -135,6 +143,13 @@ const Navbar = () => {
                     {item.name}
                   </Link>
                 ))}
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+                >
+                  관리자
+                </Link>
               </div>
             </motion.div>
           )}
