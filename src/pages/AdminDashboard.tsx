@@ -306,7 +306,7 @@ const AdminDashboard = () => {
               className="flex items-center gap-3 p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >
               <Plus size={20} />
-              <span>새 카테고리</span>
+              <span>새 포스트 카테고리</span>
             </motion.button>
             
             <motion.button
@@ -428,58 +428,7 @@ const AdminDashboard = () => {
               </div>
             </motion.div>
 
-            {/* Recent Comments */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md"
-            >
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    최근 댓글
-                  </h3>
-                  <button
-                    onClick={() => navigate('/admin/comments')}
-                    className="text-pink-600 hover:text-pink-700 text-sm font-medium"
-                  >
-                    모두 보기
-                  </button>
-                </div>
-              </div>
-              <div className="p-6">
-                {stats.recentComments.length === 0 ? (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                    아직 댓글이 없습니다.
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {stats.recentComments.map((comment) => (
-                      <div key={comment.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 dark:text-white truncate">
-                            {comment.author_name}
-                          </h4>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                            {comment.content}
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
-                            {new Date(comment.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => navigate('/admin/comments')}
-                          className="p-1 text-pink-600 hover:text-pink-700"
-                        >
-                          <MessageSquare size={14} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
+
           </div>
         </div>
 
@@ -546,9 +495,9 @@ const AdminDashboard = () => {
 
           {/* Recent Projects */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 0 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md"
           >
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -599,6 +548,59 @@ const AdminDashboard = () => {
                           <Edit size={14} />
                         </button>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Recent Comments */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md"
+          >
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  최근 댓글
+                </h3>
+                <button
+                  onClick={() => navigate('/admin/comments')}
+                  className="text-pink-600 hover:text-pink-700 text-sm font-medium"
+                >
+                  모두 보기
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              {stats.recentComments.length === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                  아직 댓글이 없습니다.
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {stats.recentComments.map((comment) => (
+                    <div key={comment.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 dark:text-white truncate">
+                          {comment.author_name}
+                        </h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                          {comment.content}
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                          {new Date(comment.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => navigate('/admin/comments')}
+                        className="p-1 text-pink-600 hover:text-pink-700"
+                      >
+                        <MessageSquare size={14} />
+                      </button>
                     </div>
                   ))}
                 </div>
