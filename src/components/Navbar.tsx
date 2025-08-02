@@ -56,7 +56,13 @@ const Navbar = () => {
             <motion.div
               id="logo-text"
               whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold text-gray-900 dark:text-white"
+              className={`text-2xl font-bold transition-colors duration-200 ${
+                scrolled 
+                  ? 'text-gray-900 dark:text-white' 
+                  : location.pathname === '/'
+                    ? 'text-white drop-shadow-lg'
+                    : 'text-gray-900 dark:text-white'
+              }`}
             >
               HJLEE
             </motion.div>
@@ -71,8 +77,16 @@ const Navbar = () => {
                 to={item.path}
                 className={`relative text-sm font-medium transition-colors duration-200 ${
                   location.pathname === item.path
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
+                    ? scrolled 
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : location.pathname === '/'
+                        ? 'text-white drop-shadow-lg'
+                        : 'text-blue-600 dark:text-blue-400'
+                    : scrolled
+                      ? 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
+                      : location.pathname === '/'
+                        ? 'text-white hover:text-blue-200 drop-shadow-lg'
+                        : 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
                 }`}
               >
                 {item.name}
@@ -80,7 +94,13 @@ const Navbar = () => {
                   <motion.div
                     id="active-tab-indicator"
                     layoutId="activeTab"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"
+                    className={`absolute -bottom-1 left-0 right-0 h-0.5 ${
+                      scrolled 
+                        ? 'bg-blue-600 dark:bg-blue-400' 
+                        : location.pathname === '/'
+                          ? 'bg-white'
+                          : 'bg-blue-600 dark:bg-blue-400'
+                    }`}
                   />
                 )}
               </Link>
