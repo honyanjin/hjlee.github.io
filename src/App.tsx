@@ -79,6 +79,15 @@ function App() {
             } 
           />
           <Route 
+            id="admin-blog-categories-route" 
+            path="/admin/blog/categories" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminCategories />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             id="admin-projects-route" 
             path="/admin/projects" 
             element={

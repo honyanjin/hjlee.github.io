@@ -143,19 +143,7 @@ const Login = () => {
             </button>
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              관리자 계정은 Supabase 대시보드에서만 생성 가능합니다
-            </p>
-            <a 
-              href="https://supabase.com/dashboard" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              Supabase 대시보드에서 계정 생성 →
-            </a>
-          </div>
+
         </form>
       </motion.div>
     </div>

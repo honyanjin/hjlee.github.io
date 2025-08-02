@@ -16,7 +16,6 @@ import {
   BarChart3,
   FileText
 } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import type { Project } from '../lib/supabase'
 
@@ -25,7 +24,6 @@ const AdminProjects = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   
-  const { signOut, user } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -51,14 +49,7 @@ const AdminProjects = () => {
     }
   }
 
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      navigate('/')
-    } catch (err) {
-      console.error('Sign out error:', err)
-    }
-  }
+
 
   const handleDeleteProject = async (id: string) => {
     if (!confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) return
@@ -136,9 +127,7 @@ const AdminProjects = () => {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 프로젝트 관리
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                안녕하세요, {user?.email}님
-              </p>
+
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -149,18 +138,11 @@ const AdminProjects = () => {
                 대시보드
               </button>
               <button
-                onClick={() => navigate('/admin/blog')}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <FileText size={16} />
-                블로그 관리
-              </button>
-              <button
                 onClick={() => navigate('/admin/projects/categories')}
                 className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
                 <Tag size={16} />
-                카테고리 관리
+                프로젝트 카테고리
               </button>
               <button
                 onClick={() => navigate('/admin/projects/new')}
@@ -168,13 +150,6 @@ const AdminProjects = () => {
               >
                 <Plus size={16} />
                 새 프로젝트
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                <LogOut size={16} />
-                로그아웃
               </button>
             </div>
           </div>

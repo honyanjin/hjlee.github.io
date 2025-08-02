@@ -117,7 +117,7 @@ const Home = () => {
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-white text-center lg:text-left"
+              className="text-white text-center lg:text-left bg-black/80 backdrop-blur-xl rounded-2xl p-8 shadow-2xl relative z-20 border border-white/20"
             >
               <motion.h1 
                 id="hero-title"

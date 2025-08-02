@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Trash2, Save, X, Palette, Tag } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Plus, Edit, Trash2, Save, X, Palette, Tag, BarChart3 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import Navbar from '../components/Navbar'
-import ProtectedRoute from '../components/ProtectedRoute'
 import { supabase } from '../lib/supabase'
 import type { Category, CategoryInsert, CategoryUpdate } from '../lib/supabase'
 
@@ -25,6 +24,7 @@ const AdminCategories = () => {
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -141,34 +141,31 @@ const AdminCategories = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
-        <div className="pt-32 flex items-center justify-center">
-          <div className="flex items-center gap-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="text-gray-600 dark:text-gray-400">카테고리를 불러오는 중...</span>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
-        
-        <div className="pt-32 px-4">
-          <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between mb-8"
-            >
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                카테고리 관리
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <header className="bg-white dark:bg-gray-800 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                포스트 카테고리 관리
               </h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate('/admin')}
+                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <BarChart3 size={16} />
+                대시보드
+              </button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -178,26 +175,31 @@ const AdminCategories = () => {
                 <Plus size={20} />
                 <span>새 카테고리</span>
               </motion.button>
-            </motion.div>
+            </div>
+          </div>
+        </div>
+      </header>
 
-            {/* Error Message */}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6"
-              >
-                {error}
-              </motion.div>
-            )}
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6"
+          >
+            {error}
+          </motion.div>
+        )}
 
-            {/* Category Form */}
-            {showForm && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8"
-              >
+        {/* Category Form */}
+        {showForm && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8"
+          >
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {editingId ? '카테고리 수정' : '새 카테고리'}
@@ -404,11 +406,9 @@ const AdminCategories = () => {
                   카테고리 생성
                 </button>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </ProtectedRoute>
+        )}
+      </main>
+    </div>
   )
 }
 
