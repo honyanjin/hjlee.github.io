@@ -162,35 +162,40 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({ title, url, description, si
           </div>
 
           {/* 링크 복사 */}
-          <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <input
-              type="text"
-              value={url}
-              readOnly
-              className="flex-1 bg-transparent text-sm text-gray-600 dark:text-gray-300 outline-none"
-            />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={copyToClipboard}
-              className={`flex items-center gap-1 px-3 py-1 rounded text-sm transition-colors ${
-                copied 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
-            >
-              {copied ? (
-                <>
-                  <Check size={14} />
-                  <span>복사됨</span>
-                </>
-              ) : (
-                <>
-                  <Copy size={14} />
-                  <span>복사</span>
-                </>
-              )}
-            </motion.button>
+          <div className="space-y-3">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              이 포스트의 주소를 복사하세요
+            </div>
+            <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <input
+                type="text"
+                value={url}
+                readOnly
+                className="flex-1 bg-transparent text-sm text-gray-600 dark:text-gray-300 outline-none font-mono"
+              />
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={copyToClipboard}
+                className={`flex items-center gap-1 px-3 py-1 rounded text-sm transition-colors ${
+                  copied 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {copied ? (
+                  <>
+                    <Check size={14} />
+                    <span>복사됨</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={14} />
+                    <span>복사</span>
+                  </>
+                )}
+              </motion.button>
+            </div>
           </div>
         </motion.div>
       )}

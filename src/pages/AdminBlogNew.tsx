@@ -17,7 +17,9 @@ import {
   Calendar,
   Tag,
   User,
-  Image
+  Image,
+  Link,
+  Copy
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -80,6 +82,18 @@ const AdminBlogNew = () => {
   const watchedContent = watch('content')
   const watchedTitle = watch('title')
 
+  // URL 미리보기 생성
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9가-힣]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+  }
+
+  const previewSlug = watchedTitle ? generateSlug(watchedTitle) : ''
+  const previewUrl = previewSlug ? `${window.location.origin}/blog/${previewSlug}` : ''
+
   const onSubmit = async (data: PostFormData) => {
     setIsLoading(true)
     setError('')
@@ -99,6 +113,7 @@ const AdminBlogNew = () => {
         author: user?.email || 'Unknown',
         tags,
         image_url: imageUrl,
+        slug: generateSlug(data.title),
         is_published: data.is_published,
         published_at: data.is_published ? new Date().toISOString() : null
       }
@@ -191,6 +206,21 @@ const AdminBlogNew = () => {
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                     {errors.title.message}
                   </p>
+                )}
+                
+                {/* URL 미리보기 */}
+                {watchedTitle && (
+                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Link size={16} className="text-blue-600 dark:text-blue-400" />
+                      <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        포스트 URL 미리보기
+                      </span>
+                    </div>
+                    <div className="text-sm text-blue-700 dark:text-blue-300 font-mono break-all">
+                      {previewUrl}
+                    </div>
+                  </div>
                 )}
               </div>
 

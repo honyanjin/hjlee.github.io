@@ -212,14 +212,7 @@ const BlogPost = () => {
                   </div>
                 </div>
               )}
-              <div className="absolute top-4 right-4">
-                <ShareButtons 
-                  title={post.title}
-                  url={window.location.href}
-                  description={post.excerpt}
-                  size="sm"
-                />
-              </div>
+
             </div>
 
             {/* Post Content */}
@@ -248,6 +241,26 @@ const BlogPost = () => {
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
                 {post.title}
               </h1>
+
+              {/* URL Display */}
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                      이 포스트의 주소
+                    </div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300 font-mono break-all">
+                      {window.location.href}
+                    </div>
+                  </div>
+                  <ShareButtons 
+                    title={post.title}
+                    url={window.location.href}
+                    description={post.excerpt}
+                    size="sm"
+                  />
+                </div>
+              </div>
 
               {/* Excerpt */}
               {post.excerpt && (
