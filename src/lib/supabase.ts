@@ -59,6 +59,7 @@ export interface BlogPost {
   category: string
   tags: string[]
   image_url?: string
+  slug: string
   is_published: boolean
   created_at: string
   updated_at: string
@@ -73,6 +74,7 @@ export interface BlogPostInsert {
   category: string
   tags: string[]
   image_url?: string
+  slug: string
   is_published: boolean
   published_at?: string | null
 }
@@ -85,6 +87,7 @@ export interface BlogPostUpdate {
   category?: string
   tags?: string[]
   image_url?: string
+  slug?: string
   is_published?: boolean
   published_at?: string | null
 }

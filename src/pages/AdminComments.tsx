@@ -44,7 +44,7 @@ const AdminComments = () => {
         .from('comments')
         .select(`
           *,
-          post:blog_posts(title)
+          post:blog_posts(title, slug)
         `)
         .order('created_at', { ascending: false })
 
@@ -178,9 +178,13 @@ const AdminComments = () => {
                         {comment.post && (
                           <div className="flex items-center gap-1">
                             <FileText size={14} />
-                            <span className="text-blue-600 dark:text-blue-400">
+                            <button
+                              onClick={() => window.open(`/blog/${comment.post.slug}`, '_blank')}
+                              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors"
+                              title="새 탭에서 포스트 보기"
+                            >
                               {comment.post.title}
-                            </span>
+                            </button>
                           </div>
                         )}
                       </div>

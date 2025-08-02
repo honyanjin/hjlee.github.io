@@ -422,7 +422,7 @@ const Blog = () => {
                     </div>
                     <button 
                       id="featured-post-read-more" 
-                      onClick={() => navigate(`/blog/${featuredPost.id}`)}
+                      onClick={() => navigate(`/blog/${featuredPost.slug}`)}
                       className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
                     >
                       <span>자세히 보기</span>
@@ -555,7 +555,7 @@ const Blog = () => {
                       </div>
                       <button 
                         id={`blog-post-read-more-${post.id}`} 
-                        onClick={() => navigate(`/blog/${post.id}`)}
+                        onClick={() => navigate(`/blog/${post.slug}`)}
                         className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
                       >
                         <span className="text-sm">자세히 보기</span>

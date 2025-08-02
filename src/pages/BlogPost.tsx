@@ -13,7 +13,7 @@ import { supabase } from '../lib/supabase'
 import type { BlogPost, Category } from '../lib/supabase'
 
 const BlogPost = () => {
-  const { id } = useParams<{ id: string }>()
+  const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const [post, setPost] = useState<BlogPost | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
@@ -21,11 +21,11 @@ const BlogPost = () => {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (id) {
-      fetchPost(id)
+    if (slug) {
+      fetchPost(slug)
     }
     fetchCategories()
-  }, [id])
+  }, [slug])
 
   const fetchCategories = async () => {
     try {
@@ -41,13 +41,13 @@ const BlogPost = () => {
     }
   }
 
-  const fetchPost = async (postId: string) => {
+  const fetchPost = async (postSlug: string) => {
     try {
       setLoading(true)
       const { data, error } = await supabase
         .from('blog_posts')
         .select('*')
-        .eq('id', postId)
+        .eq('slug', postSlug)
         .eq('is_published', true)
         .single()
 
