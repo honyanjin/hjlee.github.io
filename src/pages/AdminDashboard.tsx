@@ -302,7 +302,7 @@ const AdminDashboard = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/admin/blog/categories')}
+              onClick={() => navigate('/admin/blog/categories?new=true')}
               className="flex items-center gap-3 p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >
               <Plus size={20} />
@@ -312,7 +312,7 @@ const AdminDashboard = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/admin/projects/categories')}
+              onClick={() => navigate('/admin/projects/categories?new=true')}
               className="flex items-center gap-3 p-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
             >
               <Plus size={20} />

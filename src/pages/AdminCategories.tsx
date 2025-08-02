@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Plus, Edit, Trash2, Save, X, Palette, Tag, BarChart3 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,6 +26,7 @@ const AdminCategories = () => {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const {
     register,
@@ -42,7 +43,12 @@ const AdminCategories = () => {
 
   useEffect(() => {
     fetchCategories()
-  }, [])
+    
+    // URL 파라미터에서 new=true인 경우 새 카테고리 폼 자동 열기
+    if (searchParams.get('new') === 'true') {
+      handleNewCategory()
+    }
+  }, [searchParams])
 
   const fetchCategories = async () => {
     try {

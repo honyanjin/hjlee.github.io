@@ -4,7 +4,7 @@ import { Plus, Edit, Trash2, Save, X, Palette, Tag, ArrowLeft, BarChart3 } from 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Breadcrumb from '../components/Breadcrumb'
 import type { ProjectCategory, ProjectCategoryInsert, ProjectCategoryUpdate } from '../lib/supabase'
@@ -28,6 +28,7 @@ const AdminProjectCategories = () => {
   const [showForm, setShowForm] = useState(false)
   
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const {
     register,
@@ -44,7 +45,12 @@ const AdminProjectCategories = () => {
 
   useEffect(() => {
     fetchCategories()
-  }, [])
+    
+    // URL 파라미터에서 new=true인 경우 새 카테고리 폼 자동 열기
+    if (searchParams.get('new') === 'true') {
+      handleNewCategory()
+    }
+  }, [searchParams])
 
   const fetchCategories = async () => {
     try {
