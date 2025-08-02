@@ -164,7 +164,10 @@ const AdminDashboard = () => {
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div>
+            <Breadcrumb items={[]} />
+          </div>
+          <div className="flex justify-between items-center pb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 관리자 대시보드
@@ -192,7 +195,6 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Breadcrumb items={[{ label: '대시보드' }]} />
         
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
@@ -241,7 +243,7 @@ const AdminDashboard = () => {
               <Tag size={24} />
               <div className="text-left">
                 <div className="font-semibold">포스트 카테고리</div>
-                <div className="text-sm opacity-90">블로그 카테고리</div>
+                <div className="text-sm opacity-90">포스트 분류/편집</div>
               </div>
             </motion.button>
             
@@ -254,7 +256,7 @@ const AdminDashboard = () => {
               <Database size={24} />
               <div className="text-left">
                 <div className="font-semibold">프로젝트 카테고리</div>
-                <div className="text-sm opacity-90">프로젝트 분류</div>
+                <div className="text-sm opacity-90">프로젝트 분류/편집</div>
               </div>
             </motion.button>
             

@@ -170,7 +170,13 @@ const AdminProjectCategories = () => {
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div>
+            <Breadcrumb items={[
+              { label: '프로젝트 관리', path: '/admin/projects' },
+              { label: '프로젝트 카테고리' }
+            ]} />
+          </div>
+          <div className="flex justify-between items-center pb-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 프로젝트 카테고리 관리
@@ -200,10 +206,6 @@ const AdminProjectCategories = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Breadcrumb items={[
-          { label: '프로젝트 관리', path: '/admin/projects' },
-          { label: '프로젝트 카테고리' }
-        ]} />
         
         {error && (
           <motion.div

@@ -112,12 +112,16 @@ const AdminBlog = () => {
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div>
+            <Breadcrumb items={[
+              { label: '블로그 관리', path: '/admin/blog' }
+            ]} />
+          </div>
+          <div className="flex justify-between items-center pb-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 블로그 관리
               </h1>
-
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -148,9 +152,6 @@ const AdminBlog = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Breadcrumb items={[
-          { label: '블로그 관리', path: '/admin/blog' }
-        ]} />
         
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
