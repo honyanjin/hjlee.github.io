@@ -92,9 +92,9 @@ const Home = () => {
   return (
     <div id="home-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO 
-        title="이호진 포트폴리오 - 프론트엔드 개발자"
-        description="프론트엔드 개발자 이호진의 포트폴리오 사이트입니다. React, TypeScript, Node.js를 활용한 웹 개발 프로젝트들을 확인하세요."
-        keywords="프론트엔드, React, TypeScript, 개발자, 포트폴리오, 웹개발, UI/UX"
+        title="이호진 포트폴리오 - 풀스택 개발자"
+        description="풀스택 개발자 이호진의 포트폴리오 사이트입니다. React, TypeScript, Node.js를 활용한 웹 개발 프로젝트들을 확인하세요."
+        keywords="풀스택, React, TypeScript, 개발자, 포트폴리오, 웹개발, UI/UX"
         type="website"
       />
       <Navbar />

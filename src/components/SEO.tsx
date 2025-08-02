@@ -16,8 +16,8 @@ interface SEOProps {
 
 const SEO: React.FC<SEOProps> = ({
   title = '이호진 포트폴리오',
-  description = '프론트엔드 개발자 이호진의 포트폴리오 사이트입니다.',
-  keywords = '프론트엔드, React, TypeScript, 개발자, 포트폴리오',
+  description = '풀스택 개발자 이호진의 포트폴리오 사이트입니다.',
+  keywords = '풀스택, React, TypeScript, 개발자, 포트폴리오',
   author = '이호진',
   image = '/og-image.jpg',
   url = window.location.href,
