@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import Breadcrumb from '../components/Breadcrumb'
 import type { BlogPost, Project, Category, ProjectCategory, Comment } from '../lib/supabase'
 
 interface DashboardStats {
@@ -168,9 +169,6 @@ const AdminDashboard = () => {
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 관리자 대시보드
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                안녕하세요, {user?.email}님
-              </p>
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -194,6 +192,8 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumb items={[{ label: '대시보드' }]} />
+        
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
             {error}

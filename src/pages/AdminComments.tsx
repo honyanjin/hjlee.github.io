@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import Breadcrumb from '../components/Breadcrumb'
 import type { Comment, BlogPost } from '../lib/supabase'
 
 interface CommentWithPost extends Comment {
@@ -102,9 +103,6 @@ const AdminComments = () => {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 댓글 관리
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                안녕하세요, {user?.email}님
-              </p>
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -114,27 +112,6 @@ const AdminComments = () => {
                 <BarChart3 size={16} />
                 대시보드
               </button>
-              <button
-                onClick={() => navigate('/admin/blog')}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <FileText size={16} />
-                블로그 관리
-              </button>
-              <button
-                onClick={() => navigate('/admin/projects')}
-                className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                <FolderOpen size={16} />
-                프로젝트 관리
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                <LogOut size={16} />
-                로그아웃
-              </button>
             </div>
           </div>
         </div>
@@ -142,6 +119,10 @@ const AdminComments = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumb items={[
+          { label: '댓글 관리' }
+        ]} />
+        
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
             {error}

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import Breadcrumb from '../components/Breadcrumb'
 import type { ProjectInsert, ProjectCategory } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
 
@@ -142,6 +143,11 @@ const AdminProjectNew = () => {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumb items={[
+          { label: '프로젝트 관리', path: '/admin/projects' },
+          { label: '새 프로젝트 작성' }
+        ]} />
+        
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
             {error}

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { supabase } from '../lib/supabase'
+import Breadcrumb from '../components/Breadcrumb'
 import type { Category, CategoryInsert, CategoryUpdate } from '../lib/supabase'
 
 const categorySchema = z.object({
@@ -182,6 +183,11 @@ const AdminCategories = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumb items={[
+          { label: '블로그 관리', path: '/admin/blog' },
+          { label: '포스트 카테고리' }
+        ]} />
+        
         {/* Error Message */}
         {error && (
           <motion.div

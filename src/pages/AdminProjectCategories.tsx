@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import Breadcrumb from '../components/Breadcrumb'
 import type { ProjectCategory, ProjectCategoryInsert, ProjectCategoryUpdate } from '../lib/supabase'
 
 const categorySchema = z.object({
@@ -193,6 +194,11 @@ const AdminProjectCategories = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumb items={[
+          { label: '프로젝트 관리', path: '/admin/projects' },
+          { label: '프로젝트 카테고리' }
+        ]} />
+        
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
