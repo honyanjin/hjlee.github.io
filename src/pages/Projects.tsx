@@ -353,7 +353,7 @@ const Projects = () => {
                 >
                   <div className="relative overflow-hidden">
                     <img 
-                      src={project.image_url || '/src/content/pic_projects/Project_Temp_0.jpg'} 
+                      src={project.image_url || '/content/pic_projects/Project_Temp_0.jpg'} 
                       alt={project.title}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                     />

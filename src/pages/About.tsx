@@ -74,7 +74,7 @@ const About = () => {
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
                 <div className="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-lg">
                   <img 
-                    src="/src/content/pic_profile/hjlee_Profile_0.JPG" 
+                    src="/content/pic_profile/hjlee_Profile_0.JPG" 
                     alt="HJLEE Profile" 
                     className="w-full h-full object-cover"
                   />
@@ -138,7 +138,7 @@ const About = () => {
                   <div className="flex justify-center">
                     <div className="relative w-64 h-64 rounded-lg overflow-hidden shadow-lg">
                       <img 
-                        src="/src/content/pic_about_me/hjlee_about_me_0.jpg" 
+                        src="/content/pic_about_me/hjlee_about_me_0.jpg" 
                         alt="HJLEE About Me" 
                         className="w-full h-full object-cover"
                       />

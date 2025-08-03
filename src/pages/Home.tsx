@@ -192,7 +192,7 @@ const Home = () => {
                 <div id="profile-image-container" className="relative w-80 h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl border-4 border-white/20">
                   <img 
                     id="profile-image"
-                    src="/src/content/pic_profile/hjlee_Profile_0.JPG" 
+                    src="/content/pic_profile/hjlee_Profile_0.JPG" 
                     alt="HJLEE Profile" 
                     className="w-full h-full object-cover"
                   />
@@ -653,7 +653,7 @@ const Home = () => {
                   <div className="relative overflow-hidden">
                     <img 
                       id={`featured-project-image-${project.id}`}
-                      src={project.image_url || '/src/content/pic_projects/Project_Temp_0.jpg'} 
+                      src={project.image_url || '/content/pic_projects/Project_Temp_0.jpg'} 
                       alt={project.title}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                     />
@@ -775,7 +775,7 @@ const Home = () => {
                   <div className="relative overflow-hidden">
                     <img 
                       id={`project-image-${project.id}`}
-                      src={project.image_url || '/src/content/pic_projects/Project_Temp_0.jpg'} 
+                      src={project.image_url || '/content/pic_projects/Project_Temp_0.jpg'} 
                       alt={project.title}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                     />
