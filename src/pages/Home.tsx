@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Download } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
+import DotNavigation from '../components/DotNavigation'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
 import type { Project, ProjectCategory } from '../lib/supabase'
 
@@ -89,8 +90,18 @@ const Home = () => {
   const featuredProjects = projects.filter(project => project.featured)
   const nonFeaturedProjects = projects.filter(project => !project.featured)
 
+  // 닷 네비게이션을 위한 섹션 ID들 (Featured Projects가 있을 때만 포함)
+  const sections = [
+    'hero-section',
+    'about-section',
+    ...(featuredProjects.length > 0 ? ['featured-projects-section'] : []),
+    'projects-section',
+    'contact-section'
+  ]
+
   return (
     <div id="home-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <DotNavigation sections={sections} />
       <SEO 
         title="이호진 포트폴리오 - 풀스택 개발자"
         description="풀스택 개발자 이호진의 포트폴리오 사이트입니다. React, TypeScript, Node.js를 활용한 웹 개발 프로젝트들을 확인하세요."
