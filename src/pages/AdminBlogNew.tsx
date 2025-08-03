@@ -33,7 +33,7 @@ const postSchema = z.object({
   excerpt: z.string().min(1, '요약을 입력해주세요'),
   category: z.string().min(1, '카테고리를 선택해주세요'),
   tags: z.string().optional(),
-  is_published: z.boolean().default(false)
+  is_published: z.boolean()
 })
 
 type PostFormData = z.infer<typeof postSchema>
@@ -335,9 +335,9 @@ const AdminBlogNew = () => {
                     rehypePlugins={[rehypeHighlight]}
                     components={{
                       // 코드 블록 스타일링
-                      code({ node, inline, className, children, ...props }) {
+                      code({ node, className, children, ...props }) {
                         const match = /language-(\w+)/.exec(className || '')
-                        return !inline && match ? (
+                        return match ? (
                           <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
                             <code className={className} {...props}>
                               {children}

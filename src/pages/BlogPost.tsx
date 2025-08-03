@@ -301,9 +301,9 @@ const BlogPost = () => {
                   rehypePlugins={[rehypeHighlight]}
                   components={{
                     // 코드 블록 스타일링
-                    code({ node, inline, className, children, ...props }) {
+                    code({ node, className, children, ...props }) {
                       const match = /language-(\w+)/.exec(className || '')
-                      return !inline && match ? (
+                      return match ? (
                         <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
                           <code className={className} {...props}>
                             {children}

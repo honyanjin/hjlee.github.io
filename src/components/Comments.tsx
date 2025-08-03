@@ -105,7 +105,7 @@ const Comments = ({ postId }: CommentsProps) => {
 
   // 차단 상태 확인
   const checkBlockStatus = (limit: CommentLimit) => {
-    const now = new Date()
+    // const now = new Date()
     const lastReset = new Date(limit.last_reset_date)
     const today = new Date().toISOString().split('T')[0]
 

@@ -26,9 +26,9 @@ const projectSchema = z.object({
   tags: z.string().optional(),
   live_url: z.string().url().optional().or(z.literal('')),
   github_url: z.string().url().optional().or(z.literal('')),
-  featured: z.boolean().default(false),
+  featured: z.boolean(),
   sort_order: z.number().min(0, '순서는 0 이상이어야 합니다'),
-  is_published: z.boolean().default(false)
+  is_published: z.boolean()
 })
 
 type ProjectFormData = z.infer<typeof projectSchema>

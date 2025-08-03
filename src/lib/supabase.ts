@@ -31,7 +31,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export const testSupabaseConnection = async () => {
   try {
     console.log('🔍 Supabase 연결 테스트 중...')
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('projects')
       .select('count')
       .limit(1)

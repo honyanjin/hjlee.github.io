@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
+import { Upload, X, Loader2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 interface ImageUploadProps {
@@ -38,7 +38,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
       const fileName = `${Date.now()}.${fileExt}`
 
       // Supabase Storage에 업로드
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('blog-images')
         .upload(fileName, file, {
           cacheControl: '3600',
