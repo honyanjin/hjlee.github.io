@@ -366,67 +366,84 @@ const AdminBlogEdit = () => {
             
             {!isBasicInfoCollapsed && (
               <div className="p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Title */}
-                  <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      제목 *
-                    </label>
-                    <input
-                      {...register('title')}
-                      type="text"
-                      id="title"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                      placeholder="포스트 제목을 입력하세요"
-                    />
-                    {errors.title && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                        {errors.title.message}
-                      </p>
-                    )}
-                    
-                    {/* URL 미리보기 */}
-                    {watchedTitle && (
-                      <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Link size={16} className="text-blue-600 dark:text-blue-400" />
-                          <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                            포스트 URL 미리보기
-                          </span>
-                        </div>
-                        <div className="text-sm text-blue-700 dark:text-blue-300 font-mono break-all">
-                          {previewUrl}
-                        </div>
-                      </div>
-                    )}
+                <div className="space-y-6">
+                  {/* Title and Category Row */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Title */}
+                    <div>
+                      <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        제목 *
+                      </label>
+                      <input
+                        {...register('title')}
+                        type="text"
+                        id="title"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                        placeholder="포스트 제목을 입력하세요"
+                      />
+                      {errors.title && (
+                        <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                          {errors.title.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        카테고리 *
+                      </label>
+                      <select
+                        {...register('category')}
+                        id="category"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      >
+                        <option value="">카테고리 선택</option>
+                        {categories.map(category => (
+                          <option key={category.id} value={category.slug}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.category && (
+                        <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                          {errors.category.message}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Category */}
-                  <div>
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      카테고리 *
-                    </label>
-                    <select
-                      {...register('category')}
-                      id="category"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="">카테고리 선택</option>
-                      {categories.map(category => (
-                        <option key={category.id} value={category.slug}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.category && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                        {errors.category.message}
-                      </p>
-                    )}
-                  </div>
+                  {/* URL Preview */}
+                  {watchedTitle && (
+                    <div className="p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Link size={14} className="text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                        <span className="text-xs text-gray-600 dark:text-gray-400 flex-shrink-0">
+                          포스트 주소:
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-gray-700 dark:text-gray-300 font-mono overflow-x-auto whitespace-nowrap">
+                            {previewUrl}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(previewUrl)
+                            setSuccess('URL이 클립보드에 복사되었습니다.')
+                            setTimeout(() => setSuccess(''), 2000)
+                          }}
+                          className="flex-shrink-0 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                          title="URL 복사"
+                        >
+                          <Copy size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Excerpt */}
-                  <div className="lg:col-span-2">
+                  <div>
                     <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       요약 *
                     </label>
@@ -445,7 +462,7 @@ const AdminBlogEdit = () => {
                   </div>
 
                   {/* Tags */}
-                  <div className="lg:col-span-2">
+                  <div>
                     <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       태그
                     </label>
@@ -459,7 +476,7 @@ const AdminBlogEdit = () => {
                   </div>
 
                   {/* Featured Image */}
-                  <div className="lg:col-span-2">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       대표 이미지
                     </label>
