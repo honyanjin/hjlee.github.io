@@ -474,10 +474,12 @@ const AdminBlogEdit = () => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       대표 이미지
                     </label>
-                    <ImageUpload
-                      onImageUpload={setImageUrl}
-                      currentImage={imageUrl}
-                    />
+                    <div onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}>
+                      <ImageUpload
+                        onImageUpload={setImageUrl}
+                        currentImage={imageUrl}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

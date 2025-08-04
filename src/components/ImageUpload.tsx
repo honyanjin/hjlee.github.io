@@ -108,6 +108,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
             className="w-full h-48 object-cover rounded-lg"
           />
           <button
+            type="button"
             onClick={removeImage}
             className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700 transition-colors"
           >
@@ -149,6 +150,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
                   이미지를 드래그하여 업로드하거나
                 </p>
                 <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                 >
