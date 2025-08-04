@@ -406,9 +406,11 @@ const AdminProjectEdit = () => {
               프로젝트 이미지
             </h2>
             
+            {/* Image Upload */}
             <ImageUpload
               onImageUpload={setImageUrl}
               currentImage={imageUrl}
+              bucketName="project-images"
             />
           </div>
 

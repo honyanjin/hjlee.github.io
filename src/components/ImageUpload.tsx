@@ -6,9 +6,15 @@ interface ImageUploadProps {
   onImageUpload: (url: string) => void
   currentImage?: string
   className?: string
+  bucketName?: 'blog-images' | 'project-images'
 }
 
-const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploadProps) => {
+const ImageUpload = ({ 
+  onImageUpload, 
+  currentImage, 
+  className = '',
+  bucketName = 'blog-images'
+}: ImageUploadProps) => {
   const [isUploading, setIsUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState('')
@@ -39,7 +45,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
 
       // Supabase Storage에 업로드
       const { error } = await supabase.storage
-        .from('blog-images')
+        .from(bucketName)
         .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false
@@ -49,7 +55,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
 
       // 공개 URL 생성
       const { data: urlData } = supabase.storage
-        .from('blog-images')
+        .from(bucketName)
         .getPublicUrl(fileName)
 
       onImageUpload(urlData.publicUrl)
@@ -92,6 +98,14 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
     onImageUpload('')
   }
 
+  // 권장 크기 메시지
+  const getRecommendedSize = () => {
+    if (bucketName === 'project-images') {
+      return '💡 권장: 1200×630px (19:10 비율) - 프로젝트 썸네일용'
+    }
+    return '💡 권장: 896×384px (7:3 비율) - 블로그 헤더용'
+  }
+
   return (
     <div className={`space-y-4 ${className}`}>
       {error && (
@@ -118,7 +132,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
           </div>
           <div className="text-center">
             <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-              💡 권장: 896×384px (7:3 비율) - 최적의 표시를 위해
+              {getRecommendedSize()}
             </p>
           </div>
         </div>
@@ -169,7 +183,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
                   PNG, JPG, GIF 최대 5MB
                 </p>
                 <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                  💡 권장: 896×384px (7:3 비율)
+                  {getRecommendedSize()}
                 </p>
               </div>
             </div>

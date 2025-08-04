@@ -309,16 +309,15 @@ const AdminProjectNew = () => {
             </div>
           </div>
 
-          {/* Image */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              <Image size={20} className="inline mr-2" />
+          {/* Image Upload */}
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               프로젝트 이미지
-            </h2>
-            
+            </label>
             <ImageUpload
               onImageUpload={setImageUrl}
               currentImage={imageUrl}
+              bucketName="project-images"
             />
           </div>
 

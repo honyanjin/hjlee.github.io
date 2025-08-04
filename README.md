@@ -169,8 +169,11 @@ CREATE TABLE projects (
 
 #### 4.3 Storage 버킷 생성
 1. Storage 섹션에서 새 버킷을 생성하세요
-2. 버킷 이름: `project-images`, `blog-images`
+2. 버킷 이름: `blog-images`, `project-images`
 3. Public bucket으로 설정하세요
+4. 각 버킷의 용도:
+   - `blog-images`: 블로그 포스트 이미지
+   - `project-images`: 프로젝트 썸네일 이미지
 
 #### 4.4 관리자 계정 생성
 1. Authentication > Users에서 새 사용자를 생성하세요
@@ -212,19 +215,26 @@ src/
 │   ├── BlogPost.tsx
 │   ├── Contact.tsx
 │   ├── Login.tsx
-│   └── admin/         # 관리자 페이지
-│       ├── AdminDashboard.tsx
-│       ├── AdminBlog.tsx
-│       ├── AdminBlogNew.tsx
-│       ├── AdminBlogEdit.tsx
-│       ├── AdminCategories.tsx
-│       ├── AdminProjects.tsx
-│       ├── AdminProjectNew.tsx
-│       ├── AdminProjectEdit.tsx
-│       ├── AdminProjectCategories.tsx
-│       └── AdminComments.tsx
-└── content/           # 정적 콘텐츠
-    └── images/
+│   ├── AdminDashboard.tsx
+│   ├── AdminBlog.tsx
+│   ├── AdminBlogNew.tsx
+│   ├── AdminBlogEdit.tsx
+│   ├── AdminCategories.tsx
+│   ├── AdminProjects.tsx
+│   ├── AdminProjectNew.tsx
+│   ├── AdminProjectEdit.tsx
+│   ├── AdminProjectCategories.tsx
+│   └── AdminComments.tsx
+├── content/           # 정적 콘텐츠
+│   ├── pic_about_me/
+│   ├── pic_profile/
+│   └── pic_projects/
+├── assets/            # 이미지 및 아이콘
+│   └── react.svg
+├── App.tsx            # 메인 앱 컴포넌트
+├── main.tsx           # 앱 진입점
+├── index.css          # 전역 스타일
+└── vite-env.d.ts     # Vite 타입 정의
 ```
 
 ## 🔧 주요 설정
