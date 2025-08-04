@@ -282,75 +282,75 @@ const Comments = ({ postId }: CommentsProps) => {
   }
 
   return (
-    <div className="mt-12">
-      {/* 댓글 섹션 헤더 */}
-      <div className="flex items-center gap-2 mb-8">
-        <MessageCircle size={24} className="text-blue-600" />
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+    <div className="mt-8 sm:mt-12">
+      {/* 댓글 섹션 헤더 - 반응형 개선 */}
+      <div className="flex items-center gap-2 mb-6 sm:mb-8">
+        <MessageCircle size={20} className="sm:w-6 sm:h-6 text-blue-600" />
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
           댓글 ({comments.length})
         </h3>
       </div>
 
-                {/* 댓글 작성 폼 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`rounded-lg shadow-md p-6 mb-8 ${
-              isBlocked 
-                ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' 
-                : 'bg-white dark:bg-gray-800'
-            }`}
-          >
-                  {isBlocked && (
-            <div className="mb-4 p-4 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
-              <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
-                <Shield size={20} />
-                <div>
-                  <p className="font-semibold">댓글 작성이 차단되었습니다</p>
-                  <p className="text-sm">
-                    이 포스트는 하루 최대 댓글 수(100개)를 초과하여 임시로 댓글 작성이 차단되었습니다.
-                    {blockedUntil && (
-                      <span> 24시간 후({new Date(blockedUntil).toLocaleString()})에 다시 시도해주세요.</span>
-                    )}
-                  </p>
-                </div>
+      {/* 댓글 작성 폼 - 반응형 개선 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`rounded-lg shadow-md p-4 sm:p-6 mb-6 sm:mb-8 ${
+          isBlocked 
+            ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' 
+            : 'bg-white dark:bg-gray-800'
+        }`}
+      >
+        {isBlocked && (
+          <div className="mb-4 p-3 sm:p-4 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
+            <div className="flex items-start gap-2 text-red-800 dark:text-red-200">
+              <Shield size={18} className="sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-sm sm:text-base">댓글 작성이 차단되었습니다</p>
+                <p className="text-xs sm:text-sm mt-1">
+                  이 포스트는 하루 최대 댓글 수(100개)를 초과하여 임시로 댓글 작성이 차단되었습니다.
+                  {blockedUntil && (
+                    <span> 24시간 후({new Date(blockedUntil).toLocaleString()})에 다시 시도해주세요.</span>
+                  )}
+                </p>
               </div>
             </div>
-          )}
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label htmlFor="authorName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="authorName" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 이름 *
               </label>
-                             <input
-                 type="text"
-                 id="authorName"
-                 value={currentUser?.name || authorName}
-                 onChange={(e) => setAuthorName(e.target.value)}
-                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                 placeholder="이름을 입력하세요"
-                 required
-               />
+              <input
+                type="text"
+                id="authorName"
+                value={currentUser?.name || authorName}
+                onChange={(e) => setAuthorName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+                placeholder="이름을 입력하세요"
+                required
+              />
             </div>
             <div>
-              <label htmlFor="authorEmail" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="authorEmail" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 이메일 *
               </label>
-                             <input
-                 type="email"
-                 id="authorEmail"
-                 value={currentUser?.email || authorEmail}
-                 onChange={(e) => setAuthorEmail(e.target.value)}
-                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                 placeholder="이메일을 입력하세요"
-                 required
-               />
+              <input
+                type="email"
+                id="authorEmail"
+                value={currentUser?.email || authorEmail}
+                onChange={(e) => setAuthorEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+                placeholder="이메일을 입력하세요"
+                required
+              />
             </div>
           </div>
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="content" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               댓글 *
             </label>
             <textarea
@@ -358,38 +358,38 @@ const Comments = ({ postId }: CommentsProps) => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white resize-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white resize-none text-sm"
               placeholder="댓글을 입력하세요..."
               required
             />
           </div>
           {error && (
-            <div className="text-red-600 dark:text-red-400 text-sm">
+            <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm">
               {error}
             </div>
           )}
-                     <button
-             type="submit"
-             disabled={submitting || isBlocked}
-             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-           >
-             <Send size={16} />
-             {submitting ? '작성 중...' : isBlocked ? '댓글 작성 차단됨' : '댓글 작성'}
-           </button>
+          <button
+            type="submit"
+            disabled={submitting || isBlocked}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+          >
+            <Send size={14} className="sm:w-4 sm:h-4" />
+            {submitting ? '작성 중...' : isBlocked ? '댓글 작성 차단됨' : '댓글 작성'}
+          </button>
         </form>
       </motion.div>
 
-      {/* 댓글 목록 */}
-      <div className="space-y-4">
+      {/* 댓글 목록 - 반응형 개선 */}
+      <div className="space-y-3 sm:space-y-4">
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="flex items-center gap-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span className="text-gray-600 dark:text-gray-400">댓글을 불러오는 중...</span>
+          <div className="flex items-center justify-center py-6 sm:py-8">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-blue-600"></div>
+              <span className="text-gray-600 dark:text-gray-400 text-sm">댓글을 불러오는 중...</span>
             </div>
           </div>
         ) : comments.length === 0 ? (
-          <div className="text-center py-8 text-gray-600 dark:text-gray-400">
+          <div className="text-center py-6 sm:py-8 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
             아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
           </div>
         ) : (
@@ -401,39 +401,39 @@ const Comments = ({ postId }: CommentsProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6"
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0 mb-3">
                   <div className="flex items-center gap-2">
-                    <User size={16} className="text-gray-500" />
-                    <span className="font-semibold text-gray-900 dark:text-white">
+                    <User size={14} className="sm:w-4 sm:h-4 text-gray-500" />
+                    <span className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
                       {comment.author_name}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <Calendar size={14} />
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
+                      <Calendar size={12} className="sm:w-3.5 sm:h-3.5" />
                       <span>{new Date(comment.created_at).toLocaleDateString()}</span>
                     </div>
-                                         {(isAdmin || 
-                       (currentUser && 
-                        currentUser.email === comment.author_email && 
-                        currentUser.name === comment.author_name)) && (
-                       <button
-                         onClick={() => handleDelete(comment)}
-                         className={`transition-colors ${
-                           isAdmin 
-                             ? 'text-orange-500 hover:text-orange-700' 
-                             : 'text-red-500 hover:text-red-700'
-                         }`}
-                         title={isAdmin ? '관리자 권한으로 댓글 삭제' : '댓글 삭제'}
-                       >
-                         {isAdmin ? <Shield size={14} /> : <Trash2 size={14} />}
-                       </button>
-                     )}
+                    {(isAdmin || 
+                      (currentUser && 
+                       currentUser.email === comment.author_email && 
+                       currentUser.name === comment.author_name)) && (
+                      <button
+                        onClick={() => handleDelete(comment)}
+                        className={`transition-colors ${
+                          isAdmin 
+                            ? 'text-orange-500 hover:text-orange-700' 
+                            : 'text-red-500 hover:text-red-700'
+                        }`}
+                        title={isAdmin ? '관리자 권한으로 댓글 삭제' : '댓글 삭제'}
+                      >
+                        {isAdmin ? <Shield size={12} className="sm:w-3.5 sm:h-3.5" /> : <Trash2 size={12} className="sm:w-3.5 sm:h-3.5" />}
+                      </button>
+                    )}
                   </div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
                   {comment.content}
                 </p>
               </motion.div>

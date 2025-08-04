@@ -255,31 +255,31 @@ const Blog = () => {
       />
       <Navbar />
       
-      {/* Hero Section */}
-      <section id="blog-hero" className="pt-32 pb-20 px-4">
+      {/* Hero Section - 반응형 개선 */}
+      <section id="blog-hero" className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-3 sm:px-4 lg:px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
             id="blog-hero-content"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-12 lg:mb-16"
           >
-            <h1 id="blog-hero-title" className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h1 id="blog-hero-title" className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
               Blog
             </h1>
-            <p id="blog-hero-description" className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p id="blog-hero-description" className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-4">
               개발 경험과 기술적인 내용을 공유하는 블로그입니다. 
               새로운 기술을 배우고 적용하는 과정에서 얻은 인사이트를 나눕니다.
             </p>
           </motion.div>
 
-          {/* Search Bar */}
+          {/* Search Bar - 반응형 개선 */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="max-w-md mx-auto mb-8"
+            className="max-w-sm sm:max-w-md lg:max-w-lg mx-auto mb-6 sm:mb-8"
           >
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -288,16 +288,16 @@ const Blog = () => {
                 placeholder="포스트 검색..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
               />
             </div>
           </motion.div>
 
-          {/* Category Filter */}
-          <div id="blog-category-filters" className="flex justify-center gap-4 mb-12">
+          {/* Category Filter - 반응형 개선 */}
+          <div id="blog-category-filters" className="flex flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4 mb-8 sm:mb-10 lg:mb-12 px-4">
             <button
               onClick={() => setActiveCategory('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                 activeCategory === 'all'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
@@ -310,7 +310,7 @@ const Blog = () => {
                 key={category.id}
                 id={`category-filter-${category.slug}`}
                 onClick={() => setActiveCategory(category.slug)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                   activeCategory === category.slug
                     ? 'bg-blue-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
@@ -323,8 +323,8 @@ const Blog = () => {
         </div>
       </section>
 
-      {/* Featured Post */}
-      <section id="featured-post-section" className="py-20 px-4 bg-white dark:bg-gray-800">
+      {/* Featured Post - 반응형 개선 */}
+      <section id="featured-post-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6 bg-white dark:bg-gray-800">
         <div className="max-w-6xl mx-auto">
           <motion.div
             id="featured-post-header"
@@ -332,12 +332,12 @@ const Blog = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-12 lg:mb-16"
           >
-            <h2 id="featured-post-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="featured-post-title" className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
               Featured Post
             </h2>
-            <p id="featured-post-description" className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="featured-post-description" className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300">
               최신 블로그 포스트를 확인해보세요
             </p>
           </motion.div>
@@ -352,7 +352,7 @@ const Blog = () => {
               className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg"
             >
               <div className="grid lg:grid-cols-2">
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden h-48 sm:h-56 lg:h-auto">
                   {featuredPost.image_url ? (
                     <img 
                       id="featured-post-image"
@@ -365,18 +365,18 @@ const Blog = () => {
                       className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300"
                       style={getBackgroundStyle(featuredPost)}
                     >
-                      <div className="text-white text-center">
-                        <div className="text-4xl font-bold mb-2">
+                      <div className="text-white text-center px-4">
+                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
                           {(() => {
                             const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
                             return foundCategory ? foundCategory.name.toUpperCase() : (featuredPost.category?.toUpperCase() || 'BLOG')
                           })()}
                         </div>
-                        <div className="text-lg opacity-90">Blog Post</div>
+                        <div className="text-sm sm:text-base lg:text-lg opacity-90">Blog Post</div>
                       </div>
                     </div>
                   )}
-                  <div className="absolute top-4 right-4">
+                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
                     <ShareButtons 
                       title={featuredPost.title}
                       url={`${window.location.origin}/blog/${featuredPost.id}`}
@@ -385,29 +385,29 @@ const Blog = () => {
                     />
                   </div>
                 </div>
-                <div className="p-8">
-                  <div className="flex items-center gap-4 mb-4">
-                    <span id="featured-post-category" className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
+                <div className="p-4 sm:p-6 lg:p-8">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                    <span id="featured-post-category" className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
                       {(() => {
                         const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
                         return foundCategory ? foundCategory.name : featuredPost.category
                       })()}
                     </span>
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <Calendar size={16} />
-                      <span id="featured-post-date" className="text-sm">
+                    <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                      <Calendar size={14} className="sm:w-4 sm:h-4" />
+                      <span id="featured-post-date" className="text-xs sm:text-sm">
                         {new Date(featuredPost.published_at || featuredPost.created_at).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
-                  <h3 id="featured-post-title-text" className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                  <h3 id="featured-post-title-text" className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
                     {featuredPost.title}
                   </h3>
-                  <p id="featured-post-excerpt" className="text-gray-600 dark:text-gray-300 mb-6">
+                  <p id="featured-post-excerpt" className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 line-clamp-3">
                     {featuredPost.excerpt}
                   </p>
                   {featuredPost.tags && featuredPost.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
                       {featuredPost.tags.map((tag, index) => (
                         <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full dark:bg-gray-600 dark:text-gray-300">
                           {tag}
@@ -415,33 +415,33 @@ const Blog = () => {
                       ))}
                     </div>
                   )}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <User size={16} />
-                      <span id="featured-post-author" className="text-sm">{featuredPost.author}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                    <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                      <User size={14} className="sm:w-4 sm:h-4" />
+                      <span id="featured-post-author" className="text-xs sm:text-sm">{featuredPost.author}</span>
                     </div>
                     <button 
                       id="featured-post-read-more" 
                       onClick={() => navigate(`/blog/${featuredPost.slug}`)}
-                      className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm sm:text-base"
                     >
                       <span>자세히 보기</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={14} className="sm:w-4 sm:h-4" />
                     </button>
                   </div>
                 </div>
               </div>
             </motion.div>
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-8 sm:py-12">
               <p className="text-gray-600 dark:text-gray-400">아직 발행된 포스트가 없습니다.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* All Posts */}
-      <section id="all-posts-section" className="py-20 px-4">
+      {/* All Posts - 반응형 개선 */}
+      <section id="all-posts-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
             id="all-posts-header"
@@ -449,18 +449,18 @@ const Blog = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-12 lg:mb-16"
           >
-            <h2 id="all-posts-title" className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 id="all-posts-title" className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
               All Posts
             </h2>
-            <p id="all-posts-description" className="text-xl text-gray-600 dark:text-gray-300">
+            <p id="all-posts-description" className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300">
               모든 블로그 포스트를 확인해보세요
             </p>
           </motion.div>
 
           {filteredPosts.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8 sm:py-12">
               <p className="text-gray-600 dark:text-gray-400">
                 {searchTerm || activeCategory !== 'all' 
                   ? '검색 결과가 없습니다.' 
@@ -468,7 +468,7 @@ const Blog = () => {
               </p>
             </div>
           ) : (
-            <div id="all-posts-grid" className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="all-posts-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {filteredPosts.map((post, index) => (
                 <motion.div
                   key={post.id}
@@ -485,34 +485,34 @@ const Blog = () => {
                         id={`blog-post-image-${post.id}`}
                         {...getPostImageProps(post)}
                         alt={post.title}
-                        className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                        className="w-full h-40 sm:h-48 object-cover hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
                       <div 
                         id={`blog-post-image-${post.id}`}
-                        className="w-full h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300"
+                        className="w-full h-40 sm:h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300"
                         style={getBackgroundStyle(post)}
                       >
-                        <div className="text-white text-center">
-                          <div className="text-2xl font-bold mb-1">
+                        <div className="text-white text-center px-3 sm:px-4">
+                          <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">
                             {(() => {
                               const foundCategory = categories.find(cat => cat.id === post.category || cat.slug === post.category)
                               return foundCategory ? foundCategory.name.toUpperCase() : (post.category?.toUpperCase() || 'BLOG')
                             })()}
                           </div>
-                          <div className="text-sm opacity-90">Blog Post</div>
+                          <div className="text-xs sm:text-sm opacity-90">Blog Post</div>
                         </div>
                       </div>
                     )}
-                    <div className="absolute top-4 left-4">
-                      <span id={`blog-post-category-${post.id}`} className="px-3 py-1 bg-blue-600 text-white text-sm rounded-full">
+                    <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
+                      <span id={`blog-post-category-${post.id}`} className="px-2 sm:px-3 py-1 bg-blue-600 text-white text-xs sm:text-sm rounded-full">
                         {(() => {
                           const foundCategory = categories.find(cat => cat.id === post.category || cat.slug === post.category)
                           return foundCategory ? foundCategory.name : post.category
                         })()}
                       </span>
                     </div>
-                    <div className="absolute top-4 right-4">
+                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
                       <ShareButtons 
                         title={post.title}
                         url={`${window.location.origin}/blog/${post.id}`}
@@ -521,23 +521,23 @@ const Blog = () => {
                       />
                     </div>
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="p-4 sm:p-6">
+                    <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-1">
-                        <Calendar size={14} />
+                        <Calendar size={12} className="sm:w-3.5 sm:h-3.5" />
                         <span id={`blog-post-date-${post.id}`}>
                           {new Date(post.published_at || post.created_at).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
-                    <h3 id={`blog-post-title-${post.id}`} className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    <h3 id={`blog-post-title-${post.id}`} className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 line-clamp-2">
                       {post.title}
                     </h3>
-                    <p id={`blog-post-excerpt-${post.id}`} className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                    <p id={`blog-post-excerpt-${post.id}`} className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 line-clamp-3">
                       {post.excerpt}
                     </p>
                     {post.tags && post.tags.length > 0 && (
-                      <div id={`blog-post-tags-${post.id}`} className="flex flex-wrap gap-2 mb-4">
+                      <div id={`blog-post-tags-${post.id}`} className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
                         {post.tags.map((tag) => (
                           <span 
                             key={tag}
@@ -548,18 +548,18 @@ const Blog = () => {
                         ))}
                       </div>
                     )}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <User size={14} />
-                        <span id={`blog-post-author-${post.id}`} className="text-sm">{post.author}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                        <User size={12} className="sm:w-3.5 sm:h-3.5" />
+                        <span id={`blog-post-author-${post.id}`} className="text-xs sm:text-sm">{post.author}</span>
                       </div>
                       <button 
                         id={`blog-post-read-more-${post.id}`} 
                         onClick={() => navigate(`/blog/${post.slug}`)}
-                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+                        className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-xs sm:text-sm"
                       >
-                        <span className="text-sm">자세히 보기</span>
-                        <ArrowRight size={14} />
+                        <span>자세히 보기</span>
+                        <ArrowRight size={12} className="sm:w-3.5 sm:h-3.5" />
                       </button>
                     </div>
                   </div>
