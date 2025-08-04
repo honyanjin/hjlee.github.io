@@ -29,6 +29,7 @@ import { supabase } from '../lib/supabase'
 import Breadcrumb from '../components/Breadcrumb'
 import type { BlogPost, Category } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
+import InlineImageUpload from '../components/InlineImageUpload'
 import PreviewModal from '../components/PreviewModal'
 
 const postSchema = z.object({
@@ -83,6 +84,29 @@ const AdminBlogEdit = () => {
 
   const previewSlug = watchedTitle ? generateSlug(watchedTitle) : ''
   const previewUrl = previewSlug ? `${window.location.origin}/blog/${previewSlug}` : ''
+
+  // 이미지 삽입 함수
+  const handleImageInsert = (markdownLink: string) => {
+    const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = watchedContent || ''
+    
+    // 커서 위치에 이미지 링크 삽입
+    const newText = text.substring(0, start) + '\n' + markdownLink + '\n' + text.substring(end)
+    
+    // 폼 값 업데이트
+    setValue('content', newText)
+    
+    // 커서 위치 조정 (이미지 링크 다음 줄로)
+    setTimeout(() => {
+      const newPosition = start + markdownLink.length + 2 // +2 for newlines
+      textarea.setSelectionRange(newPosition, newPosition)
+      textarea.focus()
+    }, 0)
+  }
 
   useEffect(() => {
     if (id) {
@@ -498,14 +522,17 @@ const AdminBlogEdit = () => {
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 내용
               </h2>
-              <button
-                type="button"
-                onClick={onPreview}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-600 transition-colors"
-              >
-                <Eye size={16} />
-                미리보기
-              </button>
+              <div className="flex items-center gap-2">
+                <InlineImageUpload onImageInsert={handleImageInsert} />
+                <button
+                  type="button"
+                  onClick={onPreview}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-600 transition-colors"
+                >
+                  <Eye size={16} />
+                  미리보기
+                </button>
+              </div>
             </div>
             
             <div className="p-6">
@@ -541,6 +568,7 @@ const AdminBlogEdit = () => {
                         <div><code>[텍스트](URL)</code> - 링크</div>
                         <div><code>![대체텍스트](이미지URL)</code> - 이미지</div>
                         <div><code>[제목](유튜브URL)</code> - 유튜브 비디오 (자동 변환)</div>
+                        <div className="text-blue-600 dark:text-blue-400">💡 이미지 삽입 버튼을 클릭하거나 이미지를 드래그하여 삽입할 수 있습니다</div>
                       </div>
                     </div>
                     
@@ -594,6 +622,55 @@ const AdminBlogEdit = () => {
                 rows={20}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white font-mono"
                 placeholder="포스트 내용을 마크다운 형식으로 작성하세요..."
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  e.currentTarget.style.borderColor = '#3b82f6'
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault()
+                  e.currentTarget.style.borderColor = ''
+                }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  e.currentTarget.style.borderColor = ''
+                  
+                  const files = e.dataTransfer.files
+                  if (files && files[0] && files[0].type.startsWith('image/')) {
+                    const file = files[0]
+                    if (file.size > 5 * 1024 * 1024) {
+                      setError('파일 크기는 5MB 이하여야 합니다.')
+                      return
+                    }
+                    
+                    // 파일 업로드 로직
+                    const uploadFile = async () => {
+                      try {
+                        const fileExt = file.name.split('.').pop()
+                        const fileName = `inline-${Date.now()}.${fileExt}`
+                        
+                        const { error } = await supabase.storage
+                          .from('blog-images')
+                          .upload(fileName, file, {
+                            cacheControl: '3600',
+                            upsert: false
+                          })
+                        
+                        if (error) throw error
+                        
+                        const { data: urlData } = supabase.storage
+                          .from('blog-images')
+                          .getPublicUrl(fileName)
+                        
+                        const markdownLink = `![${file.name}](${urlData.publicUrl})`
+                        handleImageInsert(markdownLink)
+                      } catch (err: any) {
+                        setError(err.message || '이미지 업로드에 실패했습니다.')
+                      }
+                    }
+                    
+                    uploadFile()
+                  }
+                }}
               />
               {errors.content && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">
