@@ -204,27 +204,8 @@ const AdminBlogNew = () => {
       return
     }
 
-    // 임시 포스트 데이터를 세션스토리지에 저장
-    const tempPost = {
-      title: formData.title,
-      content: formData.content,
-      excerpt: formData.excerpt,
-      category: formData.category,
-      author: user?.email || 'Unknown',
-      tags: formData.tags 
-        ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
-        : [],
-      image_url: imageUrl,
-      slug: generateSlug(formData.title),
-      is_published: false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-
-    sessionStorage.setItem('tempPost', JSON.stringify(tempPost))
-    
-    // 현재 창에서 미리보기 페이지로 이동
-    navigate(`/blog/${tempPost.slug}?preview=true`)
+    // 미리보기 모드로 전환
+    setPreviewMode(true)
   }
 
   return (
@@ -428,106 +409,158 @@ const AdminBlogNew = () => {
             
             {previewMode ? (
               <div className="p-6">
-                <div className="prose prose-lg max-w-none dark:prose-invert markdown-content">
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                    {watchedTitle || '제목 없음'}
-                  </h1>
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeHighlight]}
-                    components={{
-                      // 코드 블록 스타일링
-                      code({ node, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || '')
-                        return match ? (
-                          <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
-                            <code className={className} {...props}>
-                              {children}
-                            </code>
-                          </pre>
-                        ) : (
-                          <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm" {...props}>
-                            {children}
-                          </code>
-                        )
-                      },
-                      // 링크 스타일링 (유튜브 링크 감지)
-                      a({ children, href, ...props }) {
-                        // 유튜브 링크 감지 및 변환
-                        if (href && (href.includes('youtube.com/watch') || href.includes('youtu.be/'))) {
-                          const videoId = href.includes('youtube.com/watch') 
-                            ? href.split('v=')[1]?.split('&')[0]
-                            : href.split('youtu.be/')[1]?.split('?')[0]
-                          
-                          if (videoId) {
+                {/* 미리보기 배너 */}
+                <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                  <div className="flex items-center justify-center gap-2 text-yellow-800 dark:text-yellow-200">
+                    <Eye size={16} />
+                    <span className="font-medium">미리보기 모드 - 실제 포스트가 아닙니다</span>
+                  </div>
+                </div>
+                
+                {/* 블로그 포스트 스타일 미리보기 */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                  {/* Featured Image */}
+                  {imageUrl && (
+                    <div className="relative h-64 overflow-hidden">
+                      <img 
+                        src={imageUrl}
+                        alt={watchedTitle || 'Featured Image'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Post Content */}
+                  <div className="p-6">
+                    {/* Post Meta */}
+                    <div className="flex flex-wrap items-center gap-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Calendar size={16} />
+                        <span>{new Date().toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <User size={16} />
+                        <span>{user?.email || 'Unknown'}</span>
+                      </div>
+                      {watch('category') && (
+                        <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
+                          {categories.find(cat => cat.slug === watch('category'))?.name || watch('category')}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Title */}
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                      {watchedTitle || '제목 없음'}
+                    </h1>
+
+                    {/* Excerpt */}
+                    {watch('excerpt') && (
+                      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                        {watch('excerpt')}
+                      </p>
+                    )}
+
+                    {/* Content */}
+                    <div className="prose prose-lg max-w-none dark:prose-invert markdown-content">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeHighlight]}
+                        components={{
+                          // 코드 블록 스타일링
+                          code({ node, className, children, ...props }) {
+                            const match = /language-(\w+)/.exec(className || '')
+                            return match ? (
+                              <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
+                                <code className={className} {...props}>
+                                  {children}
+                                </code>
+                              </pre>
+                            ) : (
+                              <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm" {...props}>
+                                {children}
+                              </code>
+                            )
+                          },
+                          // 링크 스타일링 (유튜브 링크 감지)
+                          a({ children, href, ...props }) {
+                            // 유튜브 링크 감지 및 변환
+                            if (href && (href.includes('youtube.com/watch') || href.includes('youtu.be/'))) {
+                              const videoId = href.includes('youtube.com/watch') 
+                                ? href.split('v=')[1]?.split('&')[0]
+                                : href.split('youtu.be/')[1]?.split('?')[0]
+                              
+                              if (videoId) {
+                                return (
+                                  <div className="my-4">
+                                    <iframe
+                                      width="100%"
+                                      height="315"
+                                      src={`https://www.youtube.com/embed/${videoId}`}
+                                      title="YouTube video player"
+                                      frameBorder="0"
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                      allowFullScreen
+                                      className="rounded-lg shadow-md"
+                                    />
+                                  </div>
+                                )
+                              }
+                            }
+                            
                             return (
-                              <div className="my-4">
-                                <iframe
-                                  width="100%"
-                                  height="315"
-                                  src={`https://www.youtube.com/embed/${videoId}`}
-                                  title="YouTube video player"
-                                  frameBorder="0"
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  allowFullScreen
-                                  className="rounded-lg shadow-md"
-                                />
+                              <a 
+                                href={href} 
+                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                {...props}
+                              >
+                                {children}
+                              </a>
+                            )
+                          },
+                          // 이미지 스타일링
+                          img({ src, alt, ...props }) {
+                            return (
+                              <img 
+                                src={src} 
+                                alt={alt}
+                                className="max-w-full h-auto rounded-lg shadow-md"
+                                {...props}
+                              />
+                            )
+                          },
+                          // 테이블 스타일링
+                          table({ children, ...props }) {
+                            return (
+                              <div className="overflow-x-auto">
+                                <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600" {...props}>
+                                  {children}
+                                </table>
                               </div>
                             )
+                          },
+                          th({ children, ...props }) {
+                            return (
+                              <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 font-semibold" {...props}>
+                                {children}
+                              </th>
+                            )
+                          },
+                          td({ children, ...props }) {
+                            return (
+                              <td className="border border-gray-300 dark:border-gray-600 px-4 py-2" {...props}>
+                                {children}
+                              </td>
+                            )
                           }
-                        }
-                        
-                        return (
-                          <a 
-                            href={href} 
-                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            {...props}
-                          >
-                            {children}
-                          </a>
-                        )
-                      },
-                      // 이미지 스타일링
-                      img({ src, alt, ...props }) {
-                        return (
-                          <img 
-                            src={src} 
-                            alt={alt}
-                            className="max-w-full h-auto rounded-lg shadow-md"
-                            {...props}
-                          />
-                        )
-                      },
-                      // 테이블 스타일링
-                      table({ children, ...props }) {
-                        return (
-                          <div className="overflow-x-auto">
-                            <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600" {...props}>
-                              {children}
-                            </table>
-                          </div>
-                        )
-                      },
-                      th({ children, ...props }) {
-                        return (
-                          <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 font-semibold" {...props}>
-                            {children}
-                          </th>
-                        )
-                      },
-                      td({ children, ...props }) {
-                        return (
-                          <td className="border border-gray-300 dark:border-gray-600 px-4 py-2" {...props}>
-                            {children}
-                          </td>
-                        )
-                      }
-                    }}
-                  >
-                    {watchedContent || '내용을 입력하세요'}
-                  </ReactMarkdown>
+                        }}
+                      >
+                        {watchedContent || '내용을 입력하세요'}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
