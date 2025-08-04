@@ -112,7 +112,7 @@ const Home = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section id="hero-section" className="relative h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 overflow-hidden">
+      <section id="hero-section" className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 overflow-hidden py-8 sm:py-12">
         {/* Background Animation */}
         <div id="hero-background" className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-10 rounded-full"></div>
@@ -121,22 +121,22 @@ const Home = () => {
           <div className="absolute bottom-1/4 right-1/3 w-24 h-24 bg-white opacity-5 rounded-full"></div>
         </div>
 
-        <div id="hero-content" className="relative z-10 max-w-6xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div id="hero-content" className="relative z-10 max-w-6xl mx-auto px-4 py-8 sm:py-12">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             {/* Text Content */}
             <motion.div
               id="hero-text"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-white text-center lg:text-left bg-black/80 backdrop-blur-xl rounded-2xl p-8 shadow-2xl relative z-20 border border-white/20"
+              className="text-white text-center lg:text-left bg-black/80 backdrop-blur-xl rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl relative z-20 border border-white/20"
             >
               <motion.h1 
                 id="hero-title"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-5xl lg:text-6xl font-bold mb-4"
+                className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4"
               >
                 안녕하세요!<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">
@@ -148,7 +148,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-xl lg:text-2xl mb-8 text-blue-100"
+                className="text-lg sm:text-xl lg:text-2xl mb-4 sm:mb-6 lg:mb-8 text-blue-100"
               >
                 풀스택 개발자 & UI/UX 디자이너
               </motion.p>
@@ -157,7 +157,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
-                className="text-lg mb-8 text-blue-100 max-w-lg"
+                className="text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 lg:mb-8 text-blue-100 max-w-lg"
               >
                 사용자 경험을 중시하는 웹 애플리케이션을 개발합니다.
                 React, TypeScript, Node.js를 주로 사용하며,
@@ -168,14 +168,16 @@ const Home = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start"
               >
-                <button id="download-resume-btn" className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
-                  <Download size={20} />
-                  이력서 다운로드
+                <button id="download-resume-btn" className="bg-white text-blue-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base">
+                  <Download size={18} className="sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">이력서 다운로드</span>
+                  <span className="sm:hidden">이력서</span>
                 </button>
-                <button id="view-projects-btn" className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
-                  프로젝트 보기
+                <button id="view-projects-btn" className="border-2 border-white text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors text-sm sm:text-base">
+                  <span className="hidden sm:inline">프로젝트 보기</span>
+                  <span className="sm:hidden">프로젝트</span>
                 </button>
               </motion.div>
             </motion.div>
@@ -190,7 +192,7 @@ const Home = () => {
             >
               <div className="relative">
                 {/* Main Profile Image */}
-                <div id="profile-image-container" className="relative w-80 h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl border-4 border-white/20">
+                <div id="profile-image-container" className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl border-4 border-white/20">
                                   <ImageWithFallback 
                   id="profile-image"
                   defaultType="PROFILE"
@@ -872,18 +874,24 @@ const Home = () => {
             <p id="contact-description" className="text-xl text-gray-600 dark:text-gray-300 mb-8">
               프로젝트나 협업에 관심이 있으시다면 언제든 연락주세요!
             </p>
-            <div id="contact-buttons" className="flex justify-center gap-6">
-              <a id="email-contact-btn" href="mailto:email@example.com" className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                <Mail size={20} />
-                이메일 보내기
+            <div id="contact-buttons" className="flex flex-wrap justify-center gap-2 sm:gap-4 lg:gap-6 px-4">
+              <a id="email-contact-btn" href="mailto:email@example.com" className="flex items-center gap-1 sm:gap-2 bg-blue-600 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm lg:text-base whitespace-nowrap">
+                <Mail size={16} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
+                <span className="hidden lg:inline">이메일 보내기</span>
+                <span className="hidden sm:inline lg:hidden">이메일</span>
+                <span className="sm:hidden">이메일</span>
               </a>
-              <a id="github-contact-btn" href="https://github.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition-colors">
-                <Github size={20} />
-                GitHub
+              <a id="github-contact-btn" href="https://github.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 sm:gap-2 bg-gray-800 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-lg hover:bg-gray-900 transition-colors text-xs sm:text-sm lg:text-base whitespace-nowrap">
+                <Github size={16} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
+                <span className="hidden lg:inline">GitHub</span>
+                <span className="hidden sm:inline lg:hidden">GitHub</span>
+                <span className="sm:hidden">GitHub</span>
               </a>
-              <a id="linkedin-contact-btn" href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors">
-                <Linkedin size={20} />
-                LinkedIn
+              <a id="linkedin-contact-btn" href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 sm:gap-2 bg-blue-700 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-lg hover:bg-blue-800 transition-colors text-xs sm:text-sm lg:text-base whitespace-nowrap">
+                <Linkedin size={16} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
+                <span className="hidden lg:inline">LinkedIn</span>
+                <span className="hidden sm:inline lg:hidden">LinkedIn</span>
+                <span className="sm:hidden">LinkedIn</span>
               </a>
             </div>
           </motion.div>
