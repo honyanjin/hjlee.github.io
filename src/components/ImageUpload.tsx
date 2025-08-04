@@ -118,7 +118,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
           </div>
           <div className="text-center">
             <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-              💡 권장: 1200×630px (16:9 비율) - 최적의 표시를 위해
+              💡 권장: 896×384px (7:3 비율) - 최적의 표시를 위해
             </p>
           </div>
         </div>
@@ -169,7 +169,7 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
                   PNG, JPG, GIF 최대 5MB
                 </p>
                 <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                  💡 권장: 1200×630px (16:9 비율)
+                  💡 권장: 896×384px (7:3 비율)
                 </p>
               </div>
             </div>
