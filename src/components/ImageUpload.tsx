@@ -101,19 +101,26 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
       )}
 
       {currentImage ? (
-        <div className="relative">
-          <img
-            src={currentImage}
-            alt="업로드된 이미지"
-            className="w-full h-48 object-cover rounded-lg"
-          />
-          <button
-            type="button"
-            onClick={removeImage}
-            className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700 transition-colors"
-          >
-            <X size={16} />
-          </button>
+        <div className="space-y-3">
+          <div className="relative">
+            <img
+              src={currentImage}
+              alt="업로드된 이미지"
+              className="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-lg"
+            />
+            <button
+              type="button"
+              onClick={removeImage}
+              className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700 transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+              💡 권장: 1200×630px (16:9 비율) - 최적의 표시를 위해
+            </p>
+          </div>
         </div>
       ) : (
         <div
@@ -157,9 +164,14 @@ const ImageUpload = ({ onImageUpload, currentImage, className = '' }: ImageUploa
                   파일 선택
                 </button>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                PNG, JPG, GIF 최대 5MB
-              </p>
+              <div className="text-center space-y-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  PNG, JPG, GIF 최대 5MB
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                  💡 권장: 1200×630px (16:9 비율)
+                </p>
+              </div>
             </div>
           )}
         </div>
