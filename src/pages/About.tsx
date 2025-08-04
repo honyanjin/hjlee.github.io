@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Download, Mail, MapPin, Calendar, Briefcase } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
+import ImageWithFallback from '../components/ImageWithFallback'
 
 const About = () => {
   const experiences = [
@@ -73,8 +74,8 @@ const About = () => {
             >
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
                 <div className="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-lg">
-                  <img 
-                    src={`${import.meta.env.BASE_URL}content/pic_profile/hjlee_Profile_0.JPG`} 
+                  <ImageWithFallback 
+                    defaultType="PROFILE"
                     alt="HJLEE Profile" 
                     className="w-full h-full object-cover"
                   />
@@ -137,8 +138,8 @@ const About = () => {
                   </div>
                   <div className="flex justify-center">
                     <div className="relative w-64 h-64 rounded-lg overflow-hidden shadow-lg">
-                      <img 
-                        src={`${import.meta.env.BASE_URL}content/pic_about_me/hjlee_about_me_0.jpg`} 
+                      <ImageWithFallback 
+                        defaultType="ABOUT_ME"
                         alt="HJLEE About Me" 
                         className="w-full h-full object-cover"
                       />

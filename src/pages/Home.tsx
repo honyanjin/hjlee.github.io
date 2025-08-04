@@ -4,6 +4,7 @@ import { Github, Linkedin, Mail, Download } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
 import DotNavigation from '../components/DotNavigation'
+import ImageWithFallback from '../components/ImageWithFallback'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
 import type { Project, ProjectCategory } from '../lib/supabase'
 
@@ -190,12 +191,12 @@ const Home = () => {
               <div className="relative">
                 {/* Main Profile Image */}
                 <div id="profile-image-container" className="relative w-80 h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl border-4 border-white/20">
-                  <img 
-                    id="profile-image"
-                    src={`${import.meta.env.BASE_URL}content/pic_profile/hjlee_Profile_0.JPG`} 
-                    alt="HJLEE Profile" 
-                    className="w-full h-full object-cover"
-                  />
+                                  <ImageWithFallback 
+                  id="profile-image"
+                  defaultType="PROFILE"
+                  alt="HJLEE Profile" 
+                  className="w-full h-full object-cover"
+                />
                 </div>
                 
                 {/* Floating Elements - Clockwise Arrangement (Wider Spread) */}
@@ -651,9 +652,9 @@ const Home = () => {
                   className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
                 >
                   <div className="relative overflow-hidden">
-                    <img 
+                    <ImageWithFallback 
                       id={`featured-project-image-${project.id}`}
-                      src={project.image_url || `${import.meta.env.BASE_URL}content/pic_projects/Project_Temp_0.jpg`} 
+                      src={project.image_url}
                       alt={project.title}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                     />
@@ -773,9 +774,9 @@ const Home = () => {
                   className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
                 >
                   <div className="relative overflow-hidden">
-                    <img 
+                    <ImageWithFallback 
                       id={`project-image-${project.id}`}
-                      src={project.image_url || `${import.meta.env.BASE_URL}content/pic_projects/Project_Temp_0.jpg`} 
+                      src={project.image_url}
                       alt={project.title}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                     />

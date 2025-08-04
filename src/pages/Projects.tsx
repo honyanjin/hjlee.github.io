@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ExternalLink, Github, Eye } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
+import ImageWithFallback from '../components/ImageWithFallback'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
 import type { Project, ProjectCategory } from '../lib/supabase'
 
@@ -47,8 +48,8 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
       className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
     >
       <div className="relative overflow-hidden">
-        <img 
-          src={project.image_url || '/src/content/pic_projects/Project_Temp_0.jpg'} 
+        <ImageWithFallback 
+          src={project.image_url}
           alt={project.title}
           className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
         />
@@ -352,8 +353,8 @@ const Projects = () => {
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
                 >
                   <div className="relative overflow-hidden">
-                    <img 
-                      src={project.image_url || `${import.meta.env.BASE_URL}content/pic_projects/Project_Temp_0.jpg`} 
+                    <ImageWithFallback 
+                      src={project.image_url}
                       alt={project.title}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                     />
