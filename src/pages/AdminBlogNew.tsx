@@ -223,8 +223,8 @@ const AdminBlogNew = () => {
 
     sessionStorage.setItem('tempPost', JSON.stringify(tempPost))
     
-    // 새 탭에서 미리보기 페이지 열기
-    window.open(`/blog/${tempPost.slug}?preview=true`, '_blank')
+    // 현재 창에서 미리보기 페이지로 이동
+    navigate(`/blog/${tempPost.slug}?preview=true`)
   }
 
   return (
