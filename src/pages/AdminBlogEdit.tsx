@@ -422,7 +422,7 @@ const AdminBlogEdit = () => {
                           포스트 주소:
                         </span>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm text-gray-700 dark:text-gray-300 font-mono overflow-x-auto whitespace-nowrap">
+                          <div className="text-sm text-gray-700 dark:text-gray-300 font-mono overflow-x-auto whitespace-nowrap scrollbar-hide">
                             {previewUrl}
                           </div>
                         </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Calendar, User, ArrowLeft, Tag, Clock, Eye } from 'lucide-react'
+import { Calendar, User, ArrowLeft, Tag, Clock, Eye, Link, Copy } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -23,6 +23,7 @@ const BlogPost = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isPreview, setIsPreview] = useState(false)
+  const [copySuccess, setCopySuccess] = useState('')
 
   useEffect(() => {
     if (slug) {
@@ -269,29 +270,39 @@ const BlogPost = () => {
             {/* Post Content - 반응형 개선 */}
             <div className="p-4 sm:p-6 lg:p-8">
               {/* Post Meta - 반응형 개선 */}
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <Calendar size={14} className="sm:w-4 sm:h-4" />
-                  <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
+              <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Calendar size={14} className="sm:w-4 sm:h-4" />
+                    <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <User size={14} className="sm:w-4 sm:h-4" />
+                    <span>{post.author}</span>
+                  </div>
+                  {post.category && (
+                    <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
+                      {(() => {
+                        const foundCategory = categories.find(cat => cat.id === post.category || cat.slug === post.category)
+                        return foundCategory ? foundCategory.name : post.category
+                      })()}
+                    </span>
+                  )}
+                  {/* 관리자가 임시글을 볼 때 상태 표시 */}
+                  {isAdmin && !post.is_published && (
+                    <span className="px-2 sm:px-3 py-1 bg-yellow-100 text-yellow-800 text-xs sm:text-sm rounded-full dark:bg-yellow-900 dark:text-yellow-200">
+                      임시저장
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <User size={14} className="sm:w-4 sm:h-4" />
-                  <span>{post.author}</span>
-                </div>
-                {post.category && (
-                  <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
-                    {(() => {
-                      const foundCategory = categories.find(cat => cat.id === post.category || cat.slug === post.category)
-                      return foundCategory ? foundCategory.name : post.category
-                    })()}
-                  </span>
-                )}
-                {/* 관리자가 임시글을 볼 때 상태 표시 */}
-                {isAdmin && !post.is_published && (
-                  <span className="px-2 sm:px-3 py-1 bg-yellow-100 text-yellow-800 text-xs sm:text-sm rounded-full dark:bg-yellow-900 dark:text-yellow-200">
-                    임시저장
-                  </span>
-                )}
+                
+                {/* Share Buttons */}
+                <ShareButtons 
+                  title={post.title}
+                  url={window.location.href}
+                  description={post.excerpt}
+                  size="sm"
+                />
               </div>
 
               {/* Title - 반응형 개선 */}
@@ -300,35 +311,48 @@ const BlogPost = () => {
               </h1>
 
               {/* URL Display - 반응형 개선 */}
-              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-                  <div className="flex-1">
-                    <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      이 포스트의 주소
-                    </div>
-                    <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-mono break-all">
-                      {window.location.href}
+              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Link size={14} className="text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                  <span className="text-xs text-gray-600 dark:text-gray-400 flex-shrink-0">
+                    포스트 주소:
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-mono overflow-x-auto whitespace-nowrap scrollbar-hide">
+                      {`${window.location.origin}/blog/${post.slug}`}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {/* 관리자가 임시글을 볼 때 편집 버튼 표시 */}
-                    {isAdmin && !post.is_published && (
-                      <button
-                        onClick={() => navigate(`/admin/blog/edit/${post.id}`)}
-                        className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        편집하기
-                      </button>
-                    )}
-                    <ShareButtons 
-                      title={post.title}
-                      url={window.location.href}
-                      description={post.excerpt}
-                      size="sm"
-                    />
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/blog/${post.slug}`)
+                      setCopySuccess('URL이 클립보드에 복사되었습니다.')
+                      setTimeout(() => setCopySuccess(''), 2000)
+                    }}
+                    className="flex-shrink-0 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                    title="URL 복사"
+                  >
+                    <Copy size={14} />
+                  </button>
                 </div>
+                {copySuccess && (
+                  <div className="mt-2 text-xs text-green-600 dark:text-green-400">
+                    {copySuccess}
+                  </div>
+                )}
               </div>
+
+              {/* 관리자 편집 버튼 */}
+              {isAdmin && !post.is_published && (
+                <div className="mb-4 sm:mb-6 flex justify-end">
+                  <button
+                    onClick={() => navigate(`/admin/blog/edit/${post.id}`)}
+                    className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    편집하기
+                  </button>
+                </div>
+              )}
 
               {/* Excerpt - 반응형 개선 */}
               {post.excerpt && (
