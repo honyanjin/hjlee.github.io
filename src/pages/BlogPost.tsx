@@ -10,11 +10,13 @@ import SEO from '../components/SEO'
 import ShareButtons from '../components/ShareButtons'
 import Comments from '../components/Comments'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 import type { BlogPost, Category } from '../lib/supabase'
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const { isAdmin } = useAuth()
   const [post, setPost] = useState<BlogPost | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -44,12 +46,17 @@ const BlogPost = () => {
   const fetchPost = async (postSlug: string) => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
+      let query = supabase
         .from('blog_posts')
         .select('*')
         .eq('slug', postSlug)
-        .eq('is_published', true)
-        .single()
+      
+      // 관리자가 아닌 경우에만 발행된 포스트만 조회
+      if (!isAdmin) {
+        query = query.eq('is_published', true)
+      }
+      
+      const { data, error } = await query.single()
 
       if (error) throw error
       setPost(data)
@@ -235,6 +242,12 @@ const BlogPost = () => {
                     })()}
                   </span>
                 )}
+                {/* 관리자가 임시글을 볼 때 상태 표시 */}
+                {isAdmin && !post.is_published && (
+                  <span className="px-2 sm:px-3 py-1 bg-yellow-100 text-yellow-800 text-xs sm:text-sm rounded-full dark:bg-yellow-900 dark:text-yellow-200">
+                    임시저장
+                  </span>
+                )}
               </div>
 
               {/* Title - 반응형 개선 */}
@@ -253,12 +266,23 @@ const BlogPost = () => {
                       {window.location.href}
                     </div>
                   </div>
-                  <ShareButtons 
-                    title={post.title}
-                    url={window.location.href}
-                    description={post.excerpt}
-                    size="sm"
-                  />
+                  <div className="flex items-center gap-2">
+                    {/* 관리자가 임시글을 볼 때 편집 버튼 표시 */}
+                    {isAdmin && !post.is_published && (
+                      <button
+                        onClick={() => navigate(`/admin/blog/edit/${post.id}`)}
+                        className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        편집하기
+                      </button>
+                    )}
+                    <ShareButtons 
+                      title={post.title}
+                      url={window.location.href}
+                      description={post.excerpt}
+                      size="sm"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -380,11 +404,13 @@ const BlogPost = () => {
       </section>
 
       {/* Comments Section - 반응형 개선 */}
-      <section className="px-3 sm:px-4 lg:px-6 pb-12 sm:pb-16 lg:pb-20">
-        <div className="max-w-4xl mx-auto">
-          <Comments postId={post.id} />
-        </div>
-      </section>
+      {post.is_published && (
+        <section className="px-3 sm:px-4 lg:px-6 pb-12 sm:pb-16 lg:pb-20">
+          <div className="max-w-4xl mx-auto">
+            <Comments postId={post.id} />
+          </div>
+        </section>
+      )}
     </div>
   )
 }

@@ -191,7 +191,11 @@ const AdminBlog = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                        <h3 
+                          className="text-lg font-medium text-gray-900 dark:text-white cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          onClick={() => navigate(`/blog/${post.slug}`)}
+                          title="포스트 보기"
+                        >
                           {post.title}
                         </h3>
                         <span className={`px-2 py-1 text-xs rounded-full ${
