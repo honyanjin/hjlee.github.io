@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Calendar, User, ArrowLeft, Tag, Clock, Eye, Link, Copy } from 'lucide-react'
+import { Calendar, User, ArrowLeft, Tag, Eye, Link, Copy } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -376,13 +376,8 @@ const BlogPost = () => {
                 </div>
               )}
 
-              {/* Reading Time - 반응형 개선 */}
-              <div className="flex items-center gap-2 mb-6 sm:mb-8 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <Clock size={16} className="text-gray-600 dark:text-gray-400 flex-shrink-0" />
-                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                  읽는 시간: 약 {Math.ceil(post.content.split(' ').length / 200)}분
-                </span>
-              </div>
+              {/* 구분선 */}
+              <div className="border-t border-gray-200 dark:border-gray-600 my-6 sm:my-8"></div>
 
               {/* Content - 반응형 개선 */}
               <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none dark:prose-invert markdown-content">
