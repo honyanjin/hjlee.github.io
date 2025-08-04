@@ -30,6 +30,7 @@ import { supabase } from '../lib/supabase'
 import Breadcrumb from '../components/Breadcrumb'
 import type { BlogPost, Category } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
+import PreviewModal from '../components/PreviewModal'
 
 const postSchema = z.object({
   title: z.string().min(1, '제목을 입력해주세요'),
@@ -46,12 +47,12 @@ const AdminBlogNew = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [previewMode, setPreviewMode] = useState(false)
   const [showFullHelp, setShowFullHelp] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
   const [isBasicInfoCollapsed, setIsBasicInfoCollapsed] = useState(false)
   const [isPublishSettingsCollapsed, setIsPublishSettingsCollapsed] = useState(true)
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
   
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -207,21 +208,8 @@ const AdminBlogNew = () => {
     // 에러 메시지 초기화
     setError('')
     
-    // 미리보기 모드로 전환 (완전히 클라이언트 사이드)
-    setPreviewMode(true)
-    
-    // 스크롤을 미리보기 섹션으로 이동
-    setTimeout(() => {
-      const contentSection = document.querySelector('[data-preview-content]')
-      if (contentSection) {
-        contentSection.scrollIntoView({ behavior: 'smooth' })
-      }
-    }, 100)
-  }
-
-  // 미리보기 모드에서 편집 모드로 돌아가기
-  const onBackToEdit = () => {
-    setPreviewMode(false)
+    // 미리보기 모달 열기
+    setIsPreviewModalOpen(true)
   }
 
   return (
@@ -404,28 +392,17 @@ const AdminBlogNew = () => {
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 내용
               </h2>
-              {previewMode ? (
-                <button
-                  type="button"
-                  onClick={onBackToEdit}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-100 dark:bg-blue-700 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-600 transition-colors"
-                >
-                  <EyeOff size={16} />
-                  편집 모드로 돌아가기
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setPreviewMode(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  <Eye size={16} />
-                  미리보기
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={onPreview}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-600 transition-colors"
+              >
+                <Eye size={16} />
+                미리보기
+              </button>
             </div>
             
-            {previewMode ? (
+            {!isBasicInfoCollapsed ? (
               <div className="p-6">
                 {/* 미리보기 배너 */}
                 <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
@@ -673,18 +650,7 @@ const AdminBlogNew = () => {
                   {...register('content')}
                   rows={20}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white font-mono"
-                  placeholder="포스트 내용을 마크다운 형식으로 작성하세요...
-
-예시:
-# 제목
-
-내용을 작성하세요.
-
-[React 튜토리얼](https://youtube.com/watch?v=dQw4w9WgXcQ)
-
-```javascript
-console.log('코드 블록');
-```"
+                  placeholder="포스트 내용을 마크다운 형식으로 작성하세요..."
                 />
                 {errors.content && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -733,56 +699,57 @@ console.log('코드 블록');
           </div>
 
           {/* Actions */}
-          {!previewMode ? (
-            <div className="flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={() => navigate('/admin/blog')}
-                className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={onPreview}
-                disabled={isLoading}
-                className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ExternalLink size={16} />
-                미리보기
-              </button>
-              <button
-                type="button"
-                onClick={onSaveDraft}
-                disabled={isLoading}
-                className="flex items-center gap-2 px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Clock size={16} />
-                {isLoading ? '저장 중...' : '임시저장'}
-              </button>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Save size={16} />
-                {isLoading ? '저장 중...' : '저장'}
-              </button>
-            </div>
-          ) : (
-            <div className="flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={onBackToEdit}
-                className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                <EyeOff size={16} />
-                편집 모드로 돌아가기
-              </button>
-            </div>
-          )}
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => navigate('/admin/blog')}
+              className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={onPreview}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ExternalLink size={16} />
+              미리보기
+            </button>
+            <button
+              type="button"
+              onClick={onSaveDraft}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Clock size={16} />
+              {isLoading ? '저장 중...' : '임시저장'}
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save size={16} />
+              {isLoading ? '저장 중...' : '저장'}
+            </button>
+          </div>
         </form>
       </main>
+
+      {/* Preview Modal */}
+      <PreviewModal
+        isOpen={isPreviewModalOpen}
+        onClose={() => setIsPreviewModalOpen(false)}
+        title={watchedTitle}
+        content={watchedContent}
+        excerpt={watch('excerpt')}
+        category={watch('category')}
+        author={user?.email || 'Unknown'}
+        imageUrl={imageUrl}
+        tags={watch('tags') ? watch('tags')!.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : []}
+        categories={categories}
+      />
     </div>
   )
 }
