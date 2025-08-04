@@ -30,3 +30,6 @@ dist-ssr
 .cursor/
 .cursorrules
 memory-bank/
+
+#임시파일
+*.backup

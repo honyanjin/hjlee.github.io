@@ -21,7 +21,9 @@ import {
   Link,
   Copy,
   Clock,
-  ExternalLink
+  ExternalLink,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -48,6 +50,8 @@ const AdminBlogNew = () => {
   const [showFullHelp, setShowFullHelp] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
+  const [isBasicInfoCollapsed, setIsBasicInfoCollapsed] = useState(false)
+  const [isPublishSettingsCollapsed, setIsPublishSettingsCollapsed] = useState(true)
   
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -223,8 +227,6 @@ const AdminBlogNew = () => {
     window.open(`/blog/${tempPost.slug}?preview=true`, '_blank')
   }
 
-
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -251,7 +253,6 @@ const AdminBlogNew = () => {
                 </h1>
               </div>
             </div>
-
           </div>
         </div>
       </header>
@@ -273,114 +274,131 @@ const AdminBlogNew = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Basic Info */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              기본 정보
-            </h2>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Title */}
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  제목 *
-                </label>
-                <input
-                  {...register('title')}
-                  type="text"
-                  id="title"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="포스트 제목을 입력하세요"
-                />
-                {errors.title && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    {errors.title.message}
-                  </p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <button
+                type="button"
+                onClick={() => setIsBasicInfoCollapsed(!isBasicInfoCollapsed)}
+                className="flex items-center justify-between w-full text-left"
+              >
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  기본 정보
+                </h2>
+                {isBasicInfoCollapsed ? (
+                  <ChevronDown size={20} className="text-gray-500 dark:text-gray-400" />
+                ) : (
+                  <ChevronUp size={20} className="text-gray-500 dark:text-gray-400" />
                 )}
-                
-                {/* URL 미리보기 */}
-                {watchedTitle && (
-                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Link size={16} className="text-blue-600 dark:text-blue-400" />
-                      <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                        포스트 URL 미리보기
-                      </span>
-                    </div>
-                    <div className="text-sm text-blue-700 dark:text-blue-300 font-mono break-all">
-                      {previewUrl}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Category */}
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  카테고리 *
-                </label>
-                <select
-                  {...register('category')}
-                  id="category"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                >
-                  <option value="">카테고리 선택</option>
-                  {categories.map(category => (
-                    <option key={category.id} value={category.slug}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.category && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    {errors.category.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Excerpt */}
-              <div className="lg:col-span-2">
-                <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  요약 *
-                </label>
-                <textarea
-                  {...register('excerpt')}
-                  id="excerpt"
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="포스트 요약을 입력하세요"
-                />
-                {errors.excerpt && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    {errors.excerpt.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Tags */}
-              <div className="lg:col-span-2">
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  태그
-                </label>
-                <input
-                  {...register('tags')}
-                  type="text"
-                  id="tags"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="태그를 쉼표로 구분하여 입력하세요 (예: React, TypeScript, Frontend)"
-                />
-              </div>
-
-              {/* Featured Image */}
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  대표 이미지
-                </label>
-                <ImageUpload
-                  onImageUpload={setImageUrl}
-                  currentImage={imageUrl}
-                />
-              </div>
+              </button>
             </div>
+            
+            {!isBasicInfoCollapsed && (
+              <div className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Title */}
+                  <div>
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      제목 *
+                    </label>
+                    <input
+                      {...register('title')}
+                      type="text"
+                      id="title"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="포스트 제목을 입력하세요"
+                    />
+                    {errors.title && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        {errors.title.message}
+                      </p>
+                    )}
+                    
+                    {/* URL 미리보기 */}
+                    {watchedTitle && (
+                      <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Link size={16} className="text-blue-600 dark:text-blue-400" />
+                          <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                            포스트 URL 미리보기
+                          </span>
+                        </div>
+                        <div className="text-sm text-blue-700 dark:text-blue-300 font-mono break-all">
+                          {previewUrl}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Category */}
+                  <div>
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      카테고리 *
+                    </label>
+                    <select
+                      {...register('category')}
+                      id="category"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="">카테고리 선택</option>
+                      {categories.map(category => (
+                        <option key={category.id} value={category.slug}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.category && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        {errors.category.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Excerpt */}
+                  <div className="lg:col-span-2">
+                    <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      요약 *
+                    </label>
+                    <textarea
+                      {...register('excerpt')}
+                      id="excerpt"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="포스트 요약을 입력하세요"
+                    />
+                    {errors.excerpt && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        {errors.excerpt.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Tags */}
+                  <div className="lg:col-span-2">
+                    <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      태그
+                    </label>
+                    <input
+                      {...register('tags')}
+                      type="text"
+                      id="tags"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="태그를 쉼표로 구분하여 입력하세요 (예: React, TypeScript, Frontend)"
+                    />
+                  </div>
+
+                  {/* Featured Image */}
+                  <div className="lg:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      대표 이미지
+                    </label>
+                    <ImageUpload
+                      onImageUpload={setImageUrl}
+                      currentImage={imageUrl}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Content */}
@@ -627,23 +645,40 @@ console.log('코드 블록');
           </div>
 
           {/* Publish Settings */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              발행 설정
-            </h2>
-            
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2">
-                <input
-                  {...register('is_published')}
-                  type="checkbox"
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  즉시 발행
-                </span>
-              </label>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <button
+                type="button"
+                onClick={() => setIsPublishSettingsCollapsed(!isPublishSettingsCollapsed)}
+                className="flex items-center justify-between w-full text-left"
+              >
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  발행 설정
+                </h2>
+                {isPublishSettingsCollapsed ? (
+                  <ChevronDown size={20} className="text-gray-500 dark:text-gray-400" />
+                ) : (
+                  <ChevronUp size={20} className="text-gray-500 dark:text-gray-400" />
+                )}
+              </button>
             </div>
+            
+            {!isPublishSettingsCollapsed && (
+              <div className="p-6">
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      {...register('is_published')}
+                      type="checkbox"
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      즉시 발행
+                    </span>
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Actions */}
