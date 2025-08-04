@@ -19,7 +19,9 @@ import {
   User,
   Image,
   Link,
-  Copy
+  Copy,
+  Clock,
+  ExternalLink
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -137,6 +139,88 @@ const AdminBlogNew = () => {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const onSaveDraft = async () => {
+    const formData = watch()
+    
+    if (!formData.title || !formData.content || !formData.excerpt || !formData.category) {
+      setError('임시저장을 위해서는 제목, 내용, 요약, 카테고리가 모두 필요합니다.')
+      return
+    }
+
+    setIsLoading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      // 태그 처리
+      const tags = formData.tags 
+        ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+        : []
+
+      const postData = {
+        title: formData.title,
+        content: formData.content,
+        excerpt: formData.excerpt,
+        category: formData.category,
+        author: user?.email || 'Unknown',
+        tags,
+        image_url: imageUrl,
+        slug: generateSlug(formData.title),
+        is_published: false,
+        published_at: null
+      }
+
+      const { error } = await supabase
+        .from('blog_posts')
+        .insert(postData)
+
+      if (error) throw error
+
+      setSuccess('포스트가 임시저장되었습니다!')
+      
+      // 3초 후 성공 메시지 숨기기
+      setTimeout(() => {
+        setSuccess('')
+      }, 3000)
+
+    } catch (err: any) {
+      setError(err.message || '임시저장에 실패했습니다.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const onPreview = () => {
+    const formData = watch()
+    
+    if (!formData.title || !formData.content || !formData.excerpt || !formData.category) {
+      setError('미리보기를 위해서는 제목, 내용, 요약, 카테고리가 모두 필요합니다.')
+      return
+    }
+
+    // 임시 포스트 데이터를 세션스토리지에 저장
+    const tempPost = {
+      title: formData.title,
+      content: formData.content,
+      excerpt: formData.excerpt,
+      category: formData.category,
+      author: user?.email || 'Unknown',
+      tags: formData.tags 
+        ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+        : [],
+      image_url: imageUrl,
+      slug: generateSlug(formData.title),
+      is_published: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+
+    sessionStorage.setItem('tempPost', JSON.stringify(tempPost))
+    
+    // 새 탭에서 미리보기 페이지 열기
+    window.open(`/blog/${tempPost.slug}?preview=true`, '_blank')
   }
 
 
@@ -570,6 +654,24 @@ console.log('코드 블록');
               className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               취소
+            </button>
+            <button
+              type="button"
+              onClick={onPreview}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ExternalLink size={16} />
+              미리보기
+            </button>
+            <button
+              type="button"
+              onClick={onSaveDraft}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Clock size={16} />
+              {isLoading ? '저장 중...' : '임시저장'}
             </button>
             <button
               type="submit"

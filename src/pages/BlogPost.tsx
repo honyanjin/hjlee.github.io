@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Calendar, User, ArrowLeft, Tag, Clock } from 'lucide-react'
+import { Calendar, User, ArrowLeft, Tag, Clock, Eye } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -16,18 +16,27 @@ import type { BlogPost, Category } from '../lib/supabase'
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { isAdmin } = useAuth()
   const [post, setPost] = useState<BlogPost | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isPreview, setIsPreview] = useState(false)
 
   useEffect(() => {
     if (slug) {
-      fetchPost(slug)
+      // 미리보기 모드 확인
+      const preview = searchParams.get('preview')
+      if (preview === 'true') {
+        setIsPreview(true)
+        loadPreviewPost()
+      } else {
+        fetchPost(slug)
+      }
     }
     fetchCategories()
-  }, [slug])
+  }, [slug, searchParams])
 
   const fetchCategories = async () => {
     try {
@@ -63,6 +72,26 @@ const BlogPost = () => {
     } catch (err: any) {
       setError('포스트를 찾을 수 없습니다.')
       console.error('Error fetching post:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadPreviewPost = () => {
+    try {
+      setLoading(true)
+      const tempPostData = sessionStorage.getItem('tempPost')
+      
+      if (!tempPostData) {
+        setError('미리보기 데이터를 찾을 수 없습니다.')
+        return
+      }
+
+      const tempPost = JSON.parse(tempPostData)
+      setPost(tempPost)
+    } catch (err: any) {
+      setError('미리보기 데이터를 불러오는데 실패했습니다.')
+      console.error('Error loading preview post:', err)
     } finally {
       setLoading(false)
     }
@@ -170,8 +199,23 @@ const BlogPost = () => {
       )}
       <Navbar />
       
+      {/* Preview Banner */}
+      {isPreview && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-white px-4 py-3 text-center font-medium"
+        >
+          <div className="flex items-center justify-center gap-2">
+            <Eye size={16} />
+            <span>미리보기 모드 - 실제 포스트가 아닙니다</span>
+          </div>
+        </motion.div>
+      )}
+      
       {/* Back Button - 반응형 개선 */}
-      <div className="pt-24 sm:pt-28 lg:pt-32 px-3 sm:px-4 lg:px-6">
+      <div className={`px-3 sm:px-4 lg:px-6 ${isPreview ? 'pt-32 sm:pt-36 lg:pt-40' : 'pt-24 sm:pt-28 lg:pt-32'}`}>
         <div className="max-w-4xl mx-auto">
           <motion.button
             initial={{ opacity: 0, x: -20 }}
@@ -404,7 +448,7 @@ const BlogPost = () => {
       </section>
 
       {/* Comments Section - 반응형 개선 */}
-      {post.is_published && (
+      {post.is_published && !isPreview && (
         <section className="px-3 sm:px-4 lg:px-6 pb-12 sm:pb-16 lg:pb-20">
           <div className="max-w-4xl mx-auto">
             <Comments postId={post.id} />
