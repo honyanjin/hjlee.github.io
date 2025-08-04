@@ -296,13 +296,23 @@ const BlogPost = () => {
                   )}
                 </div>
                 
-                {/* Share Buttons */}
-                <ShareButtons 
-                  title={post.title}
-                  url={window.location.href}
-                  description={post.excerpt}
-                  size="sm"
-                />
+                {/* 관리자 편집 버튼과 공유 버튼 */}
+                <div className="flex items-center gap-2">
+                  {isAdmin && (
+                    <button
+                      onClick={() => navigate(`/admin/blog/edit/${post.id}`)}
+                      className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      편집하기
+                    </button>
+                  )}
+                  <ShareButtons 
+                    title={post.title}
+                    url={window.location.href}
+                    description={post.excerpt}
+                    size="sm"
+                  />
+                </div>
               </div>
 
               {/* Title - 반응형 개선 */}
@@ -341,18 +351,6 @@ const BlogPost = () => {
                   </div>
                 )}
               </div>
-
-              {/* 관리자 편집 버튼 */}
-              {isAdmin && !post.is_published && (
-                <div className="mb-4 sm:mb-6 flex justify-end">
-                  <button
-                    onClick={() => navigate(`/admin/blog/edit/${post.id}`)}
-                    className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    편집하기
-                  </button>
-                </div>
-              )}
 
               {/* Excerpt - 반응형 개선 */}
               {post.excerpt && (
