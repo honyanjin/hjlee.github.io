@@ -204,8 +204,19 @@ const AdminBlogNew = () => {
       return
     }
 
-    // 미리보기 모드로 전환
+    // 에러 메시지 초기화
+    setError('')
+    
+    // 미리보기 모드로 전환 (완전히 클라이언트 사이드)
     setPreviewMode(true)
+    
+    // 스크롤을 미리보기 섹션으로 이동
+    setTimeout(() => {
+      const contentSection = document.querySelector('[data-preview-content]')
+      if (contentSection) {
+        contentSection.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 100)
   }
 
   // 미리보기 모드에서 편집 모드로 돌아가기
@@ -388,7 +399,7 @@ const AdminBlogNew = () => {
           </div>
 
           {/* Content */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow" data-preview-content>
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 내용
