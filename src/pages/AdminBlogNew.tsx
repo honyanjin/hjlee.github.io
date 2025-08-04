@@ -200,8 +200,9 @@ const AdminBlogNew = () => {
   const onPreview = () => {
     const formData = watch()
     
-    if (!formData.title || !formData.content || !formData.excerpt || !formData.category) {
-      setError('미리보기를 위해서는 제목, 내용, 요약, 카테고리가 모두 필요합니다.')
+    // 새 포스트 작성에서는 필수 필드가 없어도 미리보기 가능하도록 조건 완화
+    if (!formData.title && !formData.content) {
+      setError('미리보기를 위해서는 제목이나 내용 중 하나는 입력해주세요.')
       return
     }
 
@@ -387,7 +388,7 @@ const AdminBlogNew = () => {
           </div>
 
           {/* Content */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow" data-preview-content>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 내용
@@ -402,263 +403,105 @@ const AdminBlogNew = () => {
               </button>
             </div>
             
-            {!isBasicInfoCollapsed ? (
-              <div className="p-6">
-                {/* 미리보기 배너 */}
-                <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                  <div className="flex items-center justify-center gap-2 text-yellow-800 dark:text-yellow-200">
-                    <Eye size={16} />
-                    <span className="font-medium">미리보기 모드 - 실제 포스트가 아닙니다</span>
-                  </div>
+            <div className="p-6">
+              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">💡 도움말</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowFullHelp(!showFullHelp)}
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline"
+                  >
+                    {showFullHelp ? '간단히 보기' : '도움말 더보기'}
+                  </button>
                 </div>
                 
-                {/* 블로그 포스트 스타일 미리보기 */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                  {/* Featured Image */}
-                  {imageUrl && (
-                    <div className="relative h-64 overflow-hidden">
-                      <img 
-                        src={imageUrl}
-                        alt={watchedTitle || 'Featured Image'}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Post Content */}
-                  <div className="p-6">
-                    {/* Post Meta */}
-                    <div className="flex flex-wrap items-center gap-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <Calendar size={16} />
-                        <span>{new Date().toLocaleDateString()}</span>
+                {!showFullHelp ? (
+                  <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                    <div><strong>유튜브 삽입:</strong> 마크다운에서 `[제목](https://youtube.com/watch?v=VIDEO_ID)` 형태로 작성하면 자동으로 iframe으로 변환됩니다.</div>
+                    <div><strong>예시:</strong> `[React 튜토리얼](https://youtube.com/watch?v=dQw4w9WgXcQ)`</div>
+                    <div><strong>지원 형식:</strong> youtube.com/watch?v= 또는 youtu.be/ 링크</div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-blue-700 dark:text-blue-300 space-y-3">
+                    <div>
+                      <h4 className="font-medium mb-2">📝 기본 문법</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code># 제목</code> - H1 제목</div>
+                        <div><code>## 부제목</code> - H2 부제목</div>
+                        <div><code>### 소제목</code> - H3 소제목</div>
+                        <div><code>**굵게**</code> - 굵은 글씨</div>
+                        <div><code>*기울임*</code> - 기울임 글씨</div>
+                        <div><code>`코드`</code> - 인라인 코드</div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <User size={16} />
-                        <span>{user?.email || 'Unknown'}</span>
-                      </div>
-                      {watch('category') && (
-                        <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
-                          {categories.find(cat => cat.slug === watch('category'))?.name || watch('category')}
-                        </span>
-                      )}
                     </div>
-
-                    {/* Title */}
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                      {watchedTitle || '제목 없음'}
-                    </h1>
-
-                    {/* Excerpt */}
-                    {watch('excerpt') && (
-                      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                        {watch('excerpt')}
-                      </p>
-                    )}
-
-                    {/* Content */}
-                    <div className="prose prose-lg max-w-none dark:prose-invert markdown-content">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[rehypeHighlight]}
-                        components={{
-                          // 코드 블록 스타일링
-                          code({ node, className, children, ...props }) {
-                            const match = /language-(\w+)/.exec(className || '')
-                            return match ? (
-                              <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
-                                <code className={className} {...props}>
-                                  {children}
-                                </code>
-                              </pre>
-                            ) : (
-                              <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm" {...props}>
-                                {children}
-                              </code>
-                            )
-                          },
-                          // 링크 스타일링 (유튜브 링크 감지)
-                          a({ children, href, ...props }) {
-                            // 유튜브 링크 감지 및 변환
-                            if (href && (href.includes('youtube.com/watch') || href.includes('youtu.be/'))) {
-                              const videoId = href.includes('youtube.com/watch') 
-                                ? href.split('v=')[1]?.split('&')[0]
-                                : href.split('youtu.be/')[1]?.split('?')[0]
-                              
-                              if (videoId) {
-                                return (
-                                  <div className="my-4">
-                                    <iframe
-                                      width="100%"
-                                      height="315"
-                                      src={`https://www.youtube.com/embed/${videoId}`}
-                                      title="YouTube video player"
-                                      frameBorder="0"
-                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                      allowFullScreen
-                                      className="rounded-lg shadow-md"
-                                    />
-                                  </div>
-                                )
-                              }
-                            }
-                            
-                            return (
-                              <a 
-                                href={href} 
-                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                {...props}
-                              >
-                                {children}
-                              </a>
-                            )
-                          },
-                          // 이미지 스타일링
-                          img({ src, alt, ...props }) {
-                            return (
-                              <img 
-                                src={src} 
-                                alt={alt}
-                                className="max-w-full h-auto rounded-lg shadow-md"
-                                {...props}
-                              />
-                            )
-                          },
-                          // 테이블 스타일링
-                          table({ children, ...props }) {
-                            return (
-                              <div className="overflow-x-auto">
-                                <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600" {...props}>
-                                  {children}
-                                </table>
-                              </div>
-                            )
-                          },
-                          th({ children, ...props }) {
-                            return (
-                              <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 font-semibold" {...props}>
-                                {children}
-                              </th>
-                            )
-                          },
-                          td({ children, ...props }) {
-                            return (
-                              <td className="border border-gray-300 dark:border-gray-600 px-4 py-2" {...props}>
-                                {children}
-                              </td>
-                            )
-                          }
-                        }}
-                      >
-                        {watchedContent || '내용을 입력하세요'}
-                      </ReactMarkdown>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">🔗 링크 & 미디어</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>[텍스트](URL)</code> - 링크</div>
+                        <div><code>![대체텍스트](이미지URL)</code> - 이미지</div>
+                        <div><code>[제목](유튜브URL)</code> - 유튜브 비디오 (자동 변환)</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">📋 목록</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>- 항목</code> - 순서 없는 목록</div>
+                        <div><code>1. 항목</code> - 순서 있는 목록</div>
+                        <div><code>  - 들여쓰기</code> - 중첩 목록</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">💻 코드 예시 블록</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>```언어</code> - 코드 예시 블록 시작</div>
+                        <div><code>```</code> - 코드 예시 블록 끝</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">📊 테이블</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>| 헤더1 | 헤더2 |</code> - 테이블 헤더</div>
+                        <div><code>|------|------|</code> - 구분선</div>
+                        <div><code>| 셀1 | 셀2 |</code> - 테이블 셀</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">💬 인용</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>&gt; 인용문</code> - 인용 블록</div>
+                        <div><code>---</code> - 구분선</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">🎥 유튜브 삽입</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>[제목](https://youtube.com/watch?v=VIDEO_ID)</code></div>
+                        <div><code>[제목](https://youtu.be/VIDEO_ID)</code></div>
+                        <div>자동으로 iframe으로 변환됩니다</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ) : (
-              <div className="p-6">
-                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">💡 도움말</h3>
-                    <button
-                      type="button"
-                      onClick={() => setShowFullHelp(!showFullHelp)}
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline"
-                    >
-                      {showFullHelp ? '간단히 보기' : '도움말 더보기'}
-                    </button>
-                  </div>
-                  
-                  {!showFullHelp ? (
-                    <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-                      <div><strong>유튜브 삽입:</strong> 마크다운에서 `[제목](https://youtube.com/watch?v=VIDEO_ID)` 형태로 작성하면 자동으로 iframe으로 변환됩니다.</div>
-                      <div><strong>예시:</strong> `[React 튜토리얼](https://youtube.com/watch?v=dQw4w9WgXcQ)`</div>
-                      <div><strong>지원 형식:</strong> youtube.com/watch?v= 또는 youtu.be/ 링크</div>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-blue-700 dark:text-blue-300 space-y-3">
-                      <div>
-                        <h4 className="font-medium mb-2">📝 기본 문법</h4>
-                        <div className="space-y-1 ml-2">
-                          <div><code># 제목</code> - H1 제목</div>
-                          <div><code>## 부제목</code> - H2 부제목</div>
-                          <div><code>### 소제목</code> - H3 소제목</div>
-                          <div><code>**굵게**</code> - 굵은 글씨</div>
-                          <div><code>*기울임*</code> - 기울임 글씨</div>
-                          <div><code>`코드`</code> - 인라인 코드</div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">🔗 링크 & 미디어</h4>
-                        <div className="space-y-1 ml-2">
-                          <div><code>[텍스트](URL)</code> - 링크</div>
-                          <div><code>![대체텍스트](이미지URL)</code> - 이미지</div>
-                          <div><code>[제목](유튜브URL)</code> - 유튜브 비디오 (자동 변환)</div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">📋 목록</h4>
-                        <div className="space-y-1 ml-2">
-                          <div><code>- 항목</code> - 순서 없는 목록</div>
-                          <div><code>1. 항목</code> - 순서 있는 목록</div>
-                          <div><code>  - 들여쓰기</code> - 중첩 목록</div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">💻 코드 예시 블록</h4>
-                        <div className="space-y-1 ml-2">
-                          <div><code>```언어</code> - 코드 예시 블록 시작</div>
-                          <div><code>```</code> - 코드 예시 블록 끝</div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">📊 테이블</h4>
-                        <div className="space-y-1 ml-2">
-                          <div><code>| 헤더1 | 헤더2 |</code> - 테이블 헤더</div>
-                          <div><code>|------|------|</code> - 구분선</div>
-                          <div><code>| 셀1 | 셀2 |</code> - 테이블 셀</div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">💬 인용</h4>
-                        <div className="space-y-1 ml-2">
-                          <div><code>&gt; 인용문</code> - 인용 블록</div>
-                          <div><code>---</code> - 구분선</div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">🎥 유튜브 삽입</h4>
-                        <div className="space-y-1 ml-2">
-                          <div><code>[제목](https://youtube.com/watch?v=VIDEO_ID)</code></div>
-                          <div><code>[제목](https://youtu.be/VIDEO_ID)</code></div>
-                          <div>자동으로 iframe으로 변환됩니다</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <textarea
-                  {...register('content')}
-                  rows={20}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white font-mono"
-                  placeholder="포스트 내용을 마크다운 형식으로 작성하세요..."
-                />
-                {errors.content && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    {errors.content.message}
-                  </p>
                 )}
               </div>
-            )}
+              <textarea
+                {...register('content')}
+                rows={20}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white font-mono"
+                placeholder="포스트 내용을 마크다운 형식으로 작성하세요..."
+              />
+              {errors.content && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.content.message}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Publish Settings */}
