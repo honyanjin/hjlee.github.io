@@ -405,24 +405,18 @@ const AdminBlogNew = () => {
             
             <div className="p-6">
               <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">💡 도움말</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">💡 마크다운 도움말</h3>
                   <button
                     type="button"
                     onClick={() => setShowFullHelp(!showFullHelp)}
                     className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline"
                   >
-                    {showFullHelp ? '간단히 보기' : '도움말 더보기'}
+                    {showFullHelp ? '접기' : '도움말 보기'}
                   </button>
                 </div>
                 
-                {!showFullHelp ? (
-                  <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-                    <div><strong>유튜브 삽입:</strong> 마크다운에서 `[제목](https://youtube.com/watch?v=VIDEO_ID)` 형태로 작성하면 자동으로 iframe으로 변환됩니다.</div>
-                    <div><strong>예시:</strong> `[React 튜토리얼](https://youtube.com/watch?v=dQw4w9WgXcQ)`</div>
-                    <div><strong>지원 형식:</strong> youtube.com/watch?v= 또는 youtu.be/ 링크</div>
-                  </div>
-                ) : (
+                {showFullHelp && (
                   <div className="text-xs text-blue-700 dark:text-blue-300 space-y-3">
                     <div>
                       <h4 className="font-medium mb-2">📝 기본 문법</h4>

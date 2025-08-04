@@ -53,6 +53,7 @@ const AdminBlogEdit = () => {
   const [isBasicInfoCollapsed, setIsBasicInfoCollapsed] = useState(false)
   const [isPublishSettingsCollapsed, setIsPublishSettingsCollapsed] = useState(true)
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
+  const [showFullHelp, setShowFullHelp] = useState(false)
   
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -491,6 +492,86 @@ const AdminBlogEdit = () => {
             </div>
             
             <div className="p-6">
+              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">💡 마크다운 도움말</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowFullHelp(!showFullHelp)}
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline"
+                  >
+                    {showFullHelp ? '접기' : '도움말 보기'}
+                  </button>
+                </div>
+                
+                {showFullHelp && (
+                  <div className="text-xs text-blue-700 dark:text-blue-300 space-y-3 mt-3">
+                    <div>
+                      <h4 className="font-medium mb-2">📝 기본 문법</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code># 제목</code> - H1 제목</div>
+                        <div><code>## 부제목</code> - H2 부제목</div>
+                        <div><code>### 소제목</code> - H3 소제목</div>
+                        <div><code>**굵게**</code> - 굵은 글씨</div>
+                        <div><code>*기울임*</code> - 기울임 글씨</div>
+                        <div><code>`코드`</code> - 인라인 코드</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">🔗 링크 & 미디어</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>[텍스트](URL)</code> - 링크</div>
+                        <div><code>![대체텍스트](이미지URL)</code> - 이미지</div>
+                        <div><code>[제목](유튜브URL)</code> - 유튜브 비디오 (자동 변환)</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">📋 목록</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>- 항목</code> - 순서 없는 목록</div>
+                        <div><code>1. 항목</code> - 순서 있는 목록</div>
+                        <div><code>  - 들여쓰기</code> - 중첩 목록</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">💻 코드 예시 블록</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>```언어</code> - 코드 예시 블록 시작</div>
+                        <div><code>```</code> - 코드 예시 블록 끝</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">📊 테이블</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>| 헤더1 | 헤더2 |</code> - 테이블 헤더</div>
+                        <div><code>|------|------|</code> - 구분선</div>
+                        <div><code>| 셀1 | 셀2 |</code> - 테이블 셀</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">💬 인용</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>&gt; 인용문</code> - 인용 블록</div>
+                        <div><code>---</code> - 구분선</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">🎥 유튜브 삽입</h4>
+                      <div className="space-y-1 ml-2">
+                        <div><code>[제목](https://youtube.com/watch?v=VIDEO_ID)</code></div>
+                        <div><code>[제목](https://youtu.be/VIDEO_ID)</code></div>
+                        <div>자동으로 iframe으로 변환됩니다</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
               <textarea
                 {...register('content')}
                 rows={20}
