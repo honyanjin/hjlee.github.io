@@ -358,12 +358,15 @@ const Blog = () => {
                       id="featured-post-image"
                       {...getPostImageProps(featuredPost)}
                       alt={featuredPost.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                      onClick={() => navigate(`/blog/${featuredPost.slug}`)}
                     />
                   ) : (
                     <div 
                       id="featured-post-image"
-                      className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300 cursor-pointer"
                       style={getBackgroundStyle(featuredPost)}
+                      onClick={() => navigate(`/blog/${featuredPost.slug}`)}
                     >
                       <div className="text-white text-center px-4">
                         <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
@@ -385,49 +388,60 @@ const Blog = () => {
                     />
                   </div>
                 </div>
-                <div className="p-4 sm:p-6 lg:p-8">
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                    <span id="featured-post-category" className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
-                      {(() => {
-                        const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
-                        return foundCategory ? foundCategory.name : featuredPost.category
-                      })()}
-                    </span>
-                    <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
-                      <Calendar size={14} className="sm:w-4 sm:h-4" />
-                      <span id="featured-post-date" className="text-xs sm:text-sm">
-                        {new Date(featuredPost.published_at || featuredPost.created_at).toLocaleDateString()}
+                <div className="p-4 sm:p-6 lg:p-8 flex flex-col">
+                  {/* 상단 내용 (카테고리, 날짜, 제목, 요약, 태그) */}
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                      <span id="featured-post-category" className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
+                        {(() => {
+                          const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
+                          return foundCategory ? foundCategory.name : featuredPost.category
+                        })()}
                       </span>
-                    </div>
-                  </div>
-                  <h3 id="featured-post-title-text" className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
-                    {featuredPost.title}
-                  </h3>
-                  <p id="featured-post-excerpt" className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 line-clamp-3">
-                    {featuredPost.excerpt}
-                  </p>
-                  {featuredPost.tags && featuredPost.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
-                      {featuredPost.tags.map((tag, index) => (
-                        <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full dark:bg-gray-600 dark:text-gray-300">
-                          {tag}
+                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                        <Calendar size={14} className="sm:w-4 sm:h-4" />
+                        <span id="featured-post-date" className="text-xs sm:text-sm">
+                          {new Date(featuredPost.published_at || featuredPost.created_at).toLocaleDateString()}
                         </span>
-                      ))}
+                      </div>
                     </div>
-                  )}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-                    <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
-                      <User size={14} className="sm:w-4 sm:h-4" />
-                      <span id="featured-post-author" className="text-xs sm:text-sm">{featuredPost.author}</span>
-                    </div>
-                    <button 
-                      id="featured-post-read-more" 
+                    <h3 
+                      id="featured-post-title-text" 
+                      className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       onClick={() => navigate(`/blog/${featuredPost.slug}`)}
-                      className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm sm:text-base"
                     >
-                      <span>자세히 보기</span>
-                      <ArrowRight size={14} className="sm:w-4 sm:h-4" />
-                    </button>
+                      {featuredPost.title}
+                    </h3>
+                    <p id="featured-post-excerpt" className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 line-clamp-3">
+                      {featuredPost.excerpt}
+                    </p>
+                    {featuredPost.tags && featuredPost.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
+                        {featuredPost.tags.map((tag, index) => (
+                          <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full dark:bg-gray-600 dark:text-gray-300">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* 하단 고정 영역 (작성자와 자세히 보기) */}
+                  <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                        <User size={14} className="sm:w-4 sm:h-4" />
+                        <span id="featured-post-author" className="text-xs sm:text-sm">{featuredPost.author}</span>
+                      </div>
+                      <button 
+                        id="featured-post-read-more" 
+                        onClick={() => navigate(`/blog/${featuredPost.slug}`)}
+                        className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm sm:text-base"
+                      >
+                        <span>자세히 보기</span>
+                        <ArrowRight size={14} className="sm:w-4 sm:h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -477,7 +491,7 @@ const Blog = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col"
                 >
                   <div className="relative overflow-hidden">
                     {post.image_url ? (
@@ -485,13 +499,15 @@ const Blog = () => {
                         id={`blog-post-image-${post.id}`}
                         {...getPostImageProps(post)}
                         alt={post.title}
-                        className="w-full h-40 sm:h-48 object-cover hover:scale-105 transition-transform duration-300"
+                        className="w-full h-40 sm:h-48 object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        onClick={() => navigate(`/blog/${post.slug}`)}
                       />
                     ) : (
                       <div 
                         id={`blog-post-image-${post.id}`}
-                        className="w-full h-40 sm:h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300"
+                        className="w-full h-40 sm:h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300 cursor-pointer"
                         style={getBackgroundStyle(post)}
+                        onClick={() => navigate(`/blog/${post.slug}`)}
                       >
                         <div className="text-white text-center px-3 sm:px-4">
                           <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">
@@ -521,46 +537,59 @@ const Blog = () => {
                       />
                     </div>
                   </div>
-                  <div className="p-4 sm:p-6">
-                    <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={12} className="sm:w-3.5 sm:h-3.5" />
-                        <span id={`blog-post-date-${post.id}`}>
-                          {new Date(post.published_at || post.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                    <h3 id={`blog-post-title-${post.id}`} className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p id={`blog-post-excerpt-${post.id}`} className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 line-clamp-3">
-                      {post.excerpt}
-                    </p>
-                    {post.tags && post.tags.length > 0 && (
-                      <div id={`blog-post-tags-${post.id}`} className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
-                        {post.tags.map((tag) => (
-                          <span 
-                            key={tag}
-                            className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full dark:bg-gray-700 dark:text-gray-300"
-                          >
-                            {tag}
+                  
+                  {/* 카드 내용을 상단과 하단으로 분리 */}
+                  <div className="p-4 sm:p-6 flex flex-col flex-1">
+                    {/* 상단 내용 (날짜, 제목, 요약, 태그) */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-1">
+                          <Calendar size={12} className="sm:w-3.5 sm:h-3.5" />
+                          <span id={`blog-post-date-${post.id}`}>
+                            {new Date(post.published_at || post.created_at).toLocaleDateString()}
                           </span>
-                        ))}
+                        </div>
                       </div>
-                    )}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
-                        <User size={12} className="sm:w-3.5 sm:h-3.5" />
-                        <span id={`blog-post-author-${post.id}`} className="text-xs sm:text-sm">{post.author}</span>
-                      </div>
-                      <button 
-                        id={`blog-post-read-more-${post.id}`} 
+                      <h3 
+                        id={`blog-post-title-${post.id}`} 
+                        className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 line-clamp-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                         onClick={() => navigate(`/blog/${post.slug}`)}
-                        className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-xs sm:text-sm"
                       >
-                        <span>자세히 보기</span>
-                        <ArrowRight size={12} className="sm:w-3.5 sm:h-3.5" />
-                      </button>
+                        {post.title}
+                      </h3>
+                      <p id={`blog-post-excerpt-${post.id}`} className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 line-clamp-3">
+                        {post.excerpt}
+                      </p>
+                      {post.tags && post.tags.length > 0 && (
+                        <div id={`blog-post-tags-${post.id}`} className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
+                          {post.tags.map((tag) => (
+                            <span 
+                              key={tag}
+                              className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full dark:bg-gray-700 dark:text-gray-300"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* 하단 고정 영역 (작성자와 자세히 보기) */}
+                    <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                        <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                          <User size={12} className="sm:w-3.5 sm:h-3.5" />
+                          <span id={`blog-post-author-${post.id}`} className="text-xs sm:text-sm">{post.author}</span>
+                        </div>
+                        <button 
+                          id={`blog-post-read-more-${post.id}`} 
+                          onClick={() => navigate(`/blog/${post.slug}`)}
+                          className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-xs sm:text-sm"
+                        >
+                          <span>자세히 보기</span>
+                          <ArrowRight size={12} className="sm:w-3.5 sm:h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
