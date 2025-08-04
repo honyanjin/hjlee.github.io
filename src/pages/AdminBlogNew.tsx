@@ -208,6 +208,11 @@ const AdminBlogNew = () => {
     setPreviewMode(true)
   }
 
+  // 미리보기 모드에서 편집 모드로 돌아가기
+  const onBackToEdit = () => {
+    setPreviewMode(false)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -388,23 +393,25 @@ const AdminBlogNew = () => {
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 내용
               </h2>
-              <button
-                type="button"
-                onClick={() => setPreviewMode(!previewMode)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              >
-                {previewMode ? (
-                  <>
-                    <EyeOff size={16} />
-                    편집 모드
-                  </>
-                ) : (
-                  <>
-                    <Eye size={16} />
-                    미리보기
-                  </>
-                )}
-              </button>
+              {previewMode ? (
+                <button
+                  type="button"
+                  onClick={onBackToEdit}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-100 dark:bg-blue-700 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-600 transition-colors"
+                >
+                  <EyeOff size={16} />
+                  편집 모드로 돌아가기
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <Eye size={16} />
+                  미리보기
+                </button>
+              )}
             </div>
             
             {previewMode ? (
@@ -715,41 +722,54 @@ console.log('코드 블록');
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={() => navigate('/admin/blog')}
-              className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              취소
-            </button>
-            <button
-              type="button"
-              onClick={onPreview}
-              disabled={isLoading}
-              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ExternalLink size={16} />
-              미리보기
-            </button>
-            <button
-              type="button"
-              onClick={onSaveDraft}
-              disabled={isLoading}
-              className="flex items-center gap-2 px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Clock size={16} />
-              {isLoading ? '저장 중...' : '임시저장'}
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Save size={16} />
-              {isLoading ? '저장 중...' : '저장'}
-            </button>
-          </div>
+          {!previewMode ? (
+            <div className="flex justify-end gap-4">
+              <button
+                type="button"
+                onClick={() => navigate('/admin/blog')}
+                className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={onPreview}
+                disabled={isLoading}
+                className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ExternalLink size={16} />
+                미리보기
+              </button>
+              <button
+                type="button"
+                onClick={onSaveDraft}
+                disabled={isLoading}
+                className="flex items-center gap-2 px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Clock size={16} />
+                {isLoading ? '저장 중...' : '임시저장'}
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Save size={16} />
+                {isLoading ? '저장 중...' : '저장'}
+              </button>
+            </div>
+          ) : (
+            <div className="flex justify-end gap-4">
+              <button
+                type="button"
+                onClick={onBackToEdit}
+                className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                <EyeOff size={16} />
+                편집 모드로 돌아가기
+              </button>
+            </div>
+          )}
         </form>
       </main>
     </div>
