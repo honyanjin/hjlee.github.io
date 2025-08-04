@@ -709,32 +709,66 @@ const Home = () => {
           </motion.div>
 
           {/* Filter Buttons */}
-          <div id="project-filters" className="flex justify-center gap-4 mb-12">
-            <button
-              id="filter-all"
-              onClick={() => setActiveFilter('all')}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                activeFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              전체
-            </button>
-            {categories.map((category) => (
+          <div id="project-filters" className="mb-12 px-4">
+            {/* Desktop: Centered flex layout */}
+            <div className="hidden sm:flex flex-wrap justify-center gap-4">
               <button
-                key={category.id}
-                id={`filter-${category.slug}`}
-                onClick={() => setActiveFilter(category.slug)}
+                id="filter-all-desktop"
+                onClick={() => setActiveFilter('all')}
                 className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                  activeFilter === category.slug
+                  activeFilter === 'all'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
-                {category.name}
+                전체
               </button>
-            ))}
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  id={`filter-${category.slug}-desktop`}
+                  onClick={() => setActiveFilter(category.slug)}
+                  className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                    activeFilter === category.slug
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+            
+            {/* Mobile: Scrollable horizontal layout */}
+            <div className="sm:hidden overflow-x-auto scrollbar-hide">
+              <div className="flex gap-2 min-w-max px-2">
+                <button
+                  id="filter-all-mobile"
+                  onClick={() => setActiveFilter('all')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm whitespace-nowrap flex-shrink-0 ${
+                    activeFilter === 'all'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  전체
+                </button>
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    id={`filter-${category.slug}-mobile`}
+                    onClick={() => setActiveFilter(category.slug)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm whitespace-nowrap flex-shrink-0 ${
+                      activeFilter === category.slug
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Loading State */}
