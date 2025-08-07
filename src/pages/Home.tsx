@@ -58,7 +58,7 @@ const Home = () => {
           .order('created_at', { ascending: false })
           .limit(8) // 홈페이지에서는 최대 8개 (featured + 일반 프로젝트)
 
-        console.log('Supabase 응답:', { data, error })
+
 
         if (error) {
           console.error('Supabase 에러:', error)

@@ -4,13 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import rehypeHighlight from 'rehype-highlight'
 import { 
   Save, 
-  Eye, 
-  EyeOff,
   ArrowLeft, 
   Plus, 
   X,
@@ -21,7 +16,6 @@ import {
   Link,
   Copy,
   Clock,
-  ExternalLink,
   ChevronDown,
   ChevronUp
 } from 'lucide-react'
@@ -30,8 +24,9 @@ import { supabase } from '../lib/supabase'
 import Breadcrumb from '../components/Breadcrumb'
 import type { BlogPost, Category } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
-import InlineImageUpload from '../components/InlineImageUpload'
-import PreviewModal from '../components/PreviewModal'
+import RichTextEditor from '../components/RichTextEditor'
+import { htmlToMarkdown, generateExcerpt } from '../lib/markdownConverter'
+
 
 const postSchema = z.object({
   title: z.string().min(1, '제목을 입력해주세요'),
@@ -53,7 +48,6 @@ const AdminBlogNew = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [isBasicInfoCollapsed, setIsBasicInfoCollapsed] = useState(false)
   const [isPublishSettingsCollapsed, setIsPublishSettingsCollapsed] = useState(true)
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
   const [cursorPosition, setCursorPosition] = useState<number | null>(null)
   
   const { user } = useAuth()
@@ -105,28 +99,7 @@ const AdminBlogNew = () => {
   const previewSlug = watchedTitle ? generateSlug(watchedTitle) : ''
   const previewUrl = previewSlug ? `${window.location.origin}/blog/${previewSlug}` : ''
 
-  // 이미지 삽입 함수
-  const handleImageInsert = (markdownLink: string) => {
-    const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement
-    if (!textarea) return
 
-    const start = textarea.selectionStart
-    const end = textarea.selectionEnd
-    const text = watchedContent || ''
-    
-    // 커서 위치에 이미지 링크 삽입
-    const newText = text.substring(0, start) + '\n' + markdownLink + '\n' + text.substring(end)
-    
-    // 폼 값 업데이트
-    setValue('content', newText)
-    
-    // 커서 위치 조정 (이미지 링크 다음 줄로)
-    setTimeout(() => {
-      const newPosition = start + markdownLink.length + 2 // +2 for newlines
-      textarea.setSelectionRange(newPosition, newPosition)
-      textarea.focus()
-    }, 0)
-  }
 
   const onSubmit = async (data: PostFormData) => {
     setIsLoading(true)
@@ -139,10 +112,16 @@ const AdminBlogNew = () => {
         ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
         : []
 
+      // HTML을 마크다운으로 변환
+      const markdownContent = htmlToMarkdown(data.content)
+      
+      // 자동으로 excerpt 생성 (사용자가 입력하지 않은 경우)
+      const autoExcerpt = data.excerpt || generateExcerpt(data.content)
+
       const postData = {
         title: data.title,
-        content: data.content,
-        excerpt: data.excerpt,
+        content: markdownContent,
+        excerpt: autoExcerpt,
         category: data.category,
         author: user?.email || 'Unknown',
         tags,
@@ -190,10 +169,16 @@ const AdminBlogNew = () => {
         ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
         : []
 
+      // HTML을 마크다운으로 변환
+      const markdownContent = htmlToMarkdown(formData.content)
+      
+      // 자동으로 excerpt 생성 (사용자가 입력하지 않은 경우)
+      const autoExcerpt = formData.excerpt || generateExcerpt(formData.content)
+
       const postData = {
         title: formData.title,
-        content: formData.content,
-        excerpt: formData.excerpt,
+        content: markdownContent,
+        excerpt: autoExcerpt,
         category: formData.category,
         author: user?.email || 'Unknown',
         tags,
@@ -223,21 +208,7 @@ const AdminBlogNew = () => {
     }
   }
 
-  const onPreview = () => {
-    const formData = watch()
-    
-    // 새 포스트 작성에서는 필수 필드가 없어도 미리보기 가능하도록 조건 완화
-    if (!formData.title && !formData.content) {
-      setError('미리보기를 위해서는 제목이나 내용 중 하나는 입력해주세요.')
-      return
-    }
 
-    // 에러 메시지 초기화
-    setError('')
-    
-    // 미리보기 모달 열기
-    setIsPreviewModalOpen(true)
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -436,23 +407,12 @@ const AdminBlogNew = () => {
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 내용
               </h2>
-              <div className="flex items-center gap-2">
-                <InlineImageUpload onImageInsert={handleImageInsert} />
-                <button
-                  type="button"
-                  onClick={onPreview}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-600 transition-colors"
-                >
-                  <Eye size={16} />
-                  미리보기
-                </button>
-              </div>
             </div>
             
             <div className="p-6">
               <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">💡 마크다운 도움말</h3>
+                  <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">💡 TinyMCE 리치 텍스트 에디터 도움말</h3>
                   <button
                     type="button"
                     onClick={() => setShowFullHelp(!showFullHelp)}
@@ -465,127 +425,59 @@ const AdminBlogNew = () => {
                 {showFullHelp && (
                   <div className="text-xs text-blue-700 dark:text-blue-300 space-y-3">
                     <div>
-                      <h4 className="font-medium mb-2">📝 기본 문법</h4>
+                      <h4 className="font-medium mb-2">📝 기본 기능</h4>
                       <div className="space-y-1 ml-2">
-                        <div><code># 제목</code> - H1 제목</div>
-                        <div><code>## 부제목</code> - H2 부제목</div>
-                        <div><code>### 소제목</code> - H3 소제목</div>
-                        <div><code>**굵게**</code> - 굵은 글씨</div>
-                        <div><code>*기울임*</code> - 기울임 글씨</div>
-                        <div><code>`코드`</code> - 인라인 코드</div>
+                        <div>• 툴바 버튼을 사용하여 텍스트 스타일링</div>
+                        <div>• 이미지 드래그 앤 드롭으로 삽입</div>
+                        <div>• 미디어 버튼으로 비디오/오디오 삽입</div>
+                        <div>• 링크 버튼으로 URL 삽입</div>
                       </div>
                     </div>
                     
                     <div>
-                      <h4 className="font-medium mb-2">🔗 링크 & 미디어</h4>
+                      <h4 className="font-medium mb-2">🔗 미디어 삽입</h4>
                       <div className="space-y-1 ml-2">
-                        <div><code>[텍스트](URL)</code> - 링크</div>
-                        <div><code>![대체텍스트](이미지URL)</code> - 이미지</div>
-                        <div><code>[제목](유튜브URL)</code> - 유튜브 비디오 (자동 변환)</div>
-                        <div className="text-blue-600 dark:text-blue-400">💡 이미지 삽입 버튼을 클릭하거나 이미지를 드래그하여 삽입할 수 있습니다</div>
+                        <div>• 이미지: 드래그 앤 드롭 또는 이미지 버튼</div>
+                        <div>• 비디오: 미디어 버튼 → 비디오 탭</div>
+                        <div>• 유튜브: URL 입력 시 자동 임베드</div>
+                        <div>• 오디오: 미디어 버튼 → 오디오 탭</div>
                       </div>
                     </div>
                     
                     <div>
-                      <h4 className="font-medium mb-2">📋 목록</h4>
+                      <h4 className="font-medium mb-2">📋 편집 기능</h4>
                       <div className="space-y-1 ml-2">
-                        <div><code>- 항목</code> - 순서 없는 목록</div>
-                        <div><code>1. 항목</code> - 순서 있는 목록</div>
-                        <div><code>  - 들여쓰기</code> - 중첩 목록</div>
+                        <div>• 굵게, 기울임, 밑줄 스타일링</div>
+                        <div>• 글머리 기호 및 번호 매기기</div>
+                        <div>• 들여쓰기 및 정렬</div>
+                        <div>• 표 삽입 및 편집</div>
                       </div>
                     </div>
                     
                     <div>
-                      <h4 className="font-medium mb-2">💻 코드 예시 블록</h4>
+                      <h4 className="font-medium mb-2">💻 코드 블록</h4>
                       <div className="space-y-1 ml-2">
-                        <div><code>```언어</code> - 코드 예시 블록 시작</div>
-                        <div><code>```</code> - 코드 예시 블록 끝</div>
+                        <div>• 코드 샘플 버튼으로 코드 블록 삽입</div>
+                        <div>• 언어 선택 가능 (JavaScript, Python, CSS 등)</div>
+                        <div>• 구문 강조 지원</div>
                       </div>
                     </div>
                     
                     <div>
-                      <h4 className="font-medium mb-2">📊 테이블</h4>
+                      <h4 className="font-medium mb-2">🎨 고급 기능</h4>
                       <div className="space-y-1 ml-2">
-                        <div><code>| 헤더1 | 헤더2 |</code> - 테이블 헤더</div>
-                        <div><code>|------|------|</code> - 구분선</div>
-                        <div><code>| 셀1 | 셀2 |</code> - 테이블 셀</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">💬 인용</h4>
-                      <div className="space-y-1 ml-2">
-                        <div><code>&gt; 인용문</code> - 인용 블록</div>
-                        <div><code>---</code> - 구분선</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">🎥 유튜브 삽입</h4>
-                      <div className="space-y-1 ml-2">
-                        <div><code>[제목](https://youtube.com/watch?v=VIDEO_ID)</code></div>
-                        <div><code>[제목](https://youtu.be/VIDEO_ID)</code></div>
-                        <div>자동으로 iframe으로 변환됩니다</div>
+                        <div>• 전체화면 모드</div>
+                        <div>• 찾기 및 바꾸기</div>
+                        <div>• 실행 취소/다시 실행</div>
+                        <div>• 자동 저장</div>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
-              <textarea
-                {...register('content')}
-                rows={20}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white font-mono"
-                placeholder="포스트 내용을 마크다운 형식으로 작성하세요..."
-                onDragOver={(e) => {
-                  e.preventDefault()
-                  e.currentTarget.style.borderColor = '#3b82f6'
-                }}
-                onDragLeave={(e) => {
-                  e.preventDefault()
-                  e.currentTarget.style.borderColor = ''
-                }}
-                onDrop={(e) => {
-                  e.preventDefault()
-                  e.currentTarget.style.borderColor = ''
-                  
-                  const files = e.dataTransfer.files
-                  if (files && files[0] && files[0].type.startsWith('image/')) {
-                    // InlineImageUpload 컴포넌트의 uploadImage 함수를 직접 호출
-                    const file = files[0]
-                    if (file.size > 5 * 1024 * 1024) {
-                      setError('파일 크기는 5MB 이하여야 합니다.')
-                      return
-                    }
-                    
-                    // 파일 업로드 로직
-                    const uploadFile = async () => {
-                      try {
-                        const fileExt = file.name.split('.').pop()
-                        const fileName = `inline-${Date.now()}.${fileExt}`
-                        
-                        const { error } = await supabase.storage
-                          .from('blog-images')
-                          .upload(fileName, file, {
-                            cacheControl: '3600',
-                            upsert: false
-                          })
-                        
-                        if (error) throw error
-                        
-                        const { data: urlData } = supabase.storage
-                          .from('blog-images')
-                          .getPublicUrl(fileName)
-                        
-                        const markdownLink = `![${file.name}](${urlData.publicUrl})`
-                        handleImageInsert(markdownLink)
-                      } catch (err: any) {
-                        setError(err.message || '이미지 업로드에 실패했습니다.')
-                      }
-                    }
-                    
-                    uploadFile()
-                  }
-                }}
+              <RichTextEditor
+                value={watch('content')}
+                onChange={(content) => setValue('content', content)}
               />
               {errors.content && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -641,15 +533,7 @@ const AdminBlogNew = () => {
             >
               취소
             </button>
-            <button
-              type="button"
-              onClick={onPreview}
-              disabled={isLoading}
-              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ExternalLink size={16} />
-              미리보기
-            </button>
+
             <button
               type="button"
               onClick={onSaveDraft}
@@ -671,19 +555,7 @@ const AdminBlogNew = () => {
         </form>
       </main>
 
-      {/* Preview Modal */}
-      <PreviewModal
-        isOpen={isPreviewModalOpen}
-        onClose={() => setIsPreviewModalOpen(false)}
-        title={watchedTitle}
-        content={watchedContent}
-        excerpt={watch('excerpt')}
-        category={watch('category')}
-        author={user?.email || 'Unknown'}
-        imageUrl={imageUrl}
-        tags={watch('tags') ? watch('tags')!.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : []}
-        categories={categories}
-      />
+
     </div>
   )
 }

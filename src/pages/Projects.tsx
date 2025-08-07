@@ -168,7 +168,7 @@ const Projects = () => {
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: false })
 
-        console.log('Supabase 응답:', { data, error })
+
 
         if (error) {
           console.error('Supabase 에러:', error)

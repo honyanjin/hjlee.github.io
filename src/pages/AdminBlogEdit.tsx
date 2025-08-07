@@ -9,8 +9,6 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import { 
   Save, 
-  Eye, 
-  EyeOff,
   ArrowLeft, 
   Loader2,
   Calendar,
@@ -20,7 +18,6 @@ import {
   Link,
   Copy,
   Clock,
-  ExternalLink,
   ChevronDown,
   ChevronUp
 } from 'lucide-react'
@@ -29,8 +26,7 @@ import { supabase } from '../lib/supabase'
 import Breadcrumb from '../components/Breadcrumb'
 import type { BlogPost, Category } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
-import InlineImageUpload from '../components/InlineImageUpload'
-import PreviewModal from '../components/PreviewModal'
+
 
 const postSchema = z.object({
   title: z.string().min(1, '제목을 입력해주세요'),
@@ -53,7 +49,6 @@ const AdminBlogEdit = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [isBasicInfoCollapsed, setIsBasicInfoCollapsed] = useState(false)
   const [isPublishSettingsCollapsed, setIsPublishSettingsCollapsed] = useState(true)
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
   const [showFullHelp, setShowFullHelp] = useState(false)
   
   const { user } = useAuth()
@@ -258,20 +253,7 @@ const AdminBlogEdit = () => {
     }
   }
 
-  const onPreview = () => {
-    const formData = watch()
-    
-    if (!formData.title || !formData.content || !formData.excerpt || !formData.category) {
-      setError('미리보기를 위해서는 제목, 내용, 요약, 카테고리가 모두 필요합니다.')
-      return
-    }
 
-    // 에러 메시지 초기화
-    setError('')
-    
-    // 미리보기 모달 열기
-    setIsPreviewModalOpen(true)
-  }
 
   if (isLoading) {
     return (
@@ -523,15 +505,6 @@ const AdminBlogEdit = () => {
                 내용
               </h2>
               <div className="flex items-center gap-2">
-                <InlineImageUpload onImageInsert={handleImageInsert} />
-                <button
-                  type="button"
-                  onClick={onPreview}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-600 transition-colors"
-                >
-                  <Eye size={16} />
-                  미리보기
-                </button>
               </div>
             </div>
             
@@ -726,15 +699,7 @@ const AdminBlogEdit = () => {
             >
               취소
             </button>
-            <button
-              type="button"
-              onClick={onPreview}
-              disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ExternalLink size={16} />
-              미리보기
-            </button>
+
             <button
               type="button"
               onClick={onSaveDraft}
@@ -756,19 +721,7 @@ const AdminBlogEdit = () => {
         </form>
       </main>
 
-      {/* Preview Modal */}
-      <PreviewModal
-        isOpen={isPreviewModalOpen}
-        onClose={() => setIsPreviewModalOpen(false)}
-        title={watchedTitle}
-        content={watchedContent}
-        excerpt={watch('excerpt')}
-        category={watch('category')}
-        author={user?.email || 'Unknown'}
-        imageUrl={imageUrl}
-        tags={watch('tags') ? watch('tags')!.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : []}
-        categories={categories}
-      />
+
     </div>
   )
 }

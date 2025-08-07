@@ -4,20 +4,9 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// 개발 환경에서만 경고 출력
-if (import.meta.env.DEV) {
-  console.log('🔧 Supabase 설정 확인:')
-  console.log('URL:', supabaseUrl)
-  console.log('Anon Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'NOT SET')
-  console.log('모든 환경 변수:', import.meta.env)
-  
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('❌ Supabase environment variables are not set!')
-    console.error('Required variables: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY')
-    console.error('Please check your .env.local file.')
-  } else {
-    console.log('✅ Supabase 환경 변수가 정상적으로 설정되었습니다.')
-  }
+// 환경 변수 검증
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Supabase 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인해주세요.')
 }
 
 // 환경 변수가 없으면 에러 발생
@@ -30,21 +19,17 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // 연결 테스트 함수
 export const testSupabaseConnection = async () => {
   try {
-    console.log('🔍 Supabase 연결 테스트 중...')
     const { error } = await supabase
       .from('projects')
       .select('count')
       .limit(1)
     
     if (error) {
-      console.error('❌ Supabase 연결 실패:', error)
       return false
     }
     
-    console.log('✅ Supabase 연결 성공')
     return true
   } catch (err) {
-    console.error('❌ Supabase 연결 테스트 실패:', err)
     return false
   }
 }
