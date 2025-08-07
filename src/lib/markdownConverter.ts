@@ -12,14 +12,14 @@ const turndownService = new TurndownService({
 
 // 코드 블록 설정
 turndownService.addRule('codeBlocks', {
-  filter: function (node) {
+  filter: function (node: any) {
     return (
       node.nodeName === 'PRE' &&
       node.firstChild &&
       node.firstChild.nodeName === 'CODE'
     )
   },
-  replacement: function (content, node) {
+  replacement: function (content: string, node: any) {
     const code = node.firstChild as HTMLElement
     const className = code.getAttribute('class') || ''
     const language = className.replace('language-', '')
@@ -31,7 +31,7 @@ turndownService.addRule('codeBlocks', {
 // 이미지 설정
 turndownService.addRule('images', {
   filter: 'img',
-  replacement: function (content, node) {
+  replacement: function (content: string, node: any) {
     const img = node as HTMLImageElement
     const alt = img.alt || ''
     const src = img.src || ''
@@ -47,7 +47,7 @@ turndownService.addRule('images', {
 // 링크 설정
 turndownService.addRule('links', {
   filter: 'a',
-  replacement: function (content, node) {
+  replacement: function (content: string, node: any) {
     const link = node as HTMLAnchorElement
     const href = link.href || ''
     const title = link.title || ''
@@ -62,7 +62,7 @@ turndownService.addRule('links', {
 // 테이블 설정
 turndownService.addRule('tables', {
   filter: 'table',
-  replacement: function (content, node) {
+  replacement: function (content: string, node: any) {
     const table = node as HTMLTableElement
     const rows = Array.from(table.querySelectorAll('tr'))
     
@@ -90,7 +90,7 @@ turndownService.addRule('tables', {
 // 인용 블록 설정
 turndownService.addRule('blockquotes', {
   filter: 'blockquote',
-  replacement: function (content) {
+  replacement: function (content: string) {
     return '\n> ' + content.trim().replace(/\n/g, '\n> ') + '\n'
   }
 })
@@ -123,12 +123,10 @@ export const markdownToHtml = (markdown: string): string => {
     // marked 설정
     marked.setOptions({
       breaks: true,
-      gfm: true,
-      headerIds: true,
-      mangle: false
+      gfm: true
     })
     
-    return marked(markdown)
+    return marked(markdown) as string
   } catch (error) {
     console.error('Markdown to HTML conversion error:', error)
     return markdown
