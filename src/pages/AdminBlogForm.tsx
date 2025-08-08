@@ -52,7 +52,6 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
   const [categories, setCategories] = useState<Category[]>([])
   const [isBasicInfoCollapsed, setIsBasicInfoCollapsed] = useState(false)
   const [isPublishSettingsCollapsed, setIsPublishSettingsCollapsed] = useState(true)
-  const [showFullHelp, setShowFullHelp] = useState(false)
   
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -528,71 +527,6 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
             </div>
             
             <div className="p-6">
-              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">💡 TinyMCE 리치 텍스트 에디터 도움말</h3>
-                  <button
-                    type="button"
-                    onClick={() => setShowFullHelp(!showFullHelp)}
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline"
-                  >
-                    {showFullHelp ? '접기' : '도움말 보기'}
-                  </button>
-                </div>
-                
-                {showFullHelp && (
-                  <div className="text-xs text-blue-700 dark:text-blue-300 space-y-3 mt-3">
-                    <div>
-                      <h4 className="font-medium mb-2">📝 기본 기능</h4>
-                      <div className="space-y-1 ml-2">
-                        <div>• 툴바 버튼을 사용하여 텍스트 스타일링</div>
-                        <div>• 이미지 드래그 앤 드롭으로 삽입</div>
-                        <div>• 미디어 버튼으로 비디오/오디오 삽입</div>
-                        <div>• 링크 버튼으로 URL 삽입</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">🔗 미디어 삽입</h4>
-                      <div className="space-y-1 ml-2">
-                        <div>• 이미지: 드래그 앤 드롭 또는 이미지 버튼</div>
-                        <div>• 비디오: 미디어 버튼 → 비디오 탭</div>
-                        <div>• 유튜브: URL 입력 시 자동 임베드</div>
-                        <div>• 오디오: 미디어 버튼 → 오디오 탭</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">📋 편집 기능</h4>
-                      <div className="space-y-1 ml-2">
-                        <div>• 굵게, 기울임, 밑줄 스타일링</div>
-                        <div>• 글머리 기호 및 번호 매기기</div>
-                        <div>• 들여쓰기 및 정렬</div>
-                        <div>• 표 삽입 및 편집</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">💻 코드 블록</h4>
-                      <div className="space-y-1 ml-2">
-                        <div>• 코드 샘플 버튼으로 코드 블록 삽입</div>
-                        <div>• 언어 선택 가능 (JavaScript, Python, CSS 등)</div>
-                        <div>• 구문 강조 지원</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">🎨 고급 기능</h4>
-                      <div className="space-y-1 ml-2">
-                        <div>• 전체화면 모드</div>
-                        <div>• 찾기 및 바꾸기</div>
-                        <div>• 실행 취소/다시 실행</div>
-                        <div>• 자동 저장</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
               <RichTextEditor
                 value={watch('content')}
                 onChange={(content) => setValue('content', content)}

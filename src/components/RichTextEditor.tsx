@@ -85,12 +85,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       disabled={disabled}
       init={{
         height,
+        width: '100%',
         menubar: false,
         plugins: [
           // Core editing features
-          'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount', 'image', 'preview', 'fullscreen', 'help'
+          'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount', 'image', 'preview', 'fullscreen', 'help', 'paste', 'hr', 'visualaid'
         ],
-        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat | code codesample | preview fullscreen help',
+        toolbar: [
+          'undo redo | cut copy paste selectall | formatselect fontfamily fontsize | bold italic underline strikethrough subscript superscript | forecolor backcolor',
+          'alignleft aligncenter alignright alignjustify | numlist bullist indent outdent | link image media table | blockquote hr | removeformat code codesample | preview fullscreen help'
+        ],
         content_style: `
           body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
@@ -281,6 +285,29 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           'meta+s': {
             cmd: 'mceSave',
             desc: '저장'
+          }
+        },
+        // 툴바 최적화 설정
+        toolbar_mode: 'wrap',
+        toolbar_sticky: true,
+        toolbar_sticky_offset: 0,
+        // 툴바 아이콘 크기 조정
+        toolbar_groups: {
+          formatting: {
+            icon: 'bold',
+            tooltip: '텍스트 서식'
+          },
+          alignment: {
+            icon: 'align-left',
+            tooltip: '정렬'
+          },
+          lists: {
+            icon: 'list-ul',
+            tooltip: '목록'
+          },
+          insert: {
+            icon: 'plus',
+            tooltip: '삽입'
           }
         }
       }}
