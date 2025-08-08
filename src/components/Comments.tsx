@@ -56,14 +56,28 @@ const Comments = ({ postId }: CommentsProps) => {
   // 댓글 제한 정보 가져오기
   const fetchCommentLimit = async () => {
     try {
+      // 단일 또는 없음 허용
       const { data, error } = await supabase
         .from('comment_limits')
         .select('*')
         .eq('post_id', postId)
-        .single()
+        .maybeSingle()
 
-      if (error && error.code !== 'PGRST116') { // PGRST116는 데이터가 없을 때
-        console.error('Error fetching comment limit:', error)
+      if (error) {
+        // 다중 행 등의 경우: 가장 최신 last_reset_date 1건만 사용
+        const { data: list, error: listError } = await supabase
+          .from('comment_limits')
+          .select('*')
+          .eq('post_id', postId)
+          .order('last_reset_date', { ascending: false })
+          .limit(1)
+
+        if (!listError && list && list.length > 0) {
+          setCommentLimit(list[0])
+          checkBlockStatus(list[0])
+        } else {
+          console.error('Error fetching comment limit:', error)
+        }
         return
       }
 
@@ -82,21 +96,38 @@ const Comments = ({ postId }: CommentsProps) => {
   // 댓글 제한 레코드 생성
   const createCommentLimit = async () => {
     try {
-      const newLimit: any = {
+      const newLimit = {
         post_id: postId,
         daily_count: 0,
         last_reset_date: new Date().toISOString().split('T')[0],
         is_blocked: false,
-        blocked_until: null
+        blocked_until: null as string | null
       }
 
+      // 유니크 제약 존재 시 충돌을 안전하게 처리
       const { data, error } = await supabase
         .from('comment_limits')
-        .insert(newLimit)
+        .upsert(newLimit, { onConflict: 'post_id' })
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        // 충돌 또는 기타 오류 시, 최신 1건을 다시 조회하여 사용
+        const { data: list } = await supabase
+          .from('comment_limits')
+          .select('*')
+          .eq('post_id', postId)
+          .order('last_reset_date', { ascending: false })
+          .limit(1)
+
+        if (list && list.length > 0) {
+          setCommentLimit(list[0])
+          return
+        }
+
+        throw error
+      }
+
       setCommentLimit(data)
     } catch (err: any) {
       console.error('Error creating comment limit:', err)
