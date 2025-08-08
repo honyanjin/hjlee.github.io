@@ -52,6 +52,8 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
   const [categories, setCategories] = useState<Category[]>([])
   const [isBasicInfoCollapsed, setIsBasicInfoCollapsed] = useState(false)
   const [isPublishSettingsCollapsed, setIsPublishSettingsCollapsed] = useState(true)
+  const [redirectAfterSave, setRedirectAfterSave] = useState<boolean>(true)
+  const [previewDraftInNewTab, setPreviewDraftInNewTab] = useState<boolean>(false)
   
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -91,6 +93,19 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
       fetchPost()
     }
     fetchCategories()
+    // 저장 후 바로보기 토글 초기값 로드 (기본: On)
+    try {
+      const stored = localStorage.getItem('blog_redirect_after_save')
+      setRedirectAfterSave(stored === null ? true : stored === 'true')
+    } catch {
+      setRedirectAfterSave(true)
+    }
+    try {
+      const storedDraft = localStorage.getItem('blog_draft_preview_newtab')
+      setPreviewDraftInNewTab(storedDraft === 'true')
+    } catch {
+      setPreviewDraftInNewTab(false)
+    }
   }, [mode, id])
 
   const fetchCategories = async () => {
@@ -153,6 +168,13 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
       // 자동으로 excerpt 생성 (사용자가 입력하지 않은 경우, HTML에서 텍스트 추출 기반)
       const autoExcerpt = data.excerpt || generateExcerpt(htmlContent)
 
+      // published_at 계산: 새 글이면 발행 시 now, 편집이면 상태 전환에 따라 유지/설정/해제
+      const newPublishedAt = mode === 'new'
+        ? (data.is_published ? new Date().toISOString() : null)
+        : (data.is_published
+            ? (!post?.is_published ? new Date().toISOString() : (post?.published_at ?? null))
+            : null)
+
       const postData = {
         title: data.title,
         content: htmlContent, // HTML로 저장
@@ -163,7 +185,7 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         image_url: imageUrl,
         slug: generateSlug(data.title),
         is_published: data.is_published,
-        published_at: data.is_published ? new Date().toISOString() : null,
+        published_at: newPublishedAt,
         updated_at: new Date().toISOString()
       }
 
@@ -172,21 +194,35 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         result = await supabase
           .from('blog_posts')
           .insert(postData)
+          .select('id, post_no')
+          .single()
       } else {
         result = await supabase
           .from('blog_posts')
           .update(postData)
           .eq('id', id)
+          .select('id, post_no')
+          .single()
       }
 
       if (result.error) throw result.error
 
       setSuccess(mode === 'new' ? '포스트가 성공적으로 저장되었습니다!' : '포스트가 성공적으로 수정되었습니다!')
       
-      // 2초 후 목록으로 이동
-      setTimeout(() => {
-        navigate('/admin/blog')
-      }, 2000)
+      // 저장 후 이동 동작
+      if (redirectAfterSave) {
+        const postNo = result.data?.post_no ?? post?.post_no
+        if (postNo) {
+          navigate(`/blog/${postNo}`)
+        } else {
+          navigate('/admin/blog')
+        }
+      } else {
+        // 2초 후 목록으로 이동 (기존 동작 유지)
+        setTimeout(() => {
+          navigate('/admin/blog')
+        }, 2000)
+      }
 
     } catch (err: any) {
       setError(err.message || (mode === 'new' ? '포스트 저장에 실패했습니다.' : '포스트 수정에 실패했습니다.'))
@@ -218,6 +254,9 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
       // 자동으로 excerpt 생성 (사용자가 입력하지 않은 경우, HTML에서 텍스트 추출 기반)
       const autoExcerpt = formData.excerpt || generateExcerpt(htmlContent)
 
+      // 임시저장 시 published_at은 유지/해제 로직: 새 글은 null, 편집이면 게시 중이라면 기존 유지
+      const draftPublishedAt = mode === 'new' ? null : (post?.is_published ? (post.published_at ?? null) : null)
+
       const postData = {
         title: formData.title,
         content: htmlContent, // HTML로 저장
@@ -228,7 +267,7 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         image_url: imageUrl,
         slug: generateSlug(formData.title),
         is_published: false,
-        published_at: null,
+        published_at: draftPublishedAt,
         updated_at: new Date().toISOString()
       }
 
@@ -237,16 +276,33 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         result = await supabase
           .from('blog_posts')
           .insert(postData)
+          .select('id, post_no')
+          .single()
       } else {
         result = await supabase
           .from('blog_posts')
           .update(postData)
           .eq('id', id)
+          .select('id, post_no')
+          .single()
       }
 
       if (result.error) throw result.error
 
       setSuccess('포스트가 임시저장되었습니다!')
+      
+      // 임시저장 후 새창 미리보기 옵션
+      if (previewDraftInNewTab) {
+        const postNo = result.data?.post_no ?? post?.post_no
+        if (postNo) {
+          const url = `${window.location.origin}/blog/${postNo}?preview=true`
+          try {
+            window.open(url, '_blank', 'noopener,noreferrer')
+          } catch {
+            // 무시
+          }
+        }
+      }
       
       // 3초 후 성공 메시지 숨기기
       setTimeout(() => {
@@ -600,6 +656,64 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
               <Save size={16} />
               {isSaving ? '저장 중...' : '저장'}
             </button>
+          </div>
+
+          {/* 저장 후 바로보기 토글 */}
+          <div className="mt-4 flex items-center justify-end">
+            <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={redirectAfterSave}
+                onChange={(e) => {
+                  const next = e.target.checked
+                  setRedirectAfterSave(next)
+                  try { localStorage.setItem('blog_redirect_after_save', String(next)) } catch {}
+                }}
+              />
+              <span
+                className={`relative inline-block w-12 h-6 rounded-full transition-colors ${
+                  redirectAfterSave ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+                aria-hidden="true"
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 inline-block w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                    redirectAfterSave ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">저장하고 글 바로보기</span>
+            </label>
+          </div>
+
+          {/* 임시저장 후 새창에서 미리보기 토글 */}
+          <div className="mt-2 flex items-center justify-end">
+            <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={previewDraftInNewTab}
+                onChange={(e) => {
+                  const next = e.target.checked
+                  setPreviewDraftInNewTab(next)
+                  try { localStorage.setItem('blog_draft_preview_newtab', String(next)) } catch {}
+                }}
+              />
+              <span
+                className={`relative inline-block w-12 h-6 rounded-full transition-colors ${
+                  previewDraftInNewTab ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+                aria-hidden="true"
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 inline-block w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                    previewDraftInNewTab ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">임시저장 후 새창에서 미리보기</span>
+            </label>
           </div>
         </form>
       </main>

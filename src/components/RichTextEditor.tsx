@@ -266,7 +266,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         ],
         toolbar: [
           'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough subscript superscript | forecolor backcolor',
-          'alignleft aligncenter alignright alignjustify | toParagraph toBulletedList toNumberedList | numlist bullist indent outdent | link image media table | blockquote | visualblocks visualchars | removeformat formathtml code codesample | preview fullscreen help'
+          'alignleft aligncenter alignright alignjustify | toParagraph toBulletedList toNumberedList | numlist bullist indent outdent | link image media table | blockquote inserthr | visualblocks visualchars | removeformat formathtml code codesample | preview fullscreen help'
         ],
         // 사용자 정의 버튼 등록
         setup: (editor: any) => {
@@ -366,6 +366,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   api.close()
                 }
               })
+            }
+          })
+
+          // 가로선 삽입 버튼
+          editor.ui.registry.addButton('inserthr', {
+            text: '가로선',
+            tooltip: '가로선 삽입',
+            onAction: () => {
+              try {
+                editor.insertContent('<hr />')
+              } catch {
+                // 무시
+              }
             }
           })
 

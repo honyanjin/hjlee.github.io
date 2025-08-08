@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ExternalLink, Github, Eye } from 'lucide-react'
 import Navbar from '../components/Navbar'
+import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
 import ImageWithFallback from '../components/ImageWithFallback'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
@@ -234,6 +235,13 @@ const Projects = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <DotNavigation
+        sections={[
+          'projects-hero',
+          ...(featuredProjects.length > 0 ? ['featured-projects-section'] : []),
+          'all-projects-section',
+        ]}
+      />
       <SEO 
         title="Projects - 이호진 포트폴리오"
         description="프론트엔드 개발자 이호진의 프로젝트들을 확인하세요. React, TypeScript, Node.js를 활용한 다양한 웹 애플리케이션들을 소개합니다."
@@ -243,7 +251,7 @@ const Projects = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-4">
+      <section id="projects-hero" className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -323,7 +331,7 @@ const Projects = () => {
 
       {/* Featured Projects */}
       {featuredProjects.length > 0 && (
-        <section className="py-12 sm:py-16 lg:py-20 px-4 bg-white dark:bg-gray-800">
+        <section id="featured-projects-section" className="py-12 sm:py-16 lg:py-20 px-4 bg-white dark:bg-gray-800">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -349,7 +357,7 @@ const Projects = () => {
       )}
 
       {/* All Projects */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4">
+      <section id="all-projects-section" className="py-12 sm:py-16 lg:py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}

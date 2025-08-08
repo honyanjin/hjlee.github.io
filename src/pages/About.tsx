@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Download, Mail, MapPin, Calendar, Briefcase } from 'lucide-react'
 import Navbar from '../components/Navbar'
+import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
 import ImageWithFallback from '../components/ImageWithFallback'
 
@@ -37,6 +38,13 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <DotNavigation
+        sections={[
+          'about-hero',
+          'experience-section',
+          'education-section',
+        ]}
+      />
       <SEO 
         title="About - 이호진 포트폴리오"
         description="프론트엔드 개발자 이호진에 대해 알아보세요. 경력, 기술 스택, 교육 배경을 확인할 수 있습니다."
@@ -46,7 +54,7 @@ const About = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
+      <section id="about-hero" className="pt-32 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -219,7 +227,7 @@ const About = () => {
       </section>
 
       {/* Experience Section */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800">
+      <section id="experience-section" className="py-20 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -274,7 +282,7 @@ const About = () => {
       </section>
 
       {/* Education Section */}
-      <section className="py-20 px-4">
+      <section id="education-section" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}

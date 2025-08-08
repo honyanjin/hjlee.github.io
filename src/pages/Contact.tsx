@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Navbar from '../components/Navbar'
+import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
 
 const contactSchema = z.object({
@@ -89,6 +90,12 @@ const Contact = () => {
 
   return (
     <div id="contact-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <DotNavigation
+        sections={[
+          'contact-hero',
+          'contact-form-section',
+        ]}
+      />
       <SEO 
         title="Contact - 이호진 포트폴리오"
         description="프론트엔드 개발자 이호진에게 연락하세요. 이메일, 전화번호, 소셜 미디어를 통해 언제든지 문의해주세요."

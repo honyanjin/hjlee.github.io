@@ -3,9 +3,10 @@ import { motion } from 'framer-motion'
 
 interface DotNavigationProps {
   sections: string[]
+  titles?: Record<string, string>
 }
 
-const DotNavigation = ({ sections }: DotNavigationProps) => {
+const DotNavigation = ({ sections, titles = {} }: DotNavigationProps) => {
   const [activeSection, setActiveSection] = useState(0)
 
   useEffect(() => {
@@ -37,14 +38,28 @@ const DotNavigation = ({ sections }: DotNavigationProps) => {
   }
 
   const getSectionTitle = (sectionId: string): string => {
-    const titles: { [key: string]: string } = {
+    const defaultTitles: Record<string, string> = {
+      // 홈 페이지 기본 매핑
       'hero-section': '홈',
       'about-section': '소개',
       'featured-projects-section': '대표 프로젝트',
       'projects-section': '모든 프로젝트',
-      'contact-section': '연락처'
+      'contact-section': '연락처',
+
+      // 페이지별 일반적인 섹션 id 대응
+      'about-hero': '소개',
+      'experience-section': '경력',
+      'education-section': '학력',
+      'projects-hero': '프로젝트',
+      'all-projects-section': '전체 프로젝트',
+      'blog-hero': '블로그',
+      'featured-post-section': '추천 글',
+      'all-posts-section': '전체 글',
+      'contact-hero': '문의',
+      'contact-form-section': '연락하기',
     }
-    return titles[sectionId] || sectionId
+    const map = { ...defaultTitles, ...titles }
+    return map[sectionId] || sectionId
   }
 
   return (

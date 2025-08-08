@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Calendar, Clock, User, ArrowRight, Search, Tag } from 'lucide-react'
 import Navbar from '../components/Navbar'
+import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
 import ShareButtons from '../components/ShareButtons'
 import { supabase } from '../lib/supabase'
@@ -243,10 +244,20 @@ const Blog = () => {
     }
   }
 
-  const featuredPost = posts[0]
+  // Featured Post는 created_at이 가장 최신인 포스트로 지정
+  const featuredPost = posts.length > 0
+    ? [...posts].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+    : undefined
 
   return (
     <div id="blog-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <DotNavigation
+        sections={[
+          'blog-hero',
+          'featured-post-section',
+          'all-posts-section',
+        ]}
+      />
       <SEO 
         title="Blog - 이호진 포트폴리오"
         description="프론트엔드 개발자 이호진의 기술 블로그입니다. React, TypeScript, 웹 개발 관련 글들을 확인하세요."

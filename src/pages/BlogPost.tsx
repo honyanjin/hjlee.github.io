@@ -29,7 +29,13 @@ const BlogPost = () => {
       const preview = searchParams.get('preview')
       if (preview === 'true') {
         setIsPreview(true)
-        loadPreviewPost()
+        // 세션 미리보기 데이터가 있으면 우선 사용, 없으면 미발행 포함 조회
+        const tempPostData = sessionStorage.getItem('tempPost')
+        if (tempPostData) {
+          loadPreviewPost()
+        } else {
+          fetchPostAllowUnpublished(Number(postNo))
+        }
       } else {
         fetchPost(Number(postNo))
       }
@@ -71,6 +77,26 @@ const BlogPost = () => {
     } catch (err: any) {
       setError('포스트를 찾을 수 없습니다.')
       console.error('Error fetching post:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 미발행 포함 강제 조회 (미리보기 전용)
+  const fetchPostAllowUnpublished = async (postNumber: number) => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('post_no', postNumber)
+        .single()
+
+      if (error) throw error
+      setPost(data)
+    } catch (err: any) {
+      setError('포스트를 찾을 수 없습니다.')
+      console.error('Error fetching post (preview):', err)
     } finally {
       setLoading(false)
     }
