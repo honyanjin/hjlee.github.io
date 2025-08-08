@@ -1,1 +1,0 @@
-import{j as o}from"./ui-Ceor1h3P.js";import{A as t}from"./AdminBlogForm-DhZZi71F.js";import"./router-CLvrYEWH.js";import"./vendor-RGnvvjkK.js";import"./index-CkkEqx3o.js";import"./Breadcrumb-Bm_L--LU.js";import"./ImageUpload-BGKPMllJ.js";const n=()=>o.jsx(t,{mode:"edit"});export{n as default};
