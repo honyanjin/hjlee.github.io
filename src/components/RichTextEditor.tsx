@@ -19,6 +19,59 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const editorRef = useRef<any>(null)
 
+  // 간단 HTML 포맷터 (외부 의존성 없이 들여쓰기 정리)
+  const formatHtmlContent = (html: string, indentSize = 2): string => {
+    try {
+      const voidTags = new Set([
+        'area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'
+      ])
+      const tokens = html
+        .replace(/>\s+</g, '><') // 태그 사이 공백 정규화
+        .replace(/\n+/g, '')
+        .split(/(<[^>]+>)/g)
+        .map(t => t)
+        .filter(t => t.length > 0)
+      
+      const spaces = (n: number) => ' '.repeat(n * indentSize)
+      let indentLevel = 0
+      let result: string[] = []
+      
+      for (const token of tokens) {
+        if (!token) continue
+        if (token.startsWith('<!--')) {
+          // 주석은 현재 들여쓰기 라인에 그대로
+          result.push(`${spaces(indentLevel)}${token.trim()}`)
+          continue
+        }
+        if (token.startsWith('<') && token.endsWith('>')) {
+          const isClosing = /^<\//.test(token)
+          const isSelfClosing = /\/>$/.test(token)
+          const tagMatch = token.match(/^<\/?\s*([a-zA-Z0-9-]+)/)
+          const tagName = tagMatch ? tagMatch[1].toLowerCase() : ''
+          const isVoid = voidTags.has(tagName)
+          
+          if (isClosing) {
+            indentLevel = Math.max(indentLevel - 1, 0)
+            result.push(`${spaces(indentLevel)}${token.trim()}`)
+          } else {
+            result.push(`${spaces(indentLevel)}${token.trim()}`)
+            if (!isSelfClosing && !isVoid) {
+              indentLevel += 1
+            }
+          }
+        } else {
+          const text = token.trim()
+          if (text) {
+            result.push(`${spaces(indentLevel)}${text}`)
+          }
+        }
+      }
+      return result.join('\n')
+    } catch {
+      return html
+    }
+  }
+
   // TinyMCE API 키 설정 (환경 변수 기반)
   const apiKey: string | undefined = import.meta.env.VITE_TINYMCE_API_KEY
   if (import.meta.env.DEV && !apiKey) {
@@ -94,12 +147,82 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         menubar: false,
         plugins: [
           // Core editing features
-          'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount', 'image', 'preview', 'fullscreen', 'help', 'paste', 'hr', 'visualaid'
+          'anchor', 'autolink', 'charmap', 'codesample', 'code', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'visualchars', 'wordcount', 'image', 'preview', 'fullscreen', 'help', 'paste', 'hr', 'visualaid'
         ],
         toolbar: [
-          'undo redo | cut copy paste selectall | formatselect fontfamily fontsize | bold italic underline strikethrough subscript superscript | forecolor backcolor',
-          'alignleft aligncenter alignright alignjustify | numlist bullist indent outdent | link image media table | blockquote hr | removeformat code codesample | preview fullscreen help'
+          'undo redo | cut copy paste selectall | blocks fontfamily fontsize | bold italic underline strikethrough subscript superscript | forecolor backcolor',
+          'alignleft aligncenter alignright alignjustify | toParagraph toBulletedList toNumberedList | numlist bullist indent outdent | link image media table | blockquote hr | visualblocks visualchars | removeformat formathtml code codesample | preview fullscreen help'
         ],
+        // 사용자 정의 버튼 등록
+        setup: (editor: any) => {
+          editor.ui.registry.addButton('formathtml', {
+            text: 'HTML 정렬',
+            tooltip: '현재 내용을 HTML 들여쓰기로 정리하여 소스 보기로 표시합니다',
+            onAction: () => {
+              const current = editor.getContent({ format: 'html' })
+              const pretty = formatHtmlContent(current)
+              editor.windowManager.open({
+                title: '소스 코드 (정렬됨)',
+                size: 'large',
+                body: {
+                  type: 'panel',
+                  items: [
+                    { type: 'textarea', name: 'source', label: 'HTML', multiline: true, flex: true }
+                  ]
+                },
+                initialData: { source: pretty },
+                buttons: [
+                  { type: 'cancel', name: 'cancel', text: '닫기' },
+                  { type: 'submit', name: 'apply', text: '적용', primary: true }
+                ],
+                onSubmit: (api: any) => {
+                  const data = api.getData()
+                  const updated = typeof data?.source === 'string' ? data.source : ''
+                  if (updated) {
+                    editor.setContent(updated)
+                  }
+                  api.close()
+                }
+              })
+            }
+          })
+
+          // 문단으로 변환 (리스트 해제)
+          editor.ui.registry.addButton('toParagraph', {
+            text: '문단',
+            tooltip: '선택한 내용을 문단(P)으로 변환',
+            onAction: () => {
+              // 리스트면 해제하고 문단으로
+              editor.execCommand('RemoveList')
+              // 커서 위치 블록을 P로 강제 지정 (가능한 경우)
+              try {
+                editor.execCommand('FormatBlock', false, 'p')
+              } catch {
+                // 지원되지 않는 경우 무시
+              }
+            }
+          })
+
+          // 순서 없는 목록으로 변환
+          editor.ui.registry.addButton('toBulletedList', {
+            text: '• 목록',
+            tooltip: '선택한 내용을 순서 없는 목록으로 변환',
+            onAction: () => {
+              editor.execCommand('InsertUnorderedList')
+            }
+          })
+
+          // 순서 있는 목록으로 변환
+          editor.ui.registry.addButton('toNumberedList', {
+            text: '1. 목록',
+            tooltip: '선택한 내용을 순서 있는 목록으로 변환',
+            onAction: () => {
+              editor.execCommand('InsertOrderedList')
+            }
+          })
+        },
+        // 블록 포맷(태그) 드롭다운 항목 구성
+        block_formats: '본문=p; 제목 1=h1; 제목 2=h2; 제목 3=h3; 인용문=blockquote; 코드=pre',
         content_style: `
           body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
@@ -244,7 +367,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         // 스펠링 체크
         browser_spellcheck: true,
         // 컨텍스트 메뉴
-        contextmenu: 'link image table configurepermanentpen',
+        contextmenu: 'link image table lists configurepermanentpen',
         // 드래그 앤 드롭
         dragdrop_callbacks: true,
         // 파일 드롭
