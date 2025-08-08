@@ -57,6 +57,47 @@ const BlogPost = () => {
     }
   }
 
+  // 삽입된 라인 복사 버튼 동작(위임) 처리
+  useEffect(() => {
+    const container = document.querySelector('.markdown-content') as HTMLElement | null
+    if (!container) return
+
+    const handleClick = async (e: Event) => {
+      const target = e.target as HTMLElement
+      const icon = target.closest('.copy-line-icon') as HTMLElement | null
+      if (!icon) return
+      e.preventDefault()
+      const row = icon.closest('.code-line-row') as HTMLElement | null
+      const lineEl = row?.querySelector('.code-line') as HTMLElement | null
+      const text = lineEl?.innerText || ''
+      if (!text) return
+      try {
+        await navigator.clipboard.writeText(text)
+        const old = icon.textContent || '📋'
+        icon.textContent = '✓'
+        setTimeout(() => {
+          icon.textContent = old
+        }, 1200)
+      } catch {
+        // 무시
+      }
+    }
+
+    container.addEventListener('click', handleClick)
+    // 오른쪽 정렬: 렌더 후 구조 정리 (code-line-row가 있으면 flex-1과 ml-auto 적용 보정)
+    try {
+      container.querySelectorAll('.code-line-row').forEach((row) => {
+        const r = row as HTMLElement
+        r.classList.add('flex', 'items-start', 'gap-2', 'w-full')
+        const code = r.querySelector('.code-line') as HTMLElement | null
+        if (code) code.classList.add('flex-1')
+        const iconEl = r.querySelector('.copy-line-icon') as HTMLElement | null
+        if (iconEl) iconEl.classList.add('ml-auto')
+      })
+    } catch { /* noop */ }
+    return () => container.removeEventListener('click', handleClick)
+  }, [post?.content])
+
   const fetchPost = async (postNumber: number) => {
     try {
       setLoading(true)

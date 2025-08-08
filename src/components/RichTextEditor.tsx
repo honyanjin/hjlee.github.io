@@ -266,7 +266,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         ],
         toolbar: [
           'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough subscript superscript | forecolor backcolor',
-          'alignleft aligncenter alignright alignjustify | toParagraph toBulletedList toNumberedList | numlist bullist indent outdent | link image media table | blockquote inserthr | visualblocks visualchars | removeformat formathtml code codesample | preview fullscreen help'
+          'alignleft aligncenter alignright alignjustify | toParagraph toBulletedList toNumberedList | numlist bullist indent outdent | link image media table | blockquote inserthr | visualblocks visualchars | removeformat formathtml code codesample insertcopybtn | preview fullscreen help'
         ],
         // 사용자 정의 버튼 등록
         setup: (editor: any) => {
@@ -366,6 +366,36 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   api.close()
                 }
               })
+            }
+          })
+
+          // 라인 복사용 아이콘(📋)을 삽입하는 툴바 버튼
+          editor.ui.registry.addButton('insertcopybtn', {
+            icon: 'new-document',
+            text: '줄복사넣기',
+            tooltip: '현재 커서 줄에 코드 복사용 아이콘 삽입',
+            onAction: () => {
+              try {
+                const node: HTMLElement = editor.selection.getNode()
+                // 현재 줄의 블록 요소 찾기
+                const block = (node.closest && node.closest('p,li,pre,div')) as HTMLElement | null || node
+                if (!block) return
+                // 아이콘 마크업 (뷰어에서 이벤트 위임 처리) - 오른쪽 정렬을 위해 컨테이너에 ml-auto 적용
+                const iconHtml = '<span aria-label="코드 복사" title="복사" class="copy-line-icon cursor-pointer select-none ml-auto text-gray-500 hover:text-gray-700 transition-colors dark:text-gray-300 dark:hover:text-gray-100">📋</span>'
+
+                // 행 래퍼가 없다면 생성하여 감싸기
+                if (!block.classList.contains('code-line-row')) {
+                  const html = block.innerHTML
+                  const wrapped = `<div class="code-line-row flex items-start gap-2 w-full"><code class="code-line flex-1" style="white-space:pre-wrap">${html}</code>${iconHtml}</div>`
+                  block.innerHTML = wrapped
+                } else {
+                  // 이미 행 래퍼면 아이콘만 추가(중복 방지)
+                  const hasIcon = !!block.querySelector('.copy-line-icon')
+                  if (!hasIcon) block.insertAdjacentHTML('beforeend', iconHtml)
+                }
+              } catch {
+                // 무시
+              }
             }
           })
 
