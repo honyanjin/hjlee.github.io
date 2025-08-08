@@ -248,7 +248,7 @@ const Blog = () => {
   return (
     <div id="blog-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO 
-        title="블로그 - 이호진 포트폴리오"
+        title="Blog - 이호진 포트폴리오"
         description="프론트엔드 개발자 이호진의 기술 블로그입니다. React, TypeScript, 웹 개발 관련 글들을 확인하세요."
         keywords="블로그, 기술블로그, React, TypeScript, 웹개발, 프론트엔드"
         type="website"
@@ -435,7 +435,7 @@ const Blog = () => {
                       </div>
                       <button 
                         id="featured-post-read-more" 
-                        onClick={() => navigate(`/blog/${featuredPost.id}`)}
+                        onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
                         className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm sm:text-base"
                       >
                         <span>자세히 보기</span>

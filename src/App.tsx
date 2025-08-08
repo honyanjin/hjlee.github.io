@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
@@ -6,26 +7,34 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Projects from './pages/Projects'
 import Blog from './pages/Blog'
-import type { BlogPost as BlogPostType } from './lib/supabase'
 import BlogPost from './pages/BlogPost'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
-import AdminBlog from './pages/AdminBlog'
-import AdminBlogNew from './pages/AdminBlogNew'
-import AdminBlogEdit from './pages/AdminBlogEdit'
-import AdminCategories from './pages/AdminCategories'
-import AdminProjects from './pages/AdminProjects'
-import AdminProjectNew from './pages/AdminProjectNew'
-import AdminProjectEdit from './pages/AdminProjectEdit'
-import AdminProjectCategories from './pages/AdminProjectCategories'
-import AdminDashboard from './pages/AdminDashboard'
-import AdminComments from './pages/AdminComments'
+
+// Admin pages (code-splitting)
+const AdminBlog = lazy(() => import('./pages/AdminBlog'))
+const AdminBlogNew = lazy(() => import('./pages/AdminBlogNew'))
+const AdminBlogEdit = lazy(() => import('./pages/AdminBlogEdit'))
+const AdminCategories = lazy(() => import('./pages/AdminCategories'))
+const AdminProjects = lazy(() => import('./pages/AdminProjects'))
+const AdminProjectNew = lazy(() => import('./pages/AdminProjectNew'))
+const AdminProjectEdit = lazy(() => import('./pages/AdminProjectEdit'))
+const AdminProjectCategories = lazy(() => import('./pages/AdminProjectCategories'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const AdminComments = lazy(() => import('./pages/AdminComments'))
 
 function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <div id="app">
+          <Suspense
+            fallback={
+              <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+              </div>
+            }
+          >
           <Routes>
             <Route id="home-route" path="/" element={<Home />} />
             <Route id="about-route" path="/about" element={<About />} />
@@ -136,6 +145,7 @@ function App() {
               } 
             />
           </Routes>
+          </Suspense>
         </div>
       </AuthProvider>
     </ThemeProvider>
