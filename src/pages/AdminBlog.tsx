@@ -193,7 +193,7 @@ const AdminBlog = () => {
                       <div className="flex items-center gap-3 mb-2">
                         <h3 
                           className="text-lg font-medium text-gray-900 dark:text-white cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                          onClick={() => navigate(`/blog/${post.slug}`)}
+                          onClick={() => navigate(`/blog/${post.post_no}`)}
                           title="포스트 보기"
                         >
                           {post.title}

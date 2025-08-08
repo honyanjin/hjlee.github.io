@@ -359,14 +359,14 @@ const Blog = () => {
                       {...getPostImageProps(featuredPost)}
                       alt={featuredPost.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-                      onClick={() => navigate(`/blog/${featuredPost.slug}`)}
+                      onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
                     />
                   ) : (
                     <div 
                       id="featured-post-image"
                       className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300 cursor-pointer"
                       style={getBackgroundStyle(featuredPost)}
-                      onClick={() => navigate(`/blog/${featuredPost.slug}`)}
+                      onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
                     >
                       <div className="text-white text-center px-4">
                         <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
@@ -382,7 +382,7 @@ const Blog = () => {
                   <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
                     <ShareButtons 
                       title={featuredPost.title}
-                      url={`${window.location.origin}/blog/${featuredPost.id}`}
+                      url={`${window.location.origin}/blog/${featuredPost.post_no}`}
                       description={featuredPost.excerpt}
                       size="sm"
                     />
@@ -408,7 +408,7 @@ const Blog = () => {
                     <h3 
                       id="featured-post-title-text" 
                       className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                      onClick={() => navigate(`/blog/${featuredPost.slug}`)}
+                      onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
                     >
                       {featuredPost.title}
                     </h3>
@@ -435,7 +435,7 @@ const Blog = () => {
                       </div>
                       <button 
                         id="featured-post-read-more" 
-                        onClick={() => navigate(`/blog/${featuredPost.slug}`)}
+                        onClick={() => navigate(`/blog/${featuredPost.id}`)}
                         className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm sm:text-base"
                       >
                         <span>자세히 보기</span>
@@ -500,14 +500,14 @@ const Blog = () => {
                         {...getPostImageProps(post)}
                         alt={post.title}
                         className="w-full h-40 sm:h-48 object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-                        onClick={() => navigate(`/blog/${post.slug}`)}
+                        onClick={() => navigate(`/blog/${post.post_no}`)}
                       />
                     ) : (
                       <div 
                         id={`blog-post-image-${post.id}`}
                         className="w-full h-40 sm:h-48 flex items-center justify-center hover:scale-105 transition-transform duration-300 cursor-pointer"
                         style={getBackgroundStyle(post)}
-                        onClick={() => navigate(`/blog/${post.slug}`)}
+                        onClick={() => navigate(`/blog/${post.post_no}`)}
                       >
                         <div className="text-white text-center px-3 sm:px-4">
                           <div className="text-lg sm:text-xl lg:text-2xl font-bold mb-1">
@@ -529,12 +529,12 @@ const Blog = () => {
                       </span>
                     </div>
                     <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-                      <ShareButtons 
+                       <ShareButtons 
                         title={post.title}
-                        url={`${window.location.origin}/blog/${post.id}`}
+                        url={`${window.location.origin}/blog/${post.post_no}`}
                         description={post.excerpt}
                         size="sm"
-                      />
+                       />
                     </div>
                   </div>
                   
@@ -553,7 +553,7 @@ const Blog = () => {
                       <h3 
                         id={`blog-post-title-${post.id}`} 
                         className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 line-clamp-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                        onClick={() => navigate(`/blog/${post.slug}`)}
+                        onClick={() => navigate(`/blog/${post.post_no}`)}
                       >
                         {post.title}
                       </h3>
@@ -582,8 +582,8 @@ const Blog = () => {
                           <span id={`blog-post-author-${post.id}`} className="text-xs sm:text-sm">{post.author}</span>
                         </div>
                         <button 
-                          id={`blog-post-read-more-${post.id}`} 
-                          onClick={() => navigate(`/blog/${post.slug}`)}
+                          id={`blog-post-read-more-${post.id}`}
+                          onClick={() => navigate(`/blog/${post.post_no}`)}
                           className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-xs sm:text-sm"
                         >
                           <span>자세히 보기</span>

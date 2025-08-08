@@ -19,8 +19,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const editorRef = useRef<any>(null)
 
-  // API 키 설정
-  const apiKey = import.meta.env.VITE_TINYMCE_API_KEY || 'your_tinymce_api_key_here'
+  // TinyMCE API 키 설정 (환경 변수 기반)
+  const apiKey: string | undefined = import.meta.env.VITE_TINYMCE_API_KEY
+  if (import.meta.env.DEV && !apiKey) {
+    // 개발 환경에서 키 누락 시 경고 (프로덕션에서는 Tiny Cloud 사용 시 반드시 설정 필요)
+    // eslint-disable-next-line no-console
+    console.warn('[TinyMCE] VITE_TINYMCE_API_KEY가 설정되지 않았습니다. 개발 모드에서는 기본 키로 동작할 수 있습니다.')
+  }
 
   // 이미지 업로드 핸들러
   const handleImageUpload = async (blobInfo: any, progress: any, failure: any) => {
@@ -49,7 +54,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }
 
-  // 미디어 파일 업로드 핸들러
+  // 미디어 파일 업로드 핸들러 (버킷 통일: blog-images 사용)
   const handleMediaUpload = async (blobInfo: any, progress: any, failure: any) => {
     try {
       const file = blobInfo.blob()
@@ -57,7 +62,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const fileName = `tinymce-media-${Date.now()}.${fileExt}`
       
       const { error } = await supabase.storage
-        .from('blog-media')
+        .from('blog-images')
         .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false
@@ -66,7 +71,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       if (error) throw error
       
       const { data: urlData } = supabase.storage
-        .from('blog-media')
+        .from('blog-images')
         .getPublicUrl(fileName)
       
       return urlData.publicUrl
@@ -78,7 +83,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <Editor
-      apiKey={apiKey || 'your_tinymce_api_key_here'}
+      apiKey={apiKey}
       ref={editorRef}
       value={value}
       onEditorChange={onChange}

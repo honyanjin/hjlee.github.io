@@ -4,14 +4,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// 환경 변수 검증
+// 환경 변수 검증 (단일 체크, 구체적 메시지)
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인해주세요.')
-}
-
-// 환경 변수가 없으면 에러 발생
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인해주세요.')
+  const missing: string[] = []
+  if (!supabaseUrl) missing.push('VITE_SUPABASE_URL')
+  if (!supabaseAnonKey) missing.push('VITE_SUPABASE_ANON_KEY')
+  throw new Error(`Supabase 환경 변수 누락: ${missing.join(', ')} (.env.local 설정을 확인하세요)`)
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
@@ -37,6 +35,7 @@ export const testSupabaseConnection = async () => {
 // 데이터베이스 스키마 타입 정의
 export interface BlogPost {
   id: string
+  post_no: number
   title: string
   content: string
   excerpt: string
@@ -52,6 +51,7 @@ export interface BlogPost {
 }
 
 export interface BlogPostInsert {
+  post_no?: number
   title: string
   content: string
   excerpt: string
@@ -65,6 +65,7 @@ export interface BlogPostInsert {
 }
 
 export interface BlogPostUpdate {
+  post_no?: number
   title?: string
   content?: string
   excerpt?: string

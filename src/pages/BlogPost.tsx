@@ -14,7 +14,7 @@ import { useAuth } from '../contexts/AuthContext'
 import type { BlogPost, Category } from '../lib/supabase'
 
 const BlogPost = () => {
-  const { slug } = useParams<{ slug: string }>()
+  const { postNo } = useParams<{ postNo: string }>()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { isAdmin } = useAuth()
@@ -26,18 +26,18 @@ const BlogPost = () => {
   const [copySuccess, setCopySuccess] = useState('')
 
   useEffect(() => {
-    if (slug) {
+    if (postNo) {
       // 미리보기 모드 확인
       const preview = searchParams.get('preview')
       if (preview === 'true') {
         setIsPreview(true)
         loadPreviewPost()
       } else {
-        fetchPost(slug)
+        fetchPost(Number(postNo))
       }
     }
     fetchCategories()
-  }, [slug, searchParams])
+  }, [postNo, searchParams])
 
   const fetchCategories = async () => {
     try {
@@ -53,13 +53,13 @@ const BlogPost = () => {
     }
   }
 
-  const fetchPost = async (postSlug: string) => {
+  const fetchPost = async (postNumber: number) => {
     try {
       setLoading(true)
       let query = supabase
         .from('blog_posts')
         .select('*')
-        .eq('slug', postSlug)
+        .eq('post_no', postNumber)
       
       // 관리자가 아닌 경우에만 발행된 포스트만 조회
       if (!isAdmin) {
@@ -328,14 +328,14 @@ const BlogPost = () => {
                     포스트 주소:
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-mono overflow-x-auto whitespace-nowrap scrollbar-hide">
-                      {`${window.location.origin}/blog/${post.slug}`}
+                  <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-mono overflow-x-auto whitespace-nowrap scrollbar-hide">
+                      {`${window.location.origin}/blog/${post.post_no}`}
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
-                      navigator.clipboard.writeText(`${window.location.origin}/blog/${post.slug}`)
+                      navigator.clipboard.writeText(`${window.location.origin}/blog/${post.post_no}`)
                       setCopySuccess('URL이 클립보드에 복사되었습니다.')
                       setTimeout(() => setCopySuccess(''), 2000)
                     }}
