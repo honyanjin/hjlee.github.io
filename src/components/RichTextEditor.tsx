@@ -134,6 +134,121 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }
 
+  // Supabase 버킷에서 이미지 목록 가져오기
+  const fetchBucketImages = async (): Promise<Array<{ name: string; url: string }>> => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('blog-images')
+        .list('', { limit: 100, offset: 0, sortBy: { column: 'updated_at', order: 'desc' } })
+      if (error) throw error
+      const files = data || []
+      const results: Array<{ name: string; url: string }> = []
+      for (const file of files) {
+        if (file && file.name) {
+          const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(file.name)
+          if (urlData?.publicUrl) {
+            results.push({ name: file.name, url: urlData.publicUrl })
+          }
+        }
+      }
+      return results
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('버킷 이미지 목록 로드 실패:', e)
+      return []
+    }
+  }
+
+  // TinyMCE 파일 피커: 버킷에서 선택 지원
+  const openBucketImagePicker = async (callback: (url: string, meta?: any) => void) => {
+    const images = await fetchBucketImages()
+    const editor = editorRef.current?.editor as any
+    if (!editor) return
+
+    const items = images.map((img) => ({ text: img.name, value: img.url }))
+    if (items.length === 0) items.push({ text: '이미지가 없습니다', value: '' })
+
+    // 선택 상태를 data로 관리
+    const dialog = editor.windowManager.open({
+      title: '버킷에서 이미지 선택',
+      size: 'normal',
+      body: {
+        type: 'panel',
+        items: [
+          { type: 'htmlpanel', html: '<div style="margin-bottom:8px;font-size:12px;color:#6b7280">버킷의 이미지를 클릭하여 선택하거나 아래 드롭다운에서 선택하세요.</div>' },
+          { type: 'htmlpanel', html: '<div id="bucket-image-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:8px;max-height:320px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px;"></div>' },
+          { type: 'selectbox', name: 'image', label: '이미지 파일', items },
+          { type: 'htmlpanel', html: '<div id="bucket-image-preview" style="margin-top:8px"></div>' }
+        ]
+      },
+      initialData: { image: items[0]?.value || '' },
+      buttons: [
+        { type: 'cancel', name: 'cancel', text: '취소' },
+        { type: 'submit', name: 'submit', text: '삽입', primary: true }
+      ],
+      onChange: (api: any, _details: any) => {
+        const data = api.getData() as { image: string }
+        const url = data.image
+        const preview = document.getElementById('bucket-image-preview') as HTMLElement | null
+        if (preview) {
+          preview.innerHTML = url ? `<img src="${url}" style="max-width:100%;border:1px solid #e5e7eb;border-radius:8px"/>` : ''
+        }
+        const grid = document.getElementById('bucket-image-grid') as HTMLElement | null
+        if (grid) {
+          grid.querySelectorAll('.bucket-image-item').forEach((el) => {
+            const elUrl = (el as HTMLElement).dataset.url
+            ;(el as HTMLElement).style.outline = elUrl === url ? '2px solid #3b82f6' : 'none'
+          })
+        }
+      },
+      onSubmit: (api: any) => {
+        const data = api.getData() as { image: string }
+        if (data.image) {
+          callback(data.image, { alt: '' })
+        }
+        api.close()
+      }
+    })
+
+    // 초기 프리뷰 및 그리드 렌더
+    const data = dialog.getData() as { image: string }
+    const preview = document.getElementById('bucket-image-preview') as HTMLElement | null
+    if (preview && data.image) {
+      preview.innerHTML = `<img src="${data.image}" style="max-width:100%;border:1px solid #e5e7eb;border-radius:8px"/>`
+    }
+    const grid = document.getElementById('bucket-image-grid') as HTMLElement | null
+    if (grid) {
+      if (images.length === 0) {
+        grid.innerHTML = '<div style="color:#6b7280;font-size:12px">버킷에 이미지가 없습니다.</div>'
+      } else {
+        grid.innerHTML = images.map((img) => `
+          <div class="bucket-image-item" data-url="${img.url}" title="${img.name}" style="cursor:pointer;position:relative;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#f9fafb;">
+            <div style="width:100%;height:100px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+              <img src="${img.url}" style="max-width:100%;max-height:100%;object-fit:contain;display:block;" onerror="this.style.display='none'"/>
+            </div>
+            <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.4);color:#fff;font-size:10px;padding:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${img.name}</div>
+          </div>
+        `).join('')
+        grid.querySelectorAll('.bucket-image-item').forEach((el) => {
+          el.addEventListener('click', () => {
+            const url = (el as HTMLElement).dataset.url || ''
+            dialog.setData({ image: url })
+            const previewEl = document.getElementById('bucket-image-preview') as HTMLElement | null
+            if (previewEl) previewEl.innerHTML = url ? `<img src="${url}" style="max-width:100%;border:1px solid #e5e7eb;border-radius:8px"/>` : ''
+            grid.querySelectorAll('.bucket-image-item').forEach((item) => {
+              (item as HTMLElement).style.outline = 'none'
+            })
+            ;(el as HTMLElement).style.outline = '2px solid #3b82f6'
+          })
+        })
+        grid.querySelectorAll('.bucket-image-item').forEach((el) => {
+          const url = (el as HTMLElement).dataset.url
+          ;(el as HTMLElement).style.outline = url === data.image ? '2px solid #3b82f6' : 'none'
+        })
+      }
+    }
+  }
+
   return (
     <Editor
       apiKey={apiKey}
@@ -155,6 +270,73 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         ],
         // 사용자 정의 버튼 등록
         setup: (editor: any) => {
+          // 미디어(이미지/iframe/video) 가운데 정렬 버튼
+          const centerSelectedMedia = () => {
+            try {
+              const dom = editor.dom
+              const selectedHtml: string = editor.selection.getContent({ format: 'html' }) || ''
+              const selectionContainsMedia = /<(img|iframe|video)\b/i.test(selectedHtml)
+
+              if (selectionContainsMedia) {
+                const container = document.createElement('div')
+                container.innerHTML = selectedHtml
+                container.querySelectorAll('img').forEach((el) => {
+                  const elem = el as HTMLElement
+                  elem.style.display = 'block'
+                  elem.style.marginLeft = 'auto'
+                  elem.style.marginRight = 'auto'
+                  elem.style.float = 'none'
+                })
+                container.querySelectorAll('iframe,video').forEach((el) => {
+                  const elem = el as HTMLElement
+                  elem.style.display = 'block'
+                  elem.style.marginLeft = 'auto'
+                  elem.style.marginRight = 'auto'
+                })
+                editor.selection.setContent(container.innerHTML)
+                return
+              }
+
+              const node: HTMLElement = editor.selection.getNode()
+              if (!node) return
+
+              const mediaEl = (node.matches && node.matches('img,iframe,video'))
+                ? node
+                : (node.closest && node.closest('img,iframe,video'))
+                  ? (node.closest('img,iframe,video') as HTMLElement)
+                  : null
+              if (!mediaEl) return
+
+              if (mediaEl.tagName === 'IMG') {
+                dom.setStyles(mediaEl, {
+                  display: 'block',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  float: 'none'
+                })
+              } else {
+                dom.setStyles(mediaEl, {
+                  display: 'block',
+                  marginLeft: 'auto',
+                  marginRight: 'auto'
+                })
+              }
+            } catch {
+              // 무시
+            }
+          }
+
+          // 기본 가운데 맞춤(JustifyCenter) 실행 시, 선택된 미디어에도 가운데 정렬 스타일을 적용
+          editor.on('ExecCommand', (e: any) => {
+            try {
+              if (e.command === 'JustifyCenter') {
+                centerSelectedMedia()
+              }
+            } catch {
+              // 무시
+            }
+          })
+
           editor.ui.registry.addButton('formathtml', {
             text: 'HTML 정렬',
             tooltip: '현재 내용을 HTML 들여쓰기로 정리하여 소스 보기로 표시합니다',
@@ -284,6 +466,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             height: auto; 
             border-radius: 0.5em; 
           }
+          /* iframe은 TinyMCE/사용자 지정 높이를 그대로 유지하도록 크기 강제 지정하지 않음 */
+          iframe {
+            display: block;
+            margin: 0 auto;
+          }
+          video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
         `,
         skin: 'oxide',
         content_css: 'default',
@@ -372,6 +565,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         dragdrop_callbacks: true,
         // 파일 드롭
         file_picker_types: 'image media',
+        file_picker_callback: async (callback: any, _value: any, meta: any) => {
+          try {
+            if (meta.filetype === 'image') {
+              await openBucketImagePicker(callback)
+            }
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error('파일 피커 오류:', e)
+          }
+        },
         // 이미지 설명
         image_description: true,
         // 이미지 제목

@@ -25,7 +25,7 @@ import Breadcrumb from '../components/Breadcrumb'
 import type { BlogPost, Category } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
 import RichTextEditor from '../components/RichTextEditor'
-import { htmlToMarkdown, markdownToHtml, generateExcerpt } from '../lib/markdownConverter'
+import { generateExcerpt } from '../lib/markdownConverter'
 
 const postSchema = z.object({
   title: z.string().min(1, '제목을 입력해주세요'),
@@ -120,12 +120,9 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
 
       setPost(data)
       
-      // 마크다운 콘텐츠를 HTML로 변환
-      const htmlContent = markdownToHtml(data.content)
-      
-      // 폼에 데이터 설정
+      // 폼에 데이터 설정 (HTML 그대로)
       setValue('title', data.title)
-      setValue('content', htmlContent) // HTML 콘텐츠로 설정
+      setValue('content', data.content) // HTML 콘텐츠 그대로 설정
       setValue('excerpt', data.excerpt)
       setValue('category', data.category)
       setValue('tags', data.tags?.join(', ') || '')
@@ -151,15 +148,14 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
         : []
 
-      // HTML을 마크다운으로 변환
-      const markdownContent = htmlToMarkdown(data.content)
-      
-      // 자동으로 excerpt 생성 (사용자가 입력하지 않은 경우)
-      const autoExcerpt = data.excerpt || generateExcerpt(data.content)
+      // HTML 콘텐츠 그대로 저장
+      const htmlContent = data.content
+      // 자동으로 excerpt 생성 (사용자가 입력하지 않은 경우, HTML에서 텍스트 추출 기반)
+      const autoExcerpt = data.excerpt || generateExcerpt(htmlContent)
 
       const postData = {
         title: data.title,
-        content: markdownContent, // 마크다운으로 저장
+        content: htmlContent, // HTML로 저장
         excerpt: autoExcerpt,
         category: data.category,
         author: user?.email || 'Unknown',
@@ -217,15 +213,14 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
         : []
 
-      // HTML을 마크다운으로 변환
-      const markdownContent = htmlToMarkdown(formData.content)
-      
-      // 자동으로 excerpt 생성 (사용자가 입력하지 않은 경우)
-      const autoExcerpt = formData.excerpt || generateExcerpt(formData.content)
+      // HTML 콘텐츠 그대로 저장
+      const htmlContent = formData.content
+      // 자동으로 excerpt 생성 (사용자가 입력하지 않은 경우, HTML에서 텍스트 추출 기반)
+      const autoExcerpt = formData.excerpt || generateExcerpt(htmlContent)
 
       const postData = {
         title: formData.title,
-        content: markdownContent, // 마크다운으로 저장
+        content: htmlContent, // HTML로 저장
         excerpt: autoExcerpt,
         category: formData.category,
         author: user?.email || 'Unknown',

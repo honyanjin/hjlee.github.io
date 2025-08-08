@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Calendar, User, ArrowLeft, Tag, Eye, Link, Copy } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import rehypeHighlight from 'rehype-highlight'
+// ReactMarkdown 제거, HTML 직접 렌더링
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
 import ShareButtons from '../components/ShareButtons'
@@ -379,129 +377,8 @@ const BlogPost = () => {
               {/* 구분선 */}
               <div className="border-t border-gray-200 dark:border-gray-600 my-6 sm:my-8"></div>
 
-              {/* Content - 반응형 개선 */}
-              <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none dark:prose-invert markdown-content">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight]}
-                  components={{
-                    // 코드 블록 스타일링
-                    code({ node, className, children, ...props }) {
-                      const match = /language-(\w+)/.exec(className || '')
-                      return match ? (
-                        <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm">
-                          <code className={className} {...props}>
-                            {children}
-                          </code>
-                        </pre>
-                      ) : (
-                        <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-xs sm:text-sm" {...props}>
-                          {children}
-                        </code>
-                      )
-                    },
-                    // 링크 스타일링
-                    a({ children, href, ...props }) {
-                      // YouTube 링크 자동 임베드
-                      if (href && (href.includes('youtube.com/watch') || href.includes('youtu.be/'))) {
-                        const videoId = href.includes('youtube.com/watch')
-                          ? href.split('v=')[1]?.split('&')[0]
-                          : href.split('youtu.be/')[1]?.split('?')[0]
-                        if (videoId) {
-                          return (
-                            <div className="my-6">
-                              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                                <iframe
-                                  src={`https://www.youtube.com/embed/${videoId}`}
-                                  title="YouTube video player"
-                                  frameBorder={0}
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  allowFullScreen
-                                  className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
-                                />
-                              </div>
-                            </div>
-                          )
-                        }
-                      }
-                      // Vimeo 링크 자동 임베드
-                      if (href && href.includes('vimeo.com/')) {
-                        const parts = href.split('vimeo.com/')[1]
-                        const id = parts?.split(/[?&#]/)[0]
-                        if (id) {
-                          return (
-                            <div className="my-6">
-                              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                                <iframe
-                                  src={`https://player.vimeo.com/video/${id}`}
-                                  title="Vimeo video player"
-                                  frameBorder={0}
-                                  allow="autoplay; fullscreen; picture-in-picture"
-                                  allowFullScreen
-                                  className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
-                                />
-                              </div>
-                            </div>
-                          )
-                        }
-                      }
-                      return (
-                        <a 
-                          href={href} 
-                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          {...props}
-                        >
-                          {children}
-                        </a>
-                      )
-                    },
-                    // 이미지 스타일링
-                    img({ src, alt, ...props }) {
-                      return (
-                        <img 
-                          src={src} 
-                          alt={alt}
-                          className="max-w-full h-auto rounded-lg shadow-md"
-                          onError={(e) => {
-                            // 이미지 로드 실패 시 기본 이미지로 대체
-                            const target = e.target as HTMLImageElement
-                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNjE2MTYxIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7imqLvuI88L3RleHQ+PC9zdmc+'
-                          }}
-                          {...props}
-                        />
-                      )
-                    },
-                    // 테이블 스타일링
-                    table({ children, ...props }) {
-                      return (
-                        <div className="overflow-x-auto">
-                          <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600 text-xs sm:text-sm" {...props}>
-                            {children}
-                          </table>
-                        </div>
-                      )
-                    },
-                    th({ children, ...props }) {
-                      return (
-                        <th className="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2 bg-gray-100 dark:bg-gray-700 font-semibold" {...props}>
-                          {children}
-                        </th>
-                      )
-                    },
-                    td({ children, ...props }) {
-                      return (
-                        <td className="border border-gray-300 dark:border-gray-600 px-2 sm:px-4 py-2" {...props}>
-                          {children}
-                        </td>
-                      )
-                    }
-                  }}
-                >
-                  {post.content}
-                </ReactMarkdown>
-              </div>
+              {/* Content - HTML 직접 렌더 */}
+              <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none dark:prose-invert markdown-content" dangerouslySetInnerHTML={{ __html: post.content }} />
             </div>
           </motion.div>
         </div>

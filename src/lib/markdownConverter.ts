@@ -31,16 +31,43 @@ turndownService.addRule('codeBlocks', {
 // 이미지 설정
 turndownService.addRule('images', {
   filter: 'img',
-  replacement: function (content: string, node: any) {
+  replacement: function (_content: string, node: any) {
     const img = node as HTMLImageElement
-    const alt = img.alt || ''
     const src = img.src || ''
-    const title = img.title || ''
-    
-    if (title) {
-      return `![${alt}](${src} "${title}")`
+    const alt = img.getAttribute && (img.getAttribute('alt') || '')
+    const title = img.getAttribute && img.getAttribute('title')
+    const width = img.getAttribute && img.getAttribute('width')
+    const height = img.getAttribute && img.getAttribute('height')
+    let style = (img.getAttribute && img.getAttribute('style')) || ''
+    const className = img.getAttribute && img.getAttribute('class')
+    const borderAttr = img.getAttribute && img.getAttribute('border')
+    const borderColorAttr = img.getAttribute && img.getAttribute('bordercolor')
+
+    // width/height가 style에만 있을 경우도 보존
+    const styleW = style && /width\s*:\s*(\d+)px/i.exec(style)
+    const styleH = style && /height\s*:\s*(\d+)px/i.exec(style)
+
+    // 구형 border 속성 보정 → style로 병합
+    if (borderAttr && !/border(-width)?:/i.test(style)) {
+      const bw = parseInt(borderAttr, 10)
+      if (!Number.isNaN(bw) && bw > 0) {
+        style = `${style ? style.replace(/;\s*$/, '') + '; ' : ''}border-width: ${bw}px; border-style: solid;`
+      }
     }
-    return `![${alt}](${src})`
+    if (borderColorAttr && !/border-color:/i.test(style)) {
+      style = `${style ? style.replace(/;\s*$/, '') + '; ' : ''}border-color: ${borderColorAttr};`
+    }
+
+    const attrs: string[] = []
+    if (src) attrs.push(`src="${src}"`)
+    if (alt) attrs.push(`alt="${alt}"`)
+    if (title) attrs.push(`title="${title}"`)
+    if (width || styleW) attrs.push(`width="${width || (styleW ? styleW[1] : '')}"`)
+    if (height || styleH) attrs.push(`height="${height || (styleH ? styleH[1] : '')}"`)
+    if (style) attrs.push(`style="${style}"`)
+    if (className) attrs.push(`class="${className}"`)
+
+    return `\n<img ${attrs.join(' ')} />\n`
   }
 })
 
@@ -103,6 +130,54 @@ turndownService.addRule('horizontalRule', {
   }
 })
 
+// 인라인 스타일 보존: span, u, sup, sub, mark, br, kbd, abbr 등
+turndownService.keep((node: any) => {
+  if (!node || !node.nodeName) return false
+  const name = node.nodeName
+  if (name === 'BR') return true
+  if (name === 'U' || name === 'SUP' || name === 'SUB' || name === 'MARK' || name === 'KBD' || name === 'ABBR') return true
+  if (name === 'SPAN') {
+    const hasStyle = !!node.getAttribute && !!node.getAttribute('style')
+    const hasClass = !!node.getAttribute && !!node.getAttribute('class')
+    return hasStyle || hasClass
+  }
+  return false
+})
+
+// 정렬이 있는 단락 보존: <p style="text-align: ..."> → 그대로 HTML 유지
+turndownService.addRule('alignedParagraph', {
+  filter: function (node: any) {
+    if (!node || node.nodeName !== 'P') return false
+    const style = node.getAttribute && node.getAttribute('style')
+    return !!style && /text-align\s*:\s*(center|right|left|justify)/i.test(style)
+  },
+  replacement: function (content: string, node: any) {
+    try {
+      const style = node.getAttribute('style') || ''
+      return `\n<p style="${style}">${content}</p>\n`
+    } catch {
+      return `\n<p>${content}</p>\n`
+    }
+  }
+})
+
+// 정렬을 위한 래퍼 DIV 보존: <div style="text-align:center"> ... </div>
+turndownService.addRule('alignedDiv', {
+  filter: function (node: any) {
+    if (!node || node.nodeName !== 'DIV') return false
+    const style = node.getAttribute && node.getAttribute('style')
+    return !!style && /text-align\s*:\s*(center|right|left|justify)/i.test(style)
+  },
+  replacement: function (content: string, node: any) {
+    try {
+      const style = node.getAttribute('style') || ''
+      return `\n<div style="${style}">${content}</div>\n`
+    } catch {
+      return `\n<div>${content}</div>\n`
+    }
+  }
+})
+
 // iframe(YouTube/Vimeo) → 링크로 변환하여 Markdown에 안전하게 보존
 turndownService.addRule('iframesToLinks', {
   filter: function (node: any) {
@@ -112,18 +187,22 @@ turndownService.addRule('iframesToLinks', {
     try {
       const iframe = node as HTMLIFrameElement
       const src = iframe.src || ''
+      const widthAttr = (iframe.getAttribute && iframe.getAttribute('width')) || ''
+      const heightAttr = (iframe.getAttribute && iframe.getAttribute('height')) || ''
+      const width = parseInt(widthAttr || '', 10) || 560
+      const height = parseInt(heightAttr || '', 10) || 315
       // YouTube embed → watch 링크로 변환
       if (src.includes('youtube.com/embed/')) {
         const id = src.split('/embed/')[1]?.split(/[?&#]/)[0]
-        if (id) return `\nhttps://www.youtube.com/watch?v=${id}\n`
+        if (id) return `\n[YouTube](https://www.youtube.com/watch?v=${id} "w=${width};h=${height}")\n`
       }
       // Vimeo embed → 일반 vimeo 링크로 변환
       if (src.includes('player.vimeo.com/video/')) {
         const id = src.split('/video/')[1]?.split(/[?&#]/)[0]
-        if (id) return `\nhttps://vimeo.com/${id}\n`
+        if (id) return `\n[Vimeo](https://vimeo.com/${id} "w=${width};h=${height}")\n`
       }
       // 그 외 iframe은 src를 그대로 노출 (최소 보존)
-      if (src) return `\n${src}\n`
+      if (src) return `\n[Embed](${src})\n`
       return ''
     } catch {
       return ''
@@ -153,8 +232,48 @@ export const markdownToHtml = (markdown: string): string => {
       breaks: true,
       gfm: true
     })
-    
-    return marked(markdown) as string
+
+    const rawHtml = marked(markdown) as string
+
+    // YouTube/Vimeo 링크를 iframe으로 후처리 (편집기 로딩 시 임베드 복원)
+    const postProcessEmbeds = (html: string): string => {
+      try {
+        // YouTube (watch)
+        html = html.replace(/<a[^>]*href="https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([^"]+)"[^>]*?(?:title="([^"]*)")?[^>]*>.*?<\/a>/gi,
+          (_match, id: string, title: string | undefined) => {
+            const dims = (title || '').match(/w=(\d+);h=(\d+)/)
+            const width = dims ? parseInt(dims[1], 10) : 560
+            const height = dims ? parseInt(dims[2], 10) : 315
+            const videoId = id.split('&')[0]
+            return `\n<iframe width="${width}" height="${height}" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n`
+          })
+
+        // YouTube (youtu.be)
+        html = html.replace(/<a[^>]*href="https?:\/\/(?:www\.)?youtu\.be\/([^"\?&#]+)[^"]*"[^>]*?(?:title="([^"]*)")?[^>]*>.*?<\/a>/gi,
+          (_match, id: string, title: string | undefined) => {
+            const dims = (title || '').match(/w=(\d+);h=(\d+)/)
+            const width = dims ? parseInt(dims[1], 10) : 560
+            const height = dims ? parseInt(dims[2], 10) : 315
+            return `\n<iframe width="${width}" height="${height}" src="https://www.youtube.com/embed/${id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n`
+          })
+
+        // Vimeo
+        html = html.replace(/<a[^>]*href="https?:\/\/(?:www\.)?vimeo\.com\/([^"\?&#]+)[^"]*"[^>]*?(?:title="([^"]*)")?[^>]*>.*?<\/a>/gi,
+          (_match, id: string, title: string | undefined) => {
+            const dims = (title || '').match(/w=(\d+);h=(\d+)/)
+            const width = dims ? parseInt(dims[1], 10) : 560
+            const height = dims ? parseInt(dims[2], 10) : 315
+            return `\n<iframe width="${width}" height="${height}" src="https://player.vimeo.com/video/${id}" title="Vimeo video player" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>\n`
+          })
+
+        return html
+      } catch (e) {
+        console.error('Embed post-process failed:', e)
+        return html
+      }
+    }
+
+    return postProcessEmbeds(rawHtml)
   } catch (error) {
     console.error('Markdown to HTML conversion error:', error)
     return markdown

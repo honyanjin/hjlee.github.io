@@ -38,15 +38,20 @@
 }
 
 .markdown-content ul {
-  @apply mb-4 list-disc list-inside;
+  @apply mb-4 list-disc list-outside pl-6;
 }
 
 .markdown-content ol {
-  @apply mb-4 list-decimal list-inside;
+  @apply mb-4 list-decimal list-outside pl-6;
 }
 
 .markdown-content li {
   @apply mb-1;
+}
+
+/* 숫자/불릿 뒤에 내용이 줄바꿈 되는 현상 방지 (ReactMarkdown이 <li><p>텍스트</p></li>로 출력함) */
+.markdown-content li > p {
+  @apply inline m-0;
 }
 
 .markdown-content blockquote {
@@ -86,7 +91,7 @@
 }
 
 .markdown-content img {
-  @apply max-w-full h-auto rounded-lg shadow-md my-4;
+  @apply max-w-full my-4;
 }
 
 .markdown-content table {
