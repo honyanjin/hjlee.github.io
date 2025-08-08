@@ -19,7 +19,7 @@ import Breadcrumb from '../components/Breadcrumb'
 import type { Comment, BlogPost } from '../lib/supabase'
 
 interface CommentWithPost extends Comment {
-  post?: BlogPost
+  post?: Pick<BlogPost, 'title' | 'post_no'>
 }
 
 const AdminComments = () => {
@@ -44,7 +44,7 @@ const AdminComments = () => {
         .from('comments')
         .select(`
           *,
-          post:blog_posts(title, slug)
+          post:blog_posts(title, post_no)
         `)
         .order('created_at', { ascending: false })
 
@@ -181,7 +181,7 @@ const AdminComments = () => {
                           <div className="flex items-center gap-1">
                             <FileText size={14} />
                             <button
-                              onClick={() => window.open(`/blog/${comment.post?.slug}`, '_blank')}
+                              onClick={() => window.open(`/blog/${comment.post?.post_no}`, '_blank')}
                               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors"
                               title="새 탭에서 포스트 보기"
                             >

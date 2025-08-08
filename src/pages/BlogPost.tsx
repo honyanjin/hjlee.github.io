@@ -402,6 +402,49 @@ const BlogPost = () => {
                     },
                     // 링크 스타일링
                     a({ children, href, ...props }) {
+                      // YouTube 링크 자동 임베드
+                      if (href && (href.includes('youtube.com/watch') || href.includes('youtu.be/'))) {
+                        const videoId = href.includes('youtube.com/watch')
+                          ? href.split('v=')[1]?.split('&')[0]
+                          : href.split('youtu.be/')[1]?.split('?')[0]
+                        if (videoId) {
+                          return (
+                            <div className="my-6">
+                              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                <iframe
+                                  src={`https://www.youtube.com/embed/${videoId}`}
+                                  title="YouTube video player"
+                                  frameBorder={0}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                                />
+                              </div>
+                            </div>
+                          )
+                        }
+                      }
+                      // Vimeo 링크 자동 임베드
+                      if (href && href.includes('vimeo.com/')) {
+                        const parts = href.split('vimeo.com/')[1]
+                        const id = parts?.split(/[?&#]/)[0]
+                        if (id) {
+                          return (
+                            <div className="my-6">
+                              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                <iframe
+                                  src={`https://player.vimeo.com/video/${id}`}
+                                  title="Vimeo video player"
+                                  frameBorder={0}
+                                  allow="autoplay; fullscreen; picture-in-picture"
+                                  allowFullScreen
+                                  className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                                />
+                              </div>
+                            </div>
+                          )
+                        }
+                      }
                       return (
                         <a 
                           href={href} 

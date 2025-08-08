@@ -103,6 +103,34 @@ turndownService.addRule('horizontalRule', {
   }
 })
 
+// iframe(YouTube/Vimeo) → 링크로 변환하여 Markdown에 안전하게 보존
+turndownService.addRule('iframesToLinks', {
+  filter: function (node: any) {
+    return node.nodeName === 'IFRAME'
+  },
+  replacement: function (_content: string, node: any) {
+    try {
+      const iframe = node as HTMLIFrameElement
+      const src = iframe.src || ''
+      // YouTube embed → watch 링크로 변환
+      if (src.includes('youtube.com/embed/')) {
+        const id = src.split('/embed/')[1]?.split(/[?&#]/)[0]
+        if (id) return `\nhttps://www.youtube.com/watch?v=${id}\n`
+      }
+      // Vimeo embed → 일반 vimeo 링크로 변환
+      if (src.includes('player.vimeo.com/video/')) {
+        const id = src.split('/video/')[1]?.split(/[?&#]/)[0]
+        if (id) return `\nhttps://vimeo.com/${id}\n`
+      }
+      // 그 외 iframe은 src를 그대로 노출 (최소 보존)
+      if (src) return `\n${src}\n`
+      return ''
+    } catch {
+      return ''
+    }
+  }
+})
+
 /**
  * HTML을 마크다운으로 변환
  */

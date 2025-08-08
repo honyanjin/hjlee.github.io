@@ -73,7 +73,7 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
   const watchedContent = watch('content')
   const watchedTitle = watch('title')
 
-  // URL 미리보기 생성
+  // URL 미리보기: 편집 모드에서는 post_no를 사용하여 표시
   const generateSlug = (title: string) => {
     return title
       .toLowerCase()
@@ -82,8 +82,9 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
       .replace(/^-|-$/g, '')
   }
 
-  const previewSlug = watchedTitle ? generateSlug(watchedTitle) : ''
-  const previewUrl = previewSlug ? `${window.location.origin}/blog/${previewSlug}` : ''
+  const previewUrl = mode === 'edit' && post
+    ? `${window.location.origin}/blog/${post.post_no}`
+    : ''
 
   useEffect(() => {
     if (mode === 'edit' && id) {
@@ -439,8 +440,8 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
                     </div>
                   </div>
 
-                  {/* URL Preview */}
-                  {watchedTitle && (
+                  {/* URL Preview - 편집 모드에서 post_no 기준 표시 */}
+                  {mode === 'edit' && post && (
                     <div className="p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Link size={14} className="text-gray-500 dark:text-gray-400 flex-shrink-0" />
@@ -455,6 +456,7 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
                         <button
                           type="button"
                           onClick={() => {
+                            if (!previewUrl) return
                             navigator.clipboard.writeText(previewUrl)
                             setSuccess('URL이 클립보드에 복사되었습니다.')
                             setTimeout(() => setSuccess(''), 2000)
