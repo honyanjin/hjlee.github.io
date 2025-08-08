@@ -262,11 +262,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         menubar: false,
         plugins: [
           // Core editing features
-          'anchor', 'autolink', 'charmap', 'codesample', 'code', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'visualchars', 'wordcount', 'image', 'preview', 'fullscreen', 'help', 'paste', 'hr', 'visualaid'
+          'anchor', 'autolink', 'charmap', 'codesample', 'code', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'visualchars', 'wordcount', 'image', 'preview', 'fullscreen', 'help'
         ],
         toolbar: [
-          'undo redo | cut copy paste selectall | blocks fontfamily fontsize | bold italic underline strikethrough subscript superscript | forecolor backcolor',
-          'alignleft aligncenter alignright alignjustify | toParagraph toBulletedList toNumberedList | numlist bullist indent outdent | link image media table | blockquote hr | visualblocks visualchars | removeformat formathtml code codesample | preview fullscreen help'
+          'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough subscript superscript | forecolor backcolor',
+          'alignleft aligncenter alignright alignjustify | toParagraph toBulletedList toNumberedList | numlist bullist indent outdent | link image media table | blockquote | visualblocks visualchars | removeformat formathtml code codesample | preview fullscreen help'
         ],
         // 사용자 정의 버튼 등록
         setup: (editor: any) => {

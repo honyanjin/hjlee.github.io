@@ -141,7 +141,6 @@ const BlogPost = () => {
     )
     
     if (foundCategory) {
-      console.log('Found category:', foundCategory.name, 'Color:', foundCategory.color, 'Category input:', category)
       
       const hexToRgb = (hex: string) => {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
@@ -163,16 +162,13 @@ const BlogPost = () => {
         const darkerHex = `#${darkerRgb.r.toString(16).padStart(2, '0')}${darkerRgb.g.toString(16).padStart(2, '0')}${darkerRgb.b.toString(16).padStart(2, '0')}`
         
         const gradientStyle = `linear-gradient(to bottom right, ${foundCategory.color}, ${darkerHex})`
-        console.log('Generated gradient style:', gradientStyle)
         return {
           background: gradientStyle
         }
       }
       
-      console.log('Color conversion failed for:', foundCategory.color)
     }
     
-    console.log('Category not found for:', category, 'Available categories:', categories.map(c => ({ name: c.name, slug: c.slug, id: c.id })))
     
     return {
       background: 'linear-gradient(to bottom right, #6B7280, #374151)'

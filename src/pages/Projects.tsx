@@ -137,8 +137,6 @@ const Projects = () => {
         setLoading(true)
         setError(null)
         
-        console.log('프로젝트 데이터를 가져오는 중...')
-        
         // 먼저 연결 테스트
         const isConnected = await testSupabaseConnection()
         if (!isConnected) {
@@ -175,7 +173,6 @@ const Projects = () => {
           throw error
         }
 
-        console.log('가져온 프로젝트 수:', data?.length || 0)
         setProjects(data || [])
       } catch (err: any) {
         console.error('프로젝트를 불러오는 중 오류가 발생했습니다:', err)
