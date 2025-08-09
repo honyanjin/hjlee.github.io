@@ -24,6 +24,7 @@ import { supabase } from '../lib/supabase'
 import Breadcrumb from '../components/Breadcrumb'
 import type { BlogPost, Category } from '../lib/supabase'
 import ImageUpload from '../components/ImageUpload'
+import { ImageLibraryProvider } from '../contexts/ImageLibraryContext'
 import RichTextEditor from '../components/RichTextEditor'
 import { generateExcerpt } from '../lib/markdownConverter'
 
@@ -351,6 +352,7 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
   const breadcrumbLabel = mode === 'new' ? '새 포스트 작성' : '포스트 편집'
 
   return (
+    <ImageLibraryProvider>
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm">
@@ -718,6 +720,7 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         </form>
       </main>
     </div>
+    </ImageLibraryProvider>
   )
 }
 

@@ -347,8 +347,13 @@ const AdminStorage = () => {
 
   const filteredFiles = useMemo(() => {
     const q = searchText.trim().toLowerCase()
-    // 1) 폴더 항목 제거(파일만 표시)
-    let result = files.filter(f => (f.metadata as any)?.size != null)
+    // 1) 폴더/숨김/플레이스홀더/0바이트 제거(실파일만 표시)
+    let result = files.filter(f => {
+      const size = f.metadata?.size
+      const base = (f.name.split('/').pop() || f.name).toLowerCase()
+      const hidden = base.startsWith('.') || base.includes('emptyfolderplaceholder')
+      return size != null && size > 0 && !hidden
+    })
     if (q) result = result.filter(f => f.name.toLowerCase().includes(q))
     if (typeFilter === 'image') result = result.filter(f => isImage(f.name))
     if (typeFilter === 'other') result = result.filter(f => !isImage(f.name))

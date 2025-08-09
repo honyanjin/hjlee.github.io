@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Editor } from '@tinymce/tinymce-react'
 import { supabase } from '../lib/supabase'
+import { useImageLibrary } from '../contexts/ImageLibraryContext'
 
 interface RichTextEditorProps {
   value: string
@@ -18,6 +19,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   disabled = false
 }) => {
   const editorRef = useRef<any>(null)
+  const { open } = useImageLibrary()
 
   // 간단 HTML 포맷터 (외부 의존성 없이 들여쓰기 정리)
   const formatHtmlContent = (html: string, indentSize = 2): string => {
@@ -134,119 +136,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }
 
-  // Supabase 버킷에서 이미지 목록 가져오기
-  const fetchBucketImages = async (): Promise<Array<{ name: string; url: string }>> => {
-    try {
-      const { data, error } = await supabase.storage
-        .from('blog-images')
-        .list('', { limit: 100, offset: 0, sortBy: { column: 'updated_at', order: 'desc' } })
-      if (error) throw error
-      const files = data || []
-      const results: Array<{ name: string; url: string }> = []
-      for (const file of files) {
-        if (file && file.name) {
-          const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(file.name)
-          if (urlData?.publicUrl) {
-            results.push({ name: file.name, url: urlData.publicUrl })
-          }
-        }
-      }
-      return results
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('버킷 이미지 목록 로드 실패:', e)
-      return []
-    }
-  }
-
-  // TinyMCE 파일 피커: 버킷에서 선택 지원
+  // TinyMCE 파일 피커: 공용 이미지 라이브러리 모달 호출로 변경
   const openBucketImagePicker = async (callback: (url: string, meta?: any) => void) => {
-    const images = await fetchBucketImages()
-    const editor = editorRef.current?.editor as any
-    if (!editor) return
-
-    const items = images.map((img) => ({ text: img.name, value: img.url }))
-    if (items.length === 0) items.push({ text: '이미지가 없습니다', value: '' })
-
-    // 선택 상태를 data로 관리
-    const dialog = editor.windowManager.open({
-      title: '버킷에서 이미지 선택',
-      size: 'normal',
-      body: {
-        type: 'panel',
-        items: [
-          { type: 'htmlpanel', html: '<div style="margin-bottom:8px;font-size:12px;color:#6b7280">버킷의 이미지를 클릭하여 선택하거나 아래 드롭다운에서 선택하세요.</div>' },
-          { type: 'htmlpanel', html: '<div id="bucket-image-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:8px;max-height:320px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px;"></div>' },
-          { type: 'selectbox', name: 'image', label: '이미지 파일', items },
-          { type: 'htmlpanel', html: '<div id="bucket-image-preview" style="margin-top:8px"></div>' }
-        ]
-      },
-      initialData: { image: items[0]?.value || '' },
-      buttons: [
-        { type: 'cancel', name: 'cancel', text: '취소' },
-        { type: 'submit', name: 'submit', text: '삽입', primary: true }
-      ],
-      onChange: (api: any, _details: any) => {
-        const data = api.getData() as { image: string }
-        const url = data.image
-        const preview = document.getElementById('bucket-image-preview') as HTMLElement | null
-        if (preview) {
-          preview.innerHTML = url ? `<img src="${url}" style="max-width:100%;border:1px solid #e5e7eb;border-radius:8px"/>` : ''
-        }
-        const grid = document.getElementById('bucket-image-grid') as HTMLElement | null
-        if (grid) {
-          grid.querySelectorAll('.bucket-image-item').forEach((el) => {
-            const elUrl = (el as HTMLElement).dataset.url
-            ;(el as HTMLElement).style.outline = elUrl === url ? '2px solid #3b82f6' : 'none'
-          })
-        }
-      },
-      onSubmit: (api: any) => {
-        const data = api.getData() as { image: string }
-        if (data.image) {
-          callback(data.image, { alt: '' })
-        }
-        api.close()
-      }
-    })
-
-    // 초기 프리뷰 및 그리드 렌더
-    const data = dialog.getData() as { image: string }
-    const preview = document.getElementById('bucket-image-preview') as HTMLElement | null
-    if (preview && data.image) {
-      preview.innerHTML = `<img src="${data.image}" style="max-width:100%;border:1px solid #e5e7eb;border-radius:8px"/>`
-    }
-    const grid = document.getElementById('bucket-image-grid') as HTMLElement | null
-    if (grid) {
-      if (images.length === 0) {
-        grid.innerHTML = '<div style="color:#6b7280;font-size:12px">버킷에 이미지가 없습니다.</div>'
-      } else {
-        grid.innerHTML = images.map((img) => `
-          <div class="bucket-image-item" data-url="${img.url}" title="${img.name}" style="cursor:pointer;position:relative;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#f9fafb;">
-            <div style="width:100%;height:100px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-              <img src="${img.url}" style="max-width:100%;max-height:100%;object-fit:contain;display:block;" onerror="this.style.display='none'"/>
-            </div>
-            <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.4);color:#fff;font-size:10px;padding:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${img.name}</div>
-          </div>
-        `).join('')
-        grid.querySelectorAll('.bucket-image-item').forEach((el) => {
-          el.addEventListener('click', () => {
-            const url = (el as HTMLElement).dataset.url || ''
-            dialog.setData({ image: url })
-            const previewEl = document.getElementById('bucket-image-preview') as HTMLElement | null
-            if (previewEl) previewEl.innerHTML = url ? `<img src="${url}" style="max-width:100%;border:1px solid #e5e7eb;border-radius:8px"/>` : ''
-            grid.querySelectorAll('.bucket-image-item').forEach((item) => {
-              (item as HTMLElement).style.outline = 'none'
-            })
-            ;(el as HTMLElement).style.outline = '2px solid #3b82f6'
-          })
-        })
-        grid.querySelectorAll('.bucket-image-item').forEach((el) => {
-          const url = (el as HTMLElement).dataset.url
-          ;(el as HTMLElement).style.outline = url === data.image ? '2px solid #3b82f6' : 'none'
-        })
-      }
-    }
+    const url = await open({ bucket: 'blog-images' })
+    if (url) callback(url, { alt: '' })
   }
 
   return (
