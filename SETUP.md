@@ -15,6 +15,11 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Admin Configuration
 VITE_ADMIN_EMAIL=your_admin_email@example.com
+
+# Build/Deploy Configuration
+# 프로덕션 베이스 경로 (GitHub Pages 프로젝트 사이트의 경우 필수)
+# 예: /서브경로 (GitHub Pages 프로젝트 사이트의 경우 `/레포이름`)
+VITE_BASE_PATH=/hjlee.github.io
 ```
 
 ### 2. Supabase 프로젝트 설정

@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "homepage": "https://honyanjin.github.io/hjlee.github.io",
+    "homepage": "",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },

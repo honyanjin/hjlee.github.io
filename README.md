@@ -84,6 +84,11 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Admin Configuration
 VITE_ADMIN_EMAIL=your_admin_email@example.com
+
+# Build/Deploy Configuration
+# GitHub Pages 프로젝트 사이트인 경우 베이스 경로를 지정하세요
+# 예: /서브경로 (GitHub Pages 프로젝트 사이트의 경우 `/레포이름`)
+VITE_BASE_PATH=/hjlee.github.io
 ```
 
 ### 4. Supabase 설정
@@ -326,6 +331,12 @@ npm run deploy   # GitHub Pages 배포
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_ADMIN_EMAIL`
+- `VITE_BASE_PATH` (프로덕션 베이스 경로. GitHub Pages 프로젝트 사이트라면 `/레포이름`)
+
+#### 베이스 경로 관리 안내
+- 기본적으로 개발 모드에서는 `/`를 사용합니다.
+- 프로덕션 빌드에서는 `VITE_BASE_PATH`를 사용합니다. 미설정 시 `/`로 동작합니다.
+- GitHub Pages 사용자 사이트가 아닌 프로젝트 사이트로 배포하는 경우에 필수입니다.
 
 ## 📊 현재 상태
 
@@ -378,4 +389,4 @@ MIT License
 
 프로젝트 링크: [https://github.com/honyanjin/hjlee.github.io](https://github.com/honyanjin/hjlee.github.io)
 
-라이브 사이트: [https://honyanjin.github.io/hjlee.github.io](https://honyanjin.github.io/hjlee.github.io)
+라이브 사이트: 환경 변수 `VITE_BASE_PATH`에 따라 달라집니다. 예) `https://honyanjin.github.io/hjlee.github.io`
