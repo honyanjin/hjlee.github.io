@@ -85,6 +85,10 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 # Admin Configuration
 VITE_ADMIN_EMAIL=your_admin_email@example.com
 
+# Editor Configuration
+# TinyMCE Cloud API Key (리치 텍스트 에디터 기능)
+VITE_TINYMCE_API_KEY=your_tinymce_api_key
+
 # Build/Deploy Configuration
 # GitHub Pages 프로젝트 사이트인 경우 베이스 경로를 지정하세요
 # 예: /서브경로 (GitHub Pages 프로젝트 사이트의 경우 `/레포이름`)
@@ -331,6 +335,7 @@ npm run deploy   # GitHub Pages 배포
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_ADMIN_EMAIL`
+- `VITE_TINYMCE_API_KEY` (TinyMCE Cloud API Key)
 - `VITE_BASE_PATH` (프로덕션 베이스 경로. GitHub Pages 프로젝트 사이트라면 `/레포이름`)
 
 #### 베이스 경로 관리 안내

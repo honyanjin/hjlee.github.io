@@ -16,6 +16,10 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 # Admin Configuration
 VITE_ADMIN_EMAIL=your_admin_email@example.com
 
+# Editor Configuration
+# TinyMCE Cloud API Key (리치 텍스트 에디터)
+VITE_TINYMCE_API_KEY=your_tinymce_api_key
+
 # Build/Deploy Configuration
 # 프로덕션 베이스 경로 (GitHub Pages 프로젝트 사이트의 경우 필수)
 # 예: /서브경로 (GitHub Pages 프로젝트 사이트의 경우 `/레포이름`)
