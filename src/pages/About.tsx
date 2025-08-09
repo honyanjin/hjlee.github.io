@@ -1,11 +1,98 @@
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Download, Mail, MapPin, Calendar, Briefcase } from 'lucide-react'
+import { Download, Mail, MapPin, Calendar, Briefcase, Phone } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
 import ImageWithFallback from '../components/ImageWithFallback'
+import { supabase } from '../lib/supabase'
+
+type AboutPageSettingsT = {
+  id: string
+  show_about_me: boolean
+  show_experience: boolean
+  show_education: boolean
+  show_skills?: boolean
+  updated_at: string
+}
+
+type AboutMeSettingsT = {
+  id: string
+  display_profile_image: boolean
+  name: string | null
+  title: string | null
+  email: string | null
+  phone?: string | null
+  location: string | null
+  birth_year: number | null
+  show_email: boolean
+  show_phone?: boolean
+  show_location: boolean
+  show_birth_year: boolean
+  show_resume_button: boolean
+  resume_url: string | null
+  resume_label: string | null
+  intro_title: string | null
+  intro_content_html: string | null
+  profile_image_url: string | null
+  side_image_url: string | null
+  updated_at: string
+}
 
 const About = () => {
+  const [settings, setSettings] = useState<AboutPageSettingsT | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [aboutMe, setAboutMe] = useState<AboutMeSettingsT | null>(null)
+
+  const formatPhone = (raw?: string | null): string => {
+    if (!raw) return ''
+    const digits = raw.replace(/\D/g, '')
+    if (digits.length === 11) {
+      return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+    }
+    return raw
+  }
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('about_page_settings')
+          .select('*')
+          .eq('id', 'default')
+          .maybeSingle()
+
+        if (error) throw error
+        setSettings(data ?? null)
+
+        // About Me 요소 설정 로드
+        const { data: aboutData, error: aboutErr } = await supabase
+          .from('about_page_about_me')
+          .select('*')
+          .eq('id', 'default')
+          .maybeSingle()
+        if (aboutErr) {
+          // 무시하고 기본값 유지
+        } else {
+          setAboutMe(aboutData ?? null)
+        }
+      } catch (err) {
+        // 설정이 없으면 null 유지 (모두 표시 기본값)
+        setSettings(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const enabled = useMemo(() => ({
+    about: settings?.show_about_me ?? true,
+    skills: (settings as any)?.show_skills ?? true,
+    experience: settings?.show_experience ?? true,
+    education: settings?.show_education ?? true
+  }), [settings])
+
   const experiences = [
     {
       year: '2023 - 현재',
@@ -40,9 +127,10 @@ const About = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <DotNavigation
         sections={[
-          'about-hero',
-          'experience-section',
-          'education-section',
+          ...(enabled.about ? ['about-hero'] as const : []),
+          ...(enabled.skills ? ['skills-section'] as const : []),
+          ...(enabled.experience ? ['experience-section'] as const : []),
+          ...(enabled.education ? ['education-section'] as const : []),
         ]}
       />
       <SEO 
@@ -54,6 +142,7 @@ const About = () => {
       <Navbar />
       
       {/* Hero Section */}
+      {enabled.about && (
       <section id="about-hero" className="pt-32 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -72,49 +161,90 @@ const About = () => {
           </motion.div>
 
           {/* Profile Section */}
-          <div className="grid lg:grid-cols-3 gap-12">
+          <div className="grid lg:grid-cols-3 gap-12 items-stretch">
             {/* Profile Image */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="lg:col-span-1"
+              className="lg:col-span-1 h-full"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                <div className="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-lg">
-                  <ImageWithFallback 
-                    defaultType="PROFILE"
-                    alt="HJLEE Profile" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 h-full flex flex-col">
+                { (aboutMe?.display_profile_image ?? true) && (
+                  <div className="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-lg">
+                    <ImageWithFallback 
+                      defaultType="PROFILE"
+                      src={aboutMe?.profile_image_url ?? undefined}
+                      alt={(aboutMe?.name ?? 'HJLEE') + ' Profile'} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-4">
-                  HJLEE
+                  {aboutMe?.name ?? 'HJLEE'}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
-                  풀스택 개발자 & UI/UX 디자이너
+                  {aboutMe?.title ?? '풀스택 개발자 & UI/UX 디자이너'}
                 </p>
                 
                 {/* Contact Info */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Mail size={20} className="text-blue-600" />
-                    <span className="text-gray-700 dark:text-gray-300">email@example.com</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MapPin size={20} className="text-blue-600" />
-                    <span className="text-gray-700 dark:text-gray-300">서울, 대한민국</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Calendar size={20} className="text-blue-600" />
-                    <span className="text-gray-700 dark:text-gray-300">1995년생</span>
-                  </div>
+                <div className="space-y-3 flex-1">
+                  { (aboutMe?.show_email ?? true) && (
+                    <div className="flex items-center gap-3">
+                      <Mail size={20} className="text-blue-600" />
+                      <span className="text-gray-700 dark:text-gray-300">{aboutMe?.email ?? 'email@example.com'}</span>
+                    </div>
+                  )}
+                  { (aboutMe?.show_phone ?? false) && (
+                    <div className="flex items-center gap-3">
+                      <Phone size={20} className="text-blue-600" />
+                      {aboutMe?.phone ? (
+                        <a href={`tel:${aboutMe.phone.replace(/\D/g,'')}`} className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                          {formatPhone(aboutMe.phone)}
+                        </a>
+                      ) : (
+                        <span className="text-gray-500 dark:text-gray-400">연락처 미등록</span>
+                      )}
+                    </div>
+                  )}
+                  { (aboutMe?.show_location ?? true) && (
+                    <div className="flex items-center gap-3">
+                      <MapPin size={20} className="text-blue-600" />
+                      <span className="text-gray-700 dark:text-gray-300">{aboutMe?.location ?? '서울, 대한민국'}</span>
+                    </div>
+                  )}
+                  { (aboutMe?.show_birth_year ?? true) && aboutMe?.birth_year && (
+                    <div className="flex items-center gap-3">
+                      <Calendar size={20} className="text-blue-600" />
+                      <span className="text-gray-700 dark:text-gray-300">{aboutMe.birth_year}년생</span>
+                    </div>
+                  )}
                 </div>
 
-                <button className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                  <Download size={20} />
-                  이력서 다운로드
-                </button>
+                { (aboutMe?.show_resume_button ?? false) && (
+                  aboutMe?.resume_url ? (
+                    <a
+                      href={aboutMe.resume_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full mt-auto bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Download size={20} />
+                      {aboutMe?.resume_label ?? '이력서 다운로드'}
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full mt-auto bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-300 py-3 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
+                      aria-disabled="true"
+                      title="이력서 파일 준비 중"
+                    >
+                      <Download size={20} />
+                      {aboutMe?.resume_label ?? '이력서 다운로드'}
+                    </button>
+                  )
+                )}
               </div>
             </motion.div>
 
@@ -123,100 +253,44 @@ const About = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="lg:col-span-2"
+              className="lg:col-span-2 h-full"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 h-full flex flex-col">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  자기소개
+                  {aboutMe?.intro_title ?? '자기소개'}
                 </h3>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="space-y-4 text-gray-600 dark:text-gray-300">
-                    <p>
-                      안녕하세요! 저는 3년차 풀스택 개발자입니다. React, TypeScript, Node.js를 주로 사용하며,
-                      사용자 경험을 중시하는 웹 애플리케이션을 개발하는 것을 좋아합니다.
-                    </p>
-                    <p>
-                      새로운 기술을 배우는 것을 즐기며, 깔끔하고 유지보수가 쉬운 코드를 작성하기 위해 노력합니다.
-                      팀워크를 중요시하며, 다른 개발자들과의 협업을 통해 더 나은 솔루션을 만들어가는 것을 좋아합니다.
-                    </p>
-                    <p>
-                      현재는 프론트엔드와 백엔드 모두를 다루는 풀스택 개발자로서, 
-                      전체적인 시스템을 이해하고 효율적인 솔루션을 제공하는 것을 목표로 하고 있습니다.
-                    </p>
+                    {aboutMe?.intro_content_html ? (
+                      <div
+                        className="prose dark:prose-invert max-w-none"
+                        dangerouslySetInnerHTML={{ __html: aboutMe.intro_content_html }}
+                      />
+                    ) : (
+                      <>
+                        <p>
+                          안녕하세요! 저는 3년차 풀스택 개발자입니다. React, TypeScript, Node.js를 주로 사용하며,
+                          사용자 경험을 중시하는 웹 애플리케이션을 개발하는 것을 좋아합니다.
+                        </p>
+                        <p>
+                          새로운 기술을 배우는 것을 즐기며, 깔끔하고 유지보수가 쉬운 코드를 작성하기 위해 노력합니다.
+                          팀워크를 중요시하며, 다른 개발자들과의 협업을 통해 더 나은 솔루션을 만들어가는 것을 좋아합니다.
+                        </p>
+                        <p>
+                          현재는 프론트엔드와 백엔드 모두를 다루는 풀스택 개발자로서, 
+                          전체적인 시스템을 이해하고 효율적인 솔루션을 제공하는 것을 목표로 하고 있습니다.
+                        </p>
+                      </>
+                    )}
                   </div>
                   <div className="flex justify-center">
                     <div className="relative w-64 h-64 rounded-lg overflow-hidden shadow-lg">
                       <ImageWithFallback 
                         defaultType="ABOUT_ME"
+                        src={aboutMe?.side_image_url ?? undefined}
                         alt="HJLEE About Me" 
                         className="w-full h-full object-cover"
                       />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Skills */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  기술 스택
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Frontend</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-300">React</span>
-                        <span className="text-blue-600">90%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '90%' }}></div>
-                      </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-300">TypeScript</span>
-                        <span className="text-blue-600">85%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div>
-                      </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-300">Tailwind CSS</span>
-                        <span className="text-blue-600">80%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '80%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Backend</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-300">Node.js</span>
-                        <span className="text-blue-600">85%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div>
-                      </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-300">PostgreSQL</span>
-                        <span className="text-blue-600">75%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-                      </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-300">Docker</span>
-                        <span className="text-blue-600">70%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '70%' }}></div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -225,8 +299,53 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
+
+      {/* Skills Section (독립 섹션) */}
+      {enabled.skills && (
+      <section id="skills-section" className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">기술 스택</h2>
+          </motion.div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Frontend</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">React</span><span className="text-blue-600">90%</span></div>
+                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '90%' }}></div></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">TypeScript</span><span className="text-blue-600">85%</span></div>
+                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Tailwind CSS</span><span className="text-blue-600">80%</span></div>
+                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '80%' }}></div></div>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Backend</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Node.js</span><span className="text-blue-600">85%</span></div>
+                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">PostgreSQL</span><span className="text-blue-600">75%</span></div>
+                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div></div>
+                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Docker</span><span className="text-blue-600">70%</span></div>
+                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '70%' }}></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      )}
 
       {/* Experience Section */}
+      {enabled.experience && (
       <section id="experience-section" className="py-20 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -280,8 +399,10 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Education Section */}
+      {enabled.education && (
       <section id="education-section" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -337,6 +458,7 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
     </div>
   )
 }

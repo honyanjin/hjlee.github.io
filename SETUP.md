@@ -72,7 +72,7 @@ npm run dev
 1. `/admin/blog`로 이동하여 로그인
 2. "새 포스트" 버튼 클릭
 3. 제목, 카테고리, 요약 입력
-4. 마크다운으로 내용 작성
+4. TinyMCE 리치 텍스트로 내용 작성(HTML 저장/렌더)
 5. 태그 설정 (쉼표로 구분)
 6. 대표 이미지 업로드 (선택사항)
 7. "즉시 발행" 체크하여 발행 또는 임시저장
@@ -103,36 +103,9 @@ npm run dev
 
 ## 🔧 고급 설정
 
-### 마크다운 스타일 커스터마이징
+### 본문 렌더링 스타일
 
-`src/pages/BlogPost.tsx`의 `ReactMarkdown` 컴포넌트에서 마크다운 렌더링을 커스터마이징할 수 있습니다:
-
-```tsx
-<ReactMarkdown
-  remarkPlugins={[remarkGfm]}
-  rehypePlugins={[rehypeHighlight]}
-  components={{
-    // 코드 블록 스타일링
-    code({ node, inline, className, children, ...props }) {
-      const match = /language-(\w+)/.exec(className || '')
-      return !inline && match ? (
-        <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
-          <code className={className} {...props}>
-            {children}
-          </code>
-        </pre>
-      ) : (
-        <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm" {...props}>
-          {children}
-        </code>
-      )
-    },
-    // 추가 커스터마이징...
-  }}
->
-  {post.content}
-</ReactMarkdown>
-```
+`src/pages/BlogPost.tsx`에서 TinyMCE 저장본(HTML)을 직접 렌더링합니다. 코드 블록 라인 복사 UX는 `.copy-line-icon` 이벤트 위임으로 동작합니다.
 
 ### 색상 테마 변경
 
@@ -172,7 +145,7 @@ module.exports = {
 
 ## 🚀 배포
 
-### Vercel 배포 (권장)
+### Vercel 배포 (선택)
 
 1. [Vercel](https://vercel.com)에 가입
 2. GitHub 저장소 연결
@@ -182,7 +155,14 @@ module.exports = {
    - `VITE_ADMIN_EMAIL`
 4. Deploy 클릭
 
-### Netlify 배포
+### Netlify 배포 (선택)
+### GitHub Pages 배포 (현재 사용)
+
+1. 환경 변수에서 `VITE_BASE_PATH`를 설정합니다(프로젝트 사이트의 경우 `/레포이름`).
+2. 다음 스크립트를 사용합니다:
+   - `npm run build`
+   - `npm run deploy`
+3. 라우터는 프로덕션에서 `basename`을 `VITE_BASE_PATH`로 자동 설정합니다.
 
 1. [Netlify](https://netlify.com)에 가입
 2. GitHub 저장소 연결

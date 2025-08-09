@@ -12,19 +12,20 @@ React 19, TypeScript, Tailwind CSS로 구축된 개인 포트폴리오 및 블�
 - 이미지 업로드 및 관리
 
 ### 블로그
-- 리치 텍스트 편집기(TinyMCE) 기반 작성, HTML 렌더링
-- 코드 하이라이팅
+- 리치 텍스트 편집기(TinyMCE) 기반 작성, HTML 저장 및 직접 렌더링
+- 코드 하이라이팅 + 줄 단위 복사 UX(아이콘 클릭)
 - 카테고리 분류
 - 댓글 시스템
 - 관리자 패널
 
 ### 관리자 기능
-- 포스트 작성/편집 (마크다운 에디터)
+- 포스트 작성/편집 (TinyMCE 리치 텍스트, HTML 저장/렌더)
 - 카테고리 관리
 - 프로젝트 관리
 - 이미지 업로드 (Supabase Storage)
 - 댓글 관리
 - 발행 상태 관리
+- 스토리지 관리(`/admin/storage`): 파일 목록/검색/업로드/이동·복사·이름 변경/URL 및 서명 URL 복사, 참조 자동 업데이트
 
 ## 🛠️ 기술 스택
 
@@ -133,6 +134,17 @@ CREATE TABLE comments (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 댓글 일일 제한 테이블(스팸/남용 방지)
+CREATE TABLE comment_limits (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  post_id UUID REFERENCES blog_posts(id) ON DELETE CASCADE,
+  daily_count INTEGER NOT NULL DEFAULT 0,
+  is_blocked BOOLEAN NOT NULL DEFAULT false,
+  blocked_until TIMESTAMP WITH TIME ZONE,
+  last_reset_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  UNIQUE(post_id)
+);
+
 -- 카테고리 테이블
 CREATE TABLE categories (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -231,6 +243,10 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+
+-- storage.objects 버킷 단위 RLS (예시): 공개 읽기, 관리자만 쓰기
+-- 버킷: blog-images, project-images
+-- 정책은 Supabase 대시보드에서 버킷별로 설정하세요.
 ```
 
 추가 권장: Authentication → Providers → Email에서 "Prevent leaked passwords" 활성화, MFA(TOTP/Passkeys) 옵션 활성화.
@@ -353,7 +369,7 @@ npm run deploy   # GitHub Pages 배포
 - [x] 이미지 업로드 시스템
 - [x] 관리자 패널 완성
 - [x] 폼 검증 시스템 (React Hook Form + Zod)
- - [x] DB 보안 보강: `project_categories` RLS(공개 읽기/관리자 쓰기), 함수 `search_path` 고정
+- [x] DB 보안 보강: `project_categories` RLS(공개 읽기/관리자 쓰기), 함수 `search_path` 고정
 
 ### 🔄 진행 중인 작업
 - 성능 최적화

@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminLayout from './components/AdminLayout'
 import Home from './pages/Home'
 import About from './pages/About'
 import Projects from './pages/Projects'
@@ -23,6 +24,11 @@ const AdminProjectCategories = lazy(() => import('./pages/AdminProjectCategories
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AdminComments = lazy(() => import('./pages/AdminComments'))
   const AdminStorage = lazy(() => import('./pages/AdminStorage'))
+const AdminPagesHome = lazy(() => import('./pages/AdminPagesHome'))
+const AdminPagesAbout = lazy(() => import('./pages/AdminPagesAbout'))
+const AdminPagesProjects = lazy(() => import('./pages/AdminPagesProjects'))
+const AdminPagesBlog = lazy(() => import('./pages/AdminPagesBlog'))
+const AdminPagesContact = lazy(() => import('./pages/AdminPagesContact'))
 
 function App() {
   return (
@@ -51,7 +57,64 @@ function App() {
               path="/admin" 
               element={
                 <ProtectedRoute requireAdmin={true}>
-                  <AdminDashboard />
+                  <AdminLayout>
+                    <AdminDashboard />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-pages-home-route" 
+              path="/admin/pages/home" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout>
+                    <AdminPagesHome />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-pages-about-route" 
+              path="/admin/pages/about" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout>
+                    <AdminPagesAbout />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-pages-projects-route" 
+              path="/admin/pages/projects" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout>
+                    <AdminPagesProjects />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-pages-blog-route" 
+              path="/admin/pages/blog" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout>
+                    <AdminPagesBlog />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-pages-contact-route" 
+              path="/admin/pages/contact" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout>
+                    <AdminPagesContact />
+                  </AdminLayout>
                 </ProtectedRoute>
               } 
             />

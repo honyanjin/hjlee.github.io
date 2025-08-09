@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import ImageLibraryModal from '../components/ImageLibraryModal'
 
-type BucketName = 'blog-images' | 'project-images'
+type BucketName = 'blog-images' | 'project-images' | 'admin-pic'
 
 interface OpenOptions {
   bucket: BucketName

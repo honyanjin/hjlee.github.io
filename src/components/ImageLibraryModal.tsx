@@ -6,7 +6,7 @@ interface ImageLibraryModalProps {
   isOpen: boolean
   onClose: () => void
   onSelect: (url: string) => void
-  bucket: 'blog-images' | 'project-images'
+  bucket: 'blog-images' | 'project-images' | 'admin-pic'
 }
 
 const PAGE_SIZE = 50
