@@ -224,6 +224,19 @@ const AdminDashboard = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/admin/storage')}
+              className="flex items-center gap-3 p-6 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-lg"
+            >
+              <Image size={24} />
+              <div className="text-left">
+                <div className="font-semibold">스토리지 관리</div>
+                <div className="text-sm opacity-90">버킷 파일 관리</div>
+              </div>
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/admin/projects')}
               className="flex items-center gap-3 p-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
             >

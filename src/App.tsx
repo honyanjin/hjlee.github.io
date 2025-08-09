@@ -22,6 +22,7 @@ const AdminProjectEdit = lazy(() => import('./pages/AdminProjectEdit'))
 const AdminProjectCategories = lazy(() => import('./pages/AdminProjectCategories'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AdminComments = lazy(() => import('./pages/AdminComments'))
+  const AdminStorage = lazy(() => import('./pages/AdminStorage'))
 
 function App() {
   return (
@@ -141,6 +142,15 @@ function App() {
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <AdminComments />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-storage-route" 
+              path="/admin/storage" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminStorage />
                 </ProtectedRoute>
               } 
             />
