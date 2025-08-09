@@ -365,13 +365,27 @@ const Blog = () => {
               <div className="grid lg:grid-cols-2">
                 <div className="relative overflow-hidden h-48 sm:h-56 lg:h-auto">
                   {featuredPost.image_url ? (
-                    <img 
-                      id="featured-post-image"
-                      {...getPostImageProps(featuredPost)}
-                      alt={featuredPost.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-                      onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
-                    />
+                    <>
+                      <img 
+                        id="featured-post-image"
+                        {...getPostImageProps(featuredPost)}
+                        alt={featuredPost.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
+                      />
+                      {featuredPost.image_caption_text && (
+                        <div className="pointer-events-none absolute inset-0 flex items-end justify-center">
+                          <div className="w-full p-3 sm:p-4 bg-gradient-to-t from-black/60 to-transparent text-center">
+                            <span
+                              className="font-semibold drop-shadow-md"
+                              style={{ color: featuredPost.image_caption_color || '#ffffff', fontSize: `${featuredPost.image_caption_size || 16}px`, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
+                            >
+                              {featuredPost.image_caption_text}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div 
                       id="featured-post-image"
@@ -506,13 +520,27 @@ const Blog = () => {
                 >
                   <div className="relative overflow-hidden">
                     {post.image_url ? (
-                      <img 
-                        id={`blog-post-image-${post.id}`}
-                        {...getPostImageProps(post)}
-                        alt={post.title}
-                        className="w-full h-40 sm:h-48 object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-                        onClick={() => navigate(`/blog/${post.post_no}`)}
-                      />
+                      <>
+                        <img 
+                          id={`blog-post-image-${post.id}`}
+                          {...getPostImageProps(post)}
+                          alt={post.title}
+                          className="w-full h-40 sm:h-48 object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                          onClick={() => navigate(`/blog/${post.post_no}`)}
+                        />
+                        {post.image_caption_text && (
+                          <div className="pointer-events-none absolute inset-0 flex items-end justify-center">
+                            <div className="w-full p-2 sm:p-3 bg-gradient-to-t from-black/60 to-transparent text-center">
+                              <span
+                                className="font-semibold drop-shadow-md"
+                                style={{ color: post.image_caption_color || '#ffffff', fontSize: `${post.image_caption_size || 14}px`, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
+                              >
+                                {post.image_caption_text}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div 
                         id={`blog-post-image-${post.id}`}

@@ -301,14 +301,28 @@ const BlogPost = () => {
             transition={{ duration: 0.8 }}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
           >
-            {/* Featured Image - 반응형 개선 */}
+            {/* Featured Image - 반응형 개선 + 캡션 오버레이 */}
             <div className="relative h-48 sm:h-64 lg:h-96 overflow-hidden">
               {post.image_url ? (
-                <img 
-                  src={post.image_url}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  <img 
+                    src={post.image_url}
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {post.image_caption_text && (
+                    <div className="pointer-events-none absolute inset-0 flex items-end justify-center">
+                      <div className="w-full p-4 sm:p-5 bg-gradient-to-t from-black/60 to-transparent text-center">
+                        <span
+                          className="font-semibold drop-shadow-md"
+                          style={{ color: post.image_caption_color || '#ffffff', fontSize: `${post.image_caption_size || 18}px`, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
+                        >
+                          {post.image_caption_text}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div 
                   className="w-full h-full flex items-center justify-center"

@@ -55,6 +55,11 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
   const [isPublishSettingsCollapsed, setIsPublishSettingsCollapsed] = useState(true)
   const [redirectAfterSave, setRedirectAfterSave] = useState<boolean>(true)
   const [previewDraftInNewTab, setPreviewDraftInNewTab] = useState<boolean>(false)
+  // 대표이미지 설명 오버레이 상태 (미리보기용)
+  const [showHeroCaption, setShowHeroCaption] = useState<boolean>(false)
+  const [heroCaptionText, setHeroCaptionText] = useState<string>('')
+  const [heroCaptionSize, setHeroCaptionSize] = useState<number>(18)
+  const [heroCaptionColor, setHeroCaptionColor] = useState<string>('#ffffff')
   
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -145,6 +150,13 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
       setValue('is_published', data.is_published)
       setImageUrl(data.image_url || '')
 
+      // 캡션 편집 초기값 반영
+      const hasCaption = !!(data.image_caption_text)
+      setShowHeroCaption(hasCaption)
+      setHeroCaptionText(data.image_caption_text || '')
+      setHeroCaptionSize(typeof data.image_caption_size === 'number' ? data.image_caption_size : 18)
+      setHeroCaptionColor(data.image_caption_color || '#ffffff')
+
     } catch (err: any) {
       setError('포스트를 불러오는데 실패했습니다.')
       console.error('Error fetching post:', err)
@@ -184,6 +196,9 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         author: user?.email || 'Unknown',
         tags,
         image_url: imageUrl,
+        image_caption_text: showHeroCaption ? heroCaptionText : null,
+        image_caption_size: showHeroCaption ? heroCaptionSize : null,
+        image_caption_color: showHeroCaption ? heroCaptionColor : null,
         slug: generateSlug(data.title),
         is_published: data.is_published,
         published_at: newPublishedAt,
@@ -266,6 +281,9 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
         author: user?.email || 'Unknown',
         tags,
         image_url: imageUrl,
+        image_caption_text: showHeroCaption ? heroCaptionText : null,
+        image_caption_size: showHeroCaption ? heroCaptionSize : null,
+        image_caption_color: showHeroCaption ? heroCaptionColor : null,
         slug: generateSlug(formData.title),
         is_published: false,
         published_at: draftPublishedAt,
@@ -561,11 +579,63 @@ const AdminBlogForm: React.FC<AdminBlogFormProps> = ({ mode }) => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       대표 이미지
                     </label>
-                    <div onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}>
-                      <ImageUpload
-                        onImageUpload={setImageUrl}
-                        currentImage={imageUrl}
-                      />
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            checked={showHeroCaption}
+                            onChange={(e) => setShowHeroCaption(e.target.checked)}
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">대표이미지 설명</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={heroCaptionText}
+                          onChange={(e) => setHeroCaptionText(e.target.value)}
+                          placeholder="이미지 위 오버레이 텍스트"
+                          className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                          disabled={!showHeroCaption}
+                        />
+                        <input
+                          type="number"
+                          min={10}
+                          max={96}
+                          value={heroCaptionSize}
+                          onChange={(e) => setHeroCaptionSize(Number(e.target.value) || 18)}
+                          title="텍스트 크기(px)"
+                          className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                          disabled={!showHeroCaption}
+                        />
+                        <input
+                          type="color"
+                          value={heroCaptionColor}
+                          onChange={(e) => setHeroCaptionColor(e.target.value)}
+                          title="텍스트 색상"
+                          className="h-10 w-10 rounded-md border border-gray-300 dark:border-gray-600"
+                          disabled={!showHeroCaption}
+                        />
+                      </div>
+
+                      <div className="relative" onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}>
+                        <ImageUpload
+                          onImageUpload={setImageUrl}
+                          currentImage={imageUrl}
+                        />
+                        {imageUrl && showHeroCaption && heroCaptionText && (
+                          <div className="pointer-events-none absolute inset-0 flex items-end justify-center">
+                            <div className="w-full p-4 sm:p-5 bg-gradient-to-t from-black/60 to-transparent text-center">
+                              <span
+                                className="font-semibold drop-shadow-md"
+                                style={{ color: heroCaptionColor, fontSize: `${heroCaptionSize}px`, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
+                              >
+                                {heroCaptionText}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
