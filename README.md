@@ -12,8 +12,8 @@ React 19, TypeScript, Tailwind CSS로 구축된 개인 포트폴리오 및 블�
 - 이미지 업로드 및 관리
 
 ### 블로그
-- 마크다운 지원 (React Markdown)
-- 코드 하이라이팅 (Rehype Highlight)
+- 리치 텍스트 편집기(TinyMCE) 기반 작성, HTML 렌더링
+- 코드 하이라이팅
 - 카테고리 분류
 - 댓글 시스템
 - 관리자 패널
@@ -47,10 +47,10 @@ React 19, TypeScript, Tailwind CSS로 구축된 개인 포트폴리오 및 블�
 - **Zod**: TypeScript 기반 스키마 검증
 - **@hookform/resolvers**: 폼 리졸버 통합
 
-### Markdown & Content
-- **React Markdown**: 마크다운 렌더링
-- **Remark GFM**: GitHub Flavored Markdown 지원
-- **Rehype Highlight**: 코드 하이라이팅
+### Editor & Content
+- **TinyMCE**: 리치 텍스트 편집기 (관리자 작성)
+- **HTML 렌더링**: 본문은 HTML로 렌더링
+- **코드 하이라이팅**
 
 ### Build & Development
 - **Vite**: 빠른 개발 서버 및 빌드 도구
@@ -99,6 +99,7 @@ Supabase SQL Editor에서 다음 테이블들을 생성하세요:
 -- 블로그 포스트 테이블
 CREATE TABLE blog_posts (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  post_no INTEGER GENERATED ALWAYS AS IDENTITY UNIQUE,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   excerpt TEXT,
@@ -179,6 +180,52 @@ CREATE TABLE projects (
 1. Authentication > Users에서 새 사용자를 생성하세요
 2. 생성한 이메일을 `VITE_ADMIN_EMAIL`에 설정하세요
 
+#### 4.5 보안 설정 (권장)
+다음 SQL로 공개 테이블 RLS와 함수 보안을 적용하세요:
+
+```sql
+-- 프로젝트 카테고리: 공개 읽기, 관리자만 쓰기
+ALTER TABLE public.project_categories ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS project_categories_public_read ON public.project_categories;
+CREATE POLICY project_categories_public_read
+ON public.project_categories
+FOR SELECT
+USING (true);
+
+DROP POLICY IF EXISTS project_categories_admin_all ON public.project_categories;
+CREATE POLICY project_categories_admin_all
+ON public.project_categories
+FOR ALL
+USING ((auth.jwt() ->> 'email') = current_setting('app.admin_email', true))
+WITH CHECK ((auth.jwt() ->> 'email') = current_setting('app.admin_email', true));
+
+-- updated_at 트리거 함수들: search_path 고정 및 내장함수 완전 수식
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = pg_catalog, public
+AS $$
+BEGIN
+  NEW.updated_at := pg_catalog.now();
+  RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.update_projects_updated_at()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = pg_catalog, public
+AS $$
+BEGIN
+  NEW.updated_at := pg_catalog.now();
+  RETURN NEW;
+END;
+$$;
+```
+
+추가 권장: Authentication → Providers → Email에서 "Prevent leaked passwords" 활성화, MFA(TOTP/Passkeys) 옵션 활성화.
+
 ### 5. 개발 서버 실행
 ```bash
 npm run dev
@@ -242,7 +289,7 @@ src/
 ### 블로그 포스트 작성
 1. `/admin/blog`로 이동하여 로그인
 2. "새 포스트" 버튼 클릭
-3. 마크다운 형식으로 내용 작성
+3. TinyMCE 에디터로 내용 작성(HTML 저장/렌더)
 4. 카테고리 및 태그 설정
 5. 발행 또는 임시저장
 
@@ -263,8 +310,8 @@ src/
 ### 컴포넌트 스타일
 각 컴포넌트의 CSS 클래스를 수정하여 디자인을 변경할 수 있습니다.
 
-### 마크다운 스타일
-`BlogPost.tsx`의 `ReactMarkdown` 컴포넌트 설정을 수정하여 마크다운 렌더링을 커스터마이징할 수 있습니다.
+### 본문 렌더링 스타일
+`BlogPost.tsx`의 HTML 렌더링 스타일(코드 하이라이팅 포함)을 필요에 맞게 조정할 수 있습니다.
 
 ## 🚀 배포
 
@@ -282,19 +329,24 @@ npm run deploy   # GitHub Pages 배포
 
 ## 📊 현재 상태
 
-### ✅ 완료된 기능 (90%)
+### ✅ 완료된 기능 (92%)
 - [x] React 19 업그레이드
 - [x] 반응형 디자인 완성
 - [x] 다크모드 구현
-- [x] 블로그 시스템 (마크다운, 댓글)
+- [x] 블로그 시스템 (TinyMCE 리치 텍스트, 댓글)
 - [x] 이미지 업로드 시스템
 - [x] 관리자 패널 완성
 - [x] 폼 검증 시스템 (React Hook Form + Zod)
+ - [x] DB 보안 보강: `project_categories` RLS(공개 읽기/관리자 쓰기), 함수 `search_path` 고정
 
 ### 🔄 진행 중인 작업
 - 성능 최적화
 - 접근성 개선
 - SEO 최적화
+
+### 🔐 보안 보류 과제
+- Leaked Password Protection 활성화(HIBP)
+- MFA 옵션 확장(TOTP + WebAuthn/Passkeys) 및 로그인/가입 UI 반영
 
 ## 🐛 알려진 이슈
 
