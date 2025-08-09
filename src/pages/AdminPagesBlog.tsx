@@ -5,7 +5,7 @@ const AdminPagesBlog = () => {
     <div className="w-full">
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Breadcrumb items={[{ label: '페이지 관리', href: '/admin/pages/blog' }, { label: 'Blog' }]} />
+          <Breadcrumb items={[{ label: '페이지 관리', path: '/admin/pages/blog' }, { label: 'Blog' }]} />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Blog 페이지 관리</h1>
         </div>
       </header>
