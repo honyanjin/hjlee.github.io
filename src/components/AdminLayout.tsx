@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { ChevronDown, ChevronRight, LayoutDashboard, FileCog } from 'lucide-react'
+import { ChevronDown, ChevronRight, LayoutDashboard, FileCog, Mail } from 'lucide-react'
 
 interface AdminLayoutProps {
   children: ReactNode
@@ -109,6 +109,19 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               </Link>
             </div>
           )}
+
+          {/* Contact Messages */}
+          <Link
+            to="/admin/messages"
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors mt-3 ${
+              isActive('/admin/messages')
+                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Mail size={18} />
+            <span>Contact 메시지</span>
+          </Link>
         </nav>
       </aside>
 

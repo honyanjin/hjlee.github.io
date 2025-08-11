@@ -29,6 +29,7 @@ const AdminPagesAbout = lazy(() => import('./pages/AdminPagesAbout'))
 const AdminPagesProjects = lazy(() => import('./pages/AdminPagesProjects'))
 const AdminPagesBlog = lazy(() => import('./pages/AdminPagesBlog'))
 const AdminPagesContact = lazy(() => import('./pages/AdminPagesContact'))
+const AdminMessages = lazy(() => import('./pages/AdminMessages'))
 
 function App() {
   return (
@@ -214,6 +215,17 @@ function App() {
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <AdminStorage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-messages-route" 
+              path="/admin/messages" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout>
+                    <AdminMessages />
+                  </AdminLayout>
                 </ProtectedRoute>
               } 
             />

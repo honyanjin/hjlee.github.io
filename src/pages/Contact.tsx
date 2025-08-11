@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter } from 'lucide-react'
 import { useForm } from 'react-hook-form'
@@ -7,6 +7,7 @@ import { z } from 'zod'
 import Navbar from '../components/Navbar'
 import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
+import { supabase } from '../lib/supabase'
 
 const contactSchema = z.object({
   name: z.string().min(2, '이름은 2글자 이상이어야 합니다'),
@@ -17,9 +18,57 @@ const contactSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactSchema>
 
+type ContactSettingsT = {
+  id: string
+  show_hero: boolean
+  hero_title: string | null
+  hero_description: string | null
+  hero_bg_image_url: string | null
+  hero_cta_label: string | null
+  hero_cta_url: string | null
+  show_form: boolean
+  show_info: boolean
+  show_socials: boolean
+  show_hours: boolean
+  success_message: string | null
+  updated_at: string
+}
+
+type ContactInfoT = {
+  id: string
+  type: string
+  label: string | null
+  value: string | null
+  link: string | null
+  icon: string | null
+  display_order: number
+}
+
+type SocialT = {
+  id: string
+  name: string
+  url: string
+  icon: any
+  color: string | null
+  display_order: number
+}
+
+type HourT = {
+  id: string
+  label: string
+  time: string
+  note: string | null
+  display_order: number
+}
+
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [settings, setSettings] = useState<ContactSettingsT | null>(null)
+  const [infos, setInfos] = useState<ContactInfoT[]>([])
+  const [socials, setSocials] = useState<SocialT[]>([])
+  const [hours, setHours] = useState<HourT[]>([])
+  const [loading, setLoading] = useState(true)
 
   const {
     register,
@@ -30,70 +79,94 @@ const Contact = () => {
     resolver: zodResolver(contactSchema)
   })
 
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true)
+        const { data: s } = await supabase
+          .from('contact_page_settings')
+          .select('*')
+          .eq('id', 'default')
+          .maybeSingle()
+        if (s) setSettings(s as ContactSettingsT)
+
+        const { data: infosData } = await supabase
+          .from('contact_info')
+          .select('*')
+          .order('display_order', { ascending: true })
+          .order('created_at', { ascending: true })
+        setInfos((infosData as any) ?? [])
+
+        const { data: socialsData } = await supabase
+          .from('contact_socials')
+          .select('*')
+          .order('display_order', { ascending: true })
+          .order('created_at', { ascending: true })
+        setSocials((socialsData as any) ?? [])
+
+        const { data: hoursData } = await supabase
+          .from('contact_hours')
+          .select('*')
+          .order('display_order', { ascending: true })
+          .order('created_at', { ascending: true })
+        setHours((hoursData as any) ?? [])
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const enabled = useMemo(() => ({
+    hero: settings?.show_hero ?? true,
+    form: settings?.show_form ?? true,
+    info: settings?.show_info ?? true,
+    socials: settings?.show_socials ?? true,
+    hours: settings?.show_hours ?? true,
+  }), [settings])
+
   const onSubmit = async (data: ContactFormData) => {
-    setIsSubmitting(true)
-    // 실제 폼 제출 로직을 여기에 구현
-    console.log('Form data:', data)
-    
-    // 시뮬레이션을 위한 지연
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setIsSubmitting(false)
-    setSubmitSuccess(true)
-    reset()
-    
-    // 3초 후 성공 메시지 숨기기
-    setTimeout(() => setSubmitSuccess(false), 3000)
+    try {
+      setIsSubmitting(true)
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([{ name: data.name, email: data.email, subject: data.subject, message: data.message }])
+      if (error) throw error
+      setSubmitSuccess(true)
+      reset()
+      setTimeout(() => setSubmitSuccess(false), 3000)
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Submit failed:', e)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const contactInfo = [
-    {
-      icon: Mail,
-      title: '이메일',
-      value: 'email@example.com',
-      link: 'mailto:email@example.com'
-    },
-    {
-      icon: Phone,
-      title: '전화번호',
-      value: '+82 10-1234-5678',
-      link: 'tel:+821012345678'
-    },
-    {
-      icon: MapPin,
-      title: '위치',
-      value: '서울, 대한민국',
-      link: '#'
+  const contactInfo = (infos.length ? infos : []).map((i) => {
+    const map = { Mail, Phone, MapPin } as any
+    const iconName = (i.icon || i.type || 'Mail') as keyof typeof map
+    const IconComp = map[iconName] || Mail
+    return {
+      icon: IconComp,
+      title: i.label || i.type,
+      value: i.value || '',
+      link: i.link || '#'
     }
-  ]
+  })
 
-  const socialLinks = [
-    {
-      name: 'GitHub',
-      icon: Github,
-      url: 'https://github.com',
-      color: 'hover:bg-gray-900'
-    },
-    {
-      name: 'LinkedIn',
-      icon: Linkedin,
-      url: 'https://linkedin.com',
-      color: 'hover:bg-blue-700'
-    },
-    {
-      name: 'Twitter',
-      icon: Twitter,
-      url: 'https://twitter.com',
-      color: 'hover:bg-blue-500'
-    }
-  ]
+  const socialLinks = (socials.length ? socials : []).map((s) => {
+    const map = { Github, Linkedin, Twitter } as any
+    const IconComp = map[s.icon as any] || Github
+    return { name: s.name, icon: IconComp, url: s.url, color: s.color || '' }
+  })
 
   return (
     <div id="contact-page" className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <DotNavigation
         sections={[
-          'contact-hero',
-          'contact-form-section',
+          ...(enabled.hero ? ['contact-hero'] as const : []),
+          ...(enabled.form ? ['contact-form-section'] as const : []),
         ]}
       />
       <SEO 
@@ -105,7 +178,8 @@ const Contact = () => {
       <Navbar />
       
       {/* Hero Section - 반응형 개선 */}
-      <section id="contact-hero" className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-3 sm:px-4 lg:px-6">
+      {enabled.hero && (
+      <section id="contact-hero" className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-3 sm:px-4 lg:px-6" style={settings?.hero_bg_image_url ? { backgroundImage: `url(${settings.hero_bg_image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             id="contact-hero-content"
@@ -115,15 +189,22 @@ const Contact = () => {
             className="text-center mb-8 sm:mb-12 lg:mb-16"
           >
             <h1 id="contact-hero-title" className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-              Contact Me
+              {settings?.hero_title ?? 'Contact Me'}
             </h1>
             <p id="contact-hero-description" className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-4">
-              프로젝트나 협업에 관심이 있으시다면 언제든 연락주세요! 
-              새로운 아이디어나 기술에 대한 이야기를 나누고 싶습니다.
+              {settings?.hero_description ?? '프로젝트나 협업에 관심이 있으시다면 언제든 연락주세요! 새로운 아이디어나 기술에 대한 이야기를 나누고 싶습니다.'}
             </p>
+            {!!(settings?.hero_cta_label && settings?.hero_cta_url) && (
+              <div className="mt-6">
+                <a href={settings.hero_cta_url!} className="inline-flex items-center px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  {settings.hero_cta_label}
+                </a>
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
+      )}
 
       {/* Contact Form & Info - 반응형 개선 */}
       <section id="contact-form-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6">
@@ -292,6 +373,7 @@ const Contact = () => {
               </div>
 
               {/* Social Links - 반응형 개선 */}
+              {enabled.socials && (
               <div id="social-links-card" className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
                 <h2 id="social-links-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
                   소셜 미디어
@@ -314,30 +396,36 @@ const Contact = () => {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Availability - 반응형 개선 */}
+              {enabled.hours && (
               <div id="availability-card" className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
                 <h2 id="availability-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
                   업무 가능 시간
                 </h2>
                 <div id="availability-list" className="space-y-3 sm:space-y-4">
-                  <div id="weekday-hours" className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
-                    <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300">월요일 - 금요일</span>
-                    <span className="text-sm sm:text-base text-gray-900 dark:text-white font-semibold">09:00 - 18:00</span>
-                  </div>
-                  <div id="saturday-hours" className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
-                    <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300">토요일</span>
-                    <span className="text-sm sm:text-base text-gray-900 dark:text-white font-semibold">10:00 - 16:00</span>
-                  </div>
-                  <div id="sunday-hours" className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
-                    <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300">일요일</span>
-                    <span className="text-sm sm:text-base text-red-600 font-semibold">휴무</span>
-                  </div>
+                  {(hours.length ? hours : [
+                    { id: 'default-1', label: '월요일 - 금요일', time: '09:00 - 18:00', note: null, display_order: 0 },
+                    { id: 'default-2', label: '토요일', time: '10:00 - 16:00', note: null, display_order: 1 },
+                    { id: 'default-3', label: '일요일', time: '휴무', note: null, display_order: 2 },
+                  ]).map((h, i) => (
+                    <div key={h.id ?? i} className="flex flex-col gap-1">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
+                        <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300">{h.label}</span>
+                        <span className="text-sm sm:text-base text-gray-900 dark:text-white font-semibold">{h.time}</span>
+                      </div>
+                      {h.note && (
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{h.note}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
                 <p id="availability-note" className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   * 긴급한 프로젝트나 협업 문의는 언제든 연락주세요
                 </p>
               </div>
+              )}
             </motion.div>
           </div>
         </div>
