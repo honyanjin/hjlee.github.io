@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Download, Mail, MapPin, Calendar, Briefcase, Phone } from 'lucide-react'
+import { Download, Mail, MapPin, Calendar, Briefcase, Phone, Code } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
@@ -32,6 +32,7 @@ type AboutMeSettingsT = {
   show_resume_button: boolean
   resume_url: string | null
   resume_label: string | null
+  hero_subtitle?: string | null
   intro_title: string | null
   intro_content_html: string | null
   profile_image_url: string | null
@@ -39,10 +40,22 @@ type AboutMeSettingsT = {
   updated_at: string
 }
 
+type SkillT = {
+  id: string
+  category: string
+  skill_name: string
+  proficiency: number
+  display_order: number
+  category_order?: number
+  created_at: string
+  updated_at: string
+}
+
 const About = () => {
   const [settings, setSettings] = useState<AboutPageSettingsT | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [aboutMe, setAboutMe] = useState<AboutMeSettingsT | null>(null)
+  const [skills, setSkills] = useState<SkillT[]>([])
 
   const formatPhone = (raw?: string | null): string => {
     if (!raw) return ''
@@ -75,6 +88,18 @@ const About = () => {
           // 무시하고 기본값 유지
         } else {
           setAboutMe(aboutData ?? null)
+        }
+
+        // 기술 스택 데이터 로드
+        const { data: skillsData, error: skillsErr } = await supabase
+          .from('about_page_skills')
+          .select('*')
+          .order('category', { ascending: true })
+          .order('category_order', { ascending: true })
+        if (skillsErr) {
+          // 무시하고 빈 배열 유지
+        } else {
+          setSkills(skillsData ?? [])
         }
       } catch (err) {
         // 설정이 없으면 null 유지 (모두 표시 기본값)
@@ -155,8 +180,12 @@ const About = () => {
               About Me
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다.
-              깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다.
+              {aboutMe?.hero_subtitle ?? (
+                <>
+                  안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다.
+                  깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다.
+                </>
+              )}
             </p>
           </motion.div>
 
@@ -315,30 +344,65 @@ const About = () => {
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">기술 스택</h2>
           </motion.div>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Frontend</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">React</span><span className="text-blue-600">90%</span></div>
-                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '90%' }}></div></div>
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">TypeScript</span><span className="text-blue-600">85%</span></div>
-                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div></div>
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Tailwind CSS</span><span className="text-blue-600">80%</span></div>
-                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '80%' }}></div></div>
-                </div>
+            {skills.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <Code size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+                <p>아직 등록된 기술 스택이 없습니다.</p>
+                <p className="text-sm mt-2">관리자 페이지에서 기술 스택을 추가해주세요.</p>
               </div>
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Backend</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Node.js</span><span className="text-blue-600">85%</span></div>
-                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div></div>
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">PostgreSQL</span><span className="text-blue-600">75%</span></div>
-                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div></div>
-                  <div className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Docker</span><span className="text-blue-600">70%</span></div>
-                  <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '70%' }}></div></div>
-                </div>
-              </div>
-            </div>
+            ) : (
+              (() => {
+                // 카테고리별로 그룹화
+                const groupedSkills = skills.reduce((acc, skill) => {
+                  if (!acc[skill.category]) {
+                    acc[skill.category] = []
+                  }
+                  acc[skill.category].push(skill)
+                  return acc
+                }, {} as Record<string, SkillT[]>)
+
+                const categories = Object.keys(groupedSkills)
+                
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {categories.map((category) => (
+                      <motion.div
+                        key={category}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: categories.indexOf(category) * 0.1 }}
+                        viewport={{ once: true }}
+                        className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+                      >
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+                          {category}
+                        </h4>
+                        <div className="space-y-3">
+                          {groupedSkills[category].map((skill) => (
+                            <div key={skill.id}>
+                              <div className="flex justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                  {skill.skill_name}
+                                </span>
+                                <span className="text-sm text-blue-600 font-semibold">
+                                  {skill.proficiency}%
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
+                                <div 
+                                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" 
+                                  style={{ width: `${skill.proficiency}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )
+              })()
+            )}
           </div>
         </div>
       </section>
