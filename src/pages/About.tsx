@@ -51,11 +51,35 @@ type SkillT = {
   updated_at: string
 }
 
+type ExperienceT = {
+  id: string
+  title: string
+  period: string
+  company: string
+  description: string | null
+  display_order: number
+  created_at: string
+  updated_at: string
+}
+
+type EducationT = {
+  id: string
+  degree: string
+  period: string
+  school: string
+  description: string | null
+  display_order: number
+  created_at: string
+  updated_at: string
+}
+
 const About = () => {
   const [settings, setSettings] = useState<AboutPageSettingsT | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [aboutMe, setAboutMe] = useState<AboutMeSettingsT | null>(null)
   const [skills, setSkills] = useState<SkillT[]>([])
+  const [experiences, setExperiences] = useState<ExperienceT[]>([])
+  const [educations, setEducations] = useState<EducationT[]>([])
 
   const formatPhone = (raw?: string | null): string => {
     if (!raw) return ''
@@ -101,6 +125,26 @@ const About = () => {
         } else {
           setSkills(skillsData ?? [])
         }
+
+        // 경력 데이터 로드
+        const { data: expData, error: expErr } = await supabase
+          .from('about_page_experiences')
+          .select('*')
+          .order('display_order', { ascending: true })
+          .order('created_at', { ascending: true })
+        if (!expErr) {
+          setExperiences(expData ?? [])
+        }
+
+        // 학력 데이터 로드
+        const { data: eduData, error: eduErr } = await supabase
+          .from('about_page_educations')
+          .select('*')
+          .order('display_order', { ascending: true })
+          .order('created_at', { ascending: true })
+        if (!eduErr) {
+          setEducations(eduData ?? [])
+        }
       } catch (err) {
         // 설정이 없으면 null 유지 (모두 표시 기본값)
         setSettings(null)
@@ -118,35 +162,9 @@ const About = () => {
     education: settings?.show_education ?? true
   }), [settings])
 
-  const experiences = [
-    {
-      year: '2023 - 현재',
-      title: '풀스택 개발자',
-      company: 'Tech Company',
-      description: 'React, Node.js를 사용한 웹 애플리케이션 개발'
-    },
-    {
-      year: '2022 - 2023',
-      title: '프론트엔드 개발자',
-      company: 'Startup Inc',
-      description: 'TypeScript와 Vue.js를 활용한 사용자 인터페이스 개발'
-    },
-    {
-      year: '2021 - 2022',
-      title: '웹 개발자 인턴',
-      company: 'Digital Agency',
-      description: 'HTML, CSS, JavaScript를 사용한 반응형 웹사이트 제작'
-    }
-  ]
+  const experienceItems = experiences
 
-  const education = [
-    {
-      year: '2017 - 2021',
-      degree: '컴퓨터공학 학사',
-      school: '한국대학교',
-      description: '소프트웨어 공학 전공, 웹 개발 동아리 활동'
-    }
-  ]
+  const education = educations
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -428,7 +446,7 @@ const About = () => {
           </motion.div>
 
           <div className="space-y-8">
-            {experiences.map((exp, index) => (
+            {(experienceItems.length > 0 ? experienceItems : []).map((exp, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 50 }}
@@ -447,14 +465,14 @@ const About = () => {
                         {exp.title}
                       </h3>
                       <span className="text-sm text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full">
-                        {exp.year}
+                        {exp.period}
                       </span>
                     </div>
                     <p className="text-lg text-gray-600 dark:text-gray-300 mb-2">
                       {exp.company}
                     </p>
                     <p className="text-gray-600 dark:text-gray-400">
-                      {exp.description}
+                      {exp.description ?? ''}
                     </p>
                   </div>
                 </div>
@@ -506,14 +524,14 @@ const About = () => {
                         {edu.degree}
                       </h3>
                       <span className="text-sm text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full">
-                        {edu.year}
+                        {edu.period}
                       </span>
                     </div>
                     <p className="text-lg text-gray-600 dark:text-gray-300 mb-2">
                       {edu.school}
                     </p>
                     <p className="text-gray-600 dark:text-gray-400">
-                      {edu.description}
+                      {edu.description ?? ''}
                     </p>
                   </div>
                 </div>
