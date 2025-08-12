@@ -186,7 +186,11 @@ const About = () => {
       
       {/* Hero Section */}
       {enabled.about && (
-      <section id="about-hero" className="pt-32 pb-20 px-4">
+      <section
+        id="about-hero"
+        className="pt-32 pb-20 px-4"
+        style={(aboutMe as any)?.hero_bg_image_url ? { backgroundImage: `url(${(aboutMe as any).hero_bg_image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+      >
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -195,16 +199,24 @@ const About = () => {
             className="text-center mb-16"
           >
             <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              About Me
+              {(aboutMe as any)?.hero_title ?? 'About Me'}
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              {aboutMe?.hero_subtitle ?? (
-                <>
-                  안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다.
-                  깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다.
-                </>
-              )}
-            </p>
+            {(aboutMe as any)?.hero_description ? (
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                {(aboutMe as any).hero_description}
+              </p>
+            ) : (
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다. 깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다.
+              </p>
+            )}
+            {(aboutMe as any)?.hero_cta_label && (aboutMe as any)?.hero_cta_url && (
+              <div className="mt-6">
+                <a href={(aboutMe as any).hero_cta_url} className="inline-flex items-center px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  {(aboutMe as any).hero_cta_label}
+                </a>
+              </div>
+            )}
           </motion.div>
 
           {/* Profile Section */}

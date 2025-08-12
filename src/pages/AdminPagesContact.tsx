@@ -3,8 +3,10 @@ import Breadcrumb from '../components/Breadcrumb'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Save, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react'
+import { Save, ChevronDown, ChevronUp, Plus, Trash2, Mail, Phone, MapPin, Check } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import HeroSettings from '../components/HeroSettings'
 
 type ContactSettingsT = {
   id: string
@@ -55,6 +57,60 @@ type HourT = {
   updated_at: string
 }
 
+// Icon dropdown for Contact Info (Mail / Phone / MapPin)
+const ICON_MAP = { Mail, Phone, MapPin } as const
+type IconKey = keyof typeof ICON_MAP
+
+interface IconDropdownProps {
+  value?: string | null
+  onChange: (value: IconKey) => void
+}
+
+const IconDropdown: React.FC<IconDropdownProps> = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false)
+  const current: IconKey = (value && (value in ICON_MAP ? (value as IconKey) : 'Mail')) || 'Mail'
+  const CurrentIcon: LucideIcon = ICON_MAP[current]
+  const options = Object.keys(ICON_MAP) as IconKey[]
+
+  return (
+    <div className="relative inline-block text-left" tabIndex={0} onBlur={() => setOpen(false)}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-full inline-flex items-center justify-between gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+      >
+        <span className="inline-flex items-center gap-2">
+          <CurrentIcon size={16} className="text-blue-600 dark:text-blue-400" />
+          <span className="text-sm">{current}</span>
+        </span>
+        <ChevronDown size={16} className="text-gray-400" />
+      </button>
+      {open && (
+        <div className="absolute z-20 mt-1 w-40 origin-top-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
+          <div className="py-1">
+            {options.map((key) => {
+              const OptIcon: LucideIcon = ICON_MAP[key]
+              const selected = key === current
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => { onChange(key); setOpen(false) }}
+                  className={`w-full px-3 py-2 text-left inline-flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${selected ? 'bg-gray-50 dark:bg-gray-700/60' : ''}`}
+                >
+                  <OptIcon size={16} className="text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm text-gray-800 dark:text-gray-100">{key}</span>
+                  {selected && <Check size={14} className="ml-auto text-green-600" />}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const settingsSchema = z.object({
   show_hero: z.boolean(),
   hero_title: z.string().optional(),
@@ -99,7 +155,7 @@ const AdminPagesContact = () => {
   const [socials, setSocials] = useState<SocialT[]>([])
   const [hours, setHours] = useState<HourT[]>([])
 
-  const { register, handleSubmit, reset } = useForm<SettingsForm>({
+  const { register, handleSubmit, reset, setValue, watch } = useForm<SettingsForm>({
     resolver: zodResolver(settingsSchema),
     defaultValues: DEFAULT_SETTINGS,
   })
@@ -232,59 +288,72 @@ const AdminPagesContact = () => {
                 </div>
               </div>
               {settingsExpanded && (
-                <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <label className="flex items-center justify-between gap-4"><span className="text-sm text-gray-900 dark:text-white">Hero 표시</span><input type="checkbox" className="h-5 w-5" {...register('show_hero')} /></label>
-                  <label className="flex items-center justify-between gap-4"><span className="text-sm text-gray-900 dark:text-white">폼 표시</span><input type="checkbox" className="h-5 w-5" {...register('show_form')} /></label>
-                  <label className="flex items-center justify-between gap-4"><span className="text-sm text-gray-900 dark:text-white">연락처 표시</span><input type="checkbox" className="h-5 w-5" {...register('show_info')} /></label>
-                  <label className="flex items-center justify-between gap-4"><span className="text-sm text-gray-900 dark:text-white">소셜 링크 표시</span><input type="checkbox" className="h-5 w-5" {...register('show_socials')} /></label>
-                  <label className="flex items-center justify-between gap-4"><span className="text-sm text-gray-900 dark:text-white">업무 가능 시간 표시</span><input type="checkbox" className="h-5 w-5" {...register('show_hours')} /></label>
+                <div className="p-6 space-y-4">
+                  <label className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">Hero 표시</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">타이틀/설명/배경 이미지 영역</div>
+                    </div>
+                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" {...register('show_hero')} />
+                  </label>
+
+                  <label className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">폼 표시</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">문의 폼 제출 섹션</div>
+                    </div>
+                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" {...register('show_form')} />
+                  </label>
+
+                  <label className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">연락처 표시</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">연락처 카드 목록</div>
+                    </div>
+                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" {...register('show_info')} />
+                  </label>
+
+                  <label className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">소셜 링크 표시</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">소셜 아이콘/링크</div>
+                    </div>
+                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" {...register('show_socials')} />
+                  </label>
+
+                  <label className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">업무 가능 시간 표시</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">라벨/시간/비고 카드</div>
+                    </div>
+                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" {...register('show_hours')} />
+                  </label>
                 </div>
               )}
             </section>
 
-            {/* Hero 설정 */}
-            <section className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div
-                className="p-6 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                onClick={() => { const n = !heroExpanded; setHeroExpanded(n); localStorage.setItem('contactHeroExpanded', JSON.stringify(n)) }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Hero 설정</h2>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">타이틀/설명/배경 이미지/CTA 버튼을 설정합니다.</p>
-                  </div>
-                  <button type="button" className="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label={heroExpanded ? '접기' : '펼치기'}>
-                    {heroExpanded ? <ChevronUp size={20} className="text-gray-500 dark:text-gray-400" /> : <ChevronDown size={20} className="text-gray-500 dark:text-gray-400" />}
-                  </button>
-                </div>
-              </div>
-              {heroExpanded && (
-                <div className="p-6 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">타이틀</label>
-                      <input className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" {...register('hero_title')} />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">배경 이미지 URL</label>
-                      <input className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" {...register('hero_bg_image_url')} />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">설명</label>
-                      <textarea rows={3} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" {...register('hero_description')} />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">CTA 레이블</label>
-                      <input className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" {...register('hero_cta_label')} />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">CTA URL</label>
-                      <input className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" {...register('hero_cta_url')} />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </section>
+            {/* Hero 설정 (공통 컴포넌트) */}
+            <HeroSettings
+              sectionTitle="Hero 설정"
+              helperText="타이틀/설명/배경 이미지/CTA 버튼을 설정합니다."
+              expanded={heroExpanded}
+              onToggle={() => { const n = !heroExpanded; setHeroExpanded(n); localStorage.setItem('contactHeroExpanded', JSON.stringify(n)) }}
+              values={{
+                title: watch('hero_title') || '',
+                description: watch('hero_description') || '',
+                bgImageUrl: watch('hero_bg_image_url') || '',
+                ctaLabel: watch('hero_cta_label') || '',
+                ctaUrl: watch('hero_cta_url') || '',
+              }}
+              onValuesChange={(p) => {
+                if (p.title !== undefined) setValue('hero_title', p.title ?? '')
+                if (p.description !== undefined) setValue('hero_description', p.description ?? '')
+                if (p.bgImageUrl !== undefined) setValue('hero_bg_image_url', p.bgImageUrl ?? '')
+                if (p.ctaLabel !== undefined) setValue('hero_cta_label', p.ctaLabel ?? '')
+                if (p.ctaUrl !== undefined) setValue('hero_cta_url', p.ctaUrl ?? '')
+              }}
+              fields={{ title: true, description: true, bgImageUrl: true, cta: true, subtitle: false }}
+            />
 
             {/* 연락처 카드 */}
             <section className="bg-white dark:bg-gray-800 rounded-lg shadow">
@@ -315,7 +384,7 @@ const AdminPagesContact = () => {
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-56">label</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-56">value</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-64">link</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-40">icon</th>
+                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-40">icon</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-40">순서</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-40">작업</th>
                         </tr>
@@ -329,8 +398,8 @@ const AdminPagesContact = () => {
                                 value={item.type}
                                 onChange={(e)=>{
                                   const value = e.target.value
-                                  const iconMap: Record<string, string> = { email: 'Mail', phone: 'Phone', location: 'MapPin', custom: (item.icon ?? '') }
-                                  const autoIcon = value === 'custom' ? (item.icon ?? '') : (iconMap[value] || 'Mail')
+                                  const iconMap: Record<string, IconKey> = { email: 'Mail', phone: 'Phone', location: 'MapPin', custom: (item.icon as IconKey) || 'Mail' }
+                                  const autoIcon = value === 'custom' ? ((item.icon as IconKey) || 'Mail') : (iconMap[value as keyof typeof iconMap] || 'Mail')
                                   const updated = [...infos]
                                   updated[idx] = { ...item, type: value, icon: autoIcon }
                                   setInfos(updated)
@@ -347,7 +416,12 @@ const AdminPagesContact = () => {
                             <td className="px-3 py-2"><input value={item.label ?? ''} onChange={(e)=>{const u=[...infos]; u[idx]={...item,label:e.target.value}; setInfos(u)}} className="w-full px-3 py-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-800" placeholder="이메일"/></td>
                             <td className="px-3 py-2"><input value={item.value ?? ''} onChange={(e)=>{const u=[...infos]; u[idx]={...item,value:e.target.value}; setInfos(u)}} className="w-full px-3 py-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-800" placeholder="email@example.com"/></td>
                             <td className="px-3 py-2"><input value={item.link ?? ''} onChange={(e)=>{const u=[...infos]; u[idx]={...item,link:e.target.value}; setInfos(u)}} className="w-full px-3 py-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-800" placeholder="mailto:email@example.com"/></td>
-                            <td className="px-3 py-2"><input value={item.icon ?? ''} onChange={(e)=>{const u=[...infos]; u[idx]={...item,icon:e.target.value}; setInfos(u)}} className="w-full px-3 py-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-800" placeholder="Mail/Phone/MapPin... (타입에 따라 자동 선택)"/></td>
+                            <td className="px-3 py-2">
+                              <IconDropdown
+                                value={item.icon}
+                                onChange={(val)=>{const u=[...infos]; u[idx]={...item,icon:val}; setInfos(u)}}
+                              />
+                            </td>
                             <td className="px-3 py-2">
                               <div className="inline-flex gap-2">
                                 <button type="button" onClick={()=>{if(idx===0) return; const u=[...infos]; [u[idx-1],u[idx]]=[u[idx],u[idx-1]]; u.forEach((e,i)=>e.display_order=i); setInfos(u)}} className="px-2 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded">↑</button>

@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar'
 import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
 import { supabase } from '../lib/supabase'
+import { UI_LABELS } from '../lib/constants'
 
 const contactSchema = z.object({
   name: z.string().min(2, '이름은 2글자 이상이어야 합니다'),
@@ -125,13 +126,24 @@ const Contact = () => {
     hours: settings?.show_hours ?? true,
   }), [settings])
 
+  const showMainSection = useMemo(() => (
+    enabled.form || enabled.info || enabled.socials || enabled.hours
+  ), [enabled])
+
   const onSubmit = async (data: ContactFormData) => {
     try {
       setIsSubmitting(true)
-      const { error } = await supabase
-        .from('contact_messages')
-        .insert([{ name: data.name, email: data.email, subject: data.subject, message: data.message }])
-      if (error) throw error
+      // Call Edge Function for rate-limited submission
+      const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact-submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` },
+        body: JSON.stringify({ name: data.name, email: data.email, subject: data.subject, message: data.message })
+      })
+      if (!resp.ok) {
+        const payload = await resp.json().catch(() => ({} as any))
+        if (resp.status === 429) throw new Error('잠시 후 다시 시도해주세요. (요청이 너무 많습니다)')
+        throw new Error(payload?.error || '전송 실패')
+      }
       setSubmitSuccess(true)
       reset()
       setTimeout(() => setSubmitSuccess(false), 3000)
@@ -207,16 +219,18 @@ const Contact = () => {
       )}
 
       {/* Contact Form & Info - 반응형 개선 */}
+      {showMainSection && (
       <section id="contact-form-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6">
         <div className="max-w-6xl mx-auto">
           <div id="contact-content" className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12">
             {/* Contact Form - 반응형 개선 */}
+            {enabled.form && (
             <motion.div
               id="contact-form-container"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8"
+              className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 ${!(enabled.info || enabled.socials || enabled.hours) ? 'lg:col-span-2' : ''}`}
             >
               <h2 id="contact-form-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
                 메시지 보내기
@@ -320,22 +334,25 @@ const Contact = () => {
                   ) : (
                     <>
                       <Send size={16} className="sm:w-5 sm:h-5" />
-                      메시지 보내기
+                      {UI_LABELS.SEND_MESSAGE}
                     </>
                   )}
                 </button>
               </form>
             </motion.div>
+            )}
 
             {/* Contact Info - 반응형 개선 */}
+            {(enabled.info || enabled.socials || enabled.hours) && (
             <motion.div
               id="contact-info-container"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="space-y-6 sm:space-y-8"
+              className={`space-y-6 sm:space-y-8 ${!enabled.form ? 'lg:col-span-2' : ''}`}
             >
               {/* Contact Information - 반응형 개선 */}
+              {enabled.info && (
               <div id="contact-info-card" className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
                 <h2 id="contact-info-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
                   연락처 정보
@@ -371,6 +388,7 @@ const Contact = () => {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Social Links - 반응형 개선 */}
               {enabled.socials && (
@@ -427,9 +445,11 @@ const Contact = () => {
               </div>
               )}
             </motion.div>
+            )}
           </div>
         </div>
       </section>
+      )}
     </div>
   )
 }

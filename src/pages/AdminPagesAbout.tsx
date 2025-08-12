@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Save, Loader2, Image as ImageIcon, Info, Link as LinkIcon, Upload, ChevronDown, ChevronUp, Code, Briefcase, GraduationCap, Plus, Trash2, Pencil, Check, X } from 'lucide-react'
 import Breadcrumb from '../components/Breadcrumb'
+import HeroSettings from '../components/HeroSettings'
 import RichTextEditor from '../components/RichTextEditor'
 import { ImageLibraryProvider, useImageLibrary } from '../contexts/ImageLibraryContext'
 import { supabase } from '../lib/supabase'
@@ -109,9 +110,21 @@ const AdminPagesAboutContent = () => {
     return saved !== null ? JSON.parse(saved) : true // 기본값: 펼침
   })
 
-  // About Me 요소 설정 카드 접기/펼치기 상태 (로컬 스토리지에 저장)
-  const [isAboutMeExpanded, setIsAboutMeExpanded] = useState<boolean>(() => {
-    const saved = localStorage.getItem('adminAboutMeExpanded')
+  // Hero 설정 카드 접기/펼치기 상태 (로컬 스토리지에 저장)
+  const [isHeroExpanded, setIsHeroExpanded] = useState<boolean>(() => {
+    const saved = localStorage.getItem('adminAboutHeroExpanded')
+    return saved !== null ? JSON.parse(saved) : true // 기본값: 펼침
+  })
+
+  // 기본정보 카드 접기/펼치기 상태 (로컬 스토리지에 저장)
+  const [isBasicExpanded, setIsBasicExpanded] = useState<boolean>(() => {
+    const saved = localStorage.getItem('adminAboutBasicExpanded')
+    return saved !== null ? JSON.parse(saved) : true // 기본값: 펼침
+  })
+
+  // 소개 카드 접기/펼치기 상태 (로컬 스토리지에 저장)
+  const [isIntroExpanded, setIsIntroExpanded] = useState<boolean>(() => {
+    const saved = localStorage.getItem('adminAboutIntroExpanded')
     return saved !== null ? JSON.parse(saved) : true // 기본값: 펼침
   })
 
@@ -140,11 +153,21 @@ const AdminPagesAboutContent = () => {
     localStorage.setItem('adminSectionExpanded', JSON.stringify(newState))
   }
 
-  // About Me 설정 접기/펼치기 상태 변경 시 로컬 스토리지에 저장
-  const toggleAboutMeExpanded = () => {
-    const newState = !isAboutMeExpanded
-    setIsAboutMeExpanded(newState)
-    localStorage.setItem('adminAboutMeExpanded', JSON.stringify(newState))
+  // Hero/Basic/Intro 설정 접기/펼치기 상태 변경 시 로컬 스토리지에 저장
+  const toggleHeroExpanded = () => {
+    const newState = !isHeroExpanded
+    setIsHeroExpanded(newState)
+    localStorage.setItem('adminAboutHeroExpanded', JSON.stringify(newState))
+  }
+  const toggleBasicExpanded = () => {
+    const newState = !isBasicExpanded
+    setIsBasicExpanded(newState)
+    localStorage.setItem('adminAboutBasicExpanded', JSON.stringify(newState))
+  }
+  const toggleIntroExpanded = () => {
+    const newState = !isIntroExpanded
+    setIsIntroExpanded(newState)
+    localStorage.setItem('adminAboutIntroExpanded', JSON.stringify(newState))
   }
 
   // 기술 스택 설정 접기/펼치기 상태 변경 시 로컬 스토리지에 저장
@@ -269,7 +292,8 @@ const AdminPagesAboutContent = () => {
     setSuccess('')
 
     try {
-      const payload = {
+      // 1) 섹션 표시 설정 저장
+      const settingsPayload = {
         id: 'default',
         show_about_me: data.show_about_me,
         show_experience: data.show_experience,
@@ -277,14 +301,46 @@ const AdminPagesAboutContent = () => {
         updated_at: new Date().toISOString(),
         show_skills: watch('show_skills')
       }
-
-      const { error } = await supabase
+      const { error: settingsErr } = await supabase
         .from('about_page_settings')
-        .upsert(payload, { onConflict: 'id' })
+        .upsert(settingsPayload, { onConflict: 'id' })
+      if (settingsErr) throw settingsErr
 
-      if (error) throw error
+      // 2) About(Hero 포함) 저장 – 전역 저장 시에도 hero 설정 반영
+      const aboutPayload = {
+        id: 'default',
+        display_profile_image: aboutMe?.display_profile_image ?? true,
+        name: aboutMe?.name ?? null,
+        title: aboutMe?.title ?? null,
+        email: aboutMe?.email ?? null,
+        phone: (aboutMe as any)?.phone ?? null,
+        location: aboutMe?.location ?? null,
+        birth_year: aboutMe?.birth_year ?? null,
+        show_email: aboutMe?.show_email ?? true,
+        show_phone: (aboutMe as any)?.show_phone ?? true,
+        show_location: aboutMe?.show_location ?? true,
+        show_birth_year: aboutMe?.show_birth_year ?? true,
+        show_resume_button: aboutMe?.show_resume_button ?? false,
+        resume_url: aboutMe?.resume_url ?? null,
+        resume_label: aboutMe?.resume_label ?? null,
+        ...(hasHeroSubtitleCol ? { hero_subtitle: (aboutMe as any)?.hero_subtitle ?? null } : {}),
+        hero_title: (aboutMe as any)?.hero_title ?? null,
+        hero_description: (aboutMe as any)?.hero_description ?? null,
+        hero_bg_image_url: (aboutMe as any)?.hero_bg_image_url ?? null,
+        hero_cta_label: (aboutMe as any)?.hero_cta_label ?? null,
+        hero_cta_url: (aboutMe as any)?.hero_cta_url ?? null,
+        intro_title: aboutMe?.intro_title ?? null,
+        intro_content_html: aboutMe?.intro_content_html ?? null,
+        profile_image_url: aboutMe?.profile_image_url ?? null,
+        side_image_url: aboutMe?.side_image_url ?? null,
+        updated_at: new Date().toISOString()
+      }
+      const { error: aboutErr } = await supabase
+        .from('about_page_about_me')
+        .upsert(aboutPayload, { onConflict: 'id' })
+      if (aboutErr) throw aboutErr
 
-      setSuccess('섹션 설정이 저장되었습니다.')
+      setSuccess('설정이 저장되었습니다. (섹션 + Hero)')
     } catch (err: any) {
       setError(err.message || '설정 저장에 실패했습니다.')
     } finally {
@@ -395,63 +451,61 @@ const AdminPagesAboutContent = () => {
               )}
             </section>
 
-            {/* About Me 요소 설정 */}
+            {/* Hero 설정 (공통 컴포넌트: Contact과 동일 UI) */}
+            <HeroSettings
+              sectionTitle="Hero 설정"
+              helperText="타이틀/설명/배경 이미지/CTA 버튼을 설정합니다."
+              expanded={isHeroExpanded}
+              onToggle={toggleHeroExpanded}
+              values={{
+                title: (aboutMe as any)?.hero_title ?? '',
+                description: (aboutMe as any)?.hero_description ?? '',
+                bgImageUrl: (aboutMe as any)?.hero_bg_image_url ?? '',
+                ctaLabel: (aboutMe as any)?.hero_cta_label ?? '',
+                ctaUrl: (aboutMe as any)?.hero_cta_url ?? '',
+              }}
+              onValuesChange={(p)=>{
+                setAboutMe(prev => {
+                  const base = prev ?? {
+                    id: 'default', display_profile_image: true,
+                    name: null, title: null, email: null, phone: null, location: null, birth_year: null,
+                    show_email: true, show_phone: true, show_location: true, show_birth_year: true,
+                    show_resume_button: false,
+                    resume_url: null, resume_label: null,
+                    intro_title: null, intro_content_html: null,
+                    profile_image_url: null, side_image_url: null, updated_at: new Date().toISOString()
+                  }
+                  return {
+                    ...base,
+                    hero_title: p.title !== undefined ? (p.title ?? null) : (base as any).hero_title,
+                    hero_description: p.description !== undefined ? (p.description ?? null) : (base as any).hero_description,
+                    hero_bg_image_url: p.bgImageUrl !== undefined ? (p.bgImageUrl ?? null) : (base as any).hero_bg_image_url,
+                    hero_cta_label: p.ctaLabel !== undefined ? (p.ctaLabel ?? null) : (base as any).hero_cta_label,
+                    hero_cta_url: p.ctaUrl !== undefined ? (p.ctaUrl ?? null) : (base as any).hero_cta_url,
+                  } as any
+                })
+              }}
+              fields={{ title: true, description: true, bgImageUrl: true, cta: true, subtitle: false }}
+            />
+
+            {/* 기본정보 카드 */}
             <section className="bg-white dark:bg-gray-800 rounded-lg shadow">
               <div 
                 className="p-6 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                onClick={toggleAboutMeExpanded}
+                onClick={toggleBasicExpanded}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                      <Info size={18} /> About Me 요소 설정
-                    </h2>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">프로필, 소개 텍스트, 버튼 등을 관리합니다.</p>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"><Info size={18} /> 기본정보 카드</h2>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">이름/타이틀/연락처 등 표시 여부 포함</p>
                   </div>
-                  <button
-                    type="button"
-                    className="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                    aria-label={isAboutMeExpanded ? '접기' : '펼치기'}
-                  >
-                    {isAboutMeExpanded ? (
-                      <ChevronUp size={20} className="text-gray-500 dark:text-gray-400" />
-                    ) : (
-                      <ChevronDown size={20} className="text-gray-500 dark:text-gray-400" />
-                    )}
+                  <button type="button" className="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label={isBasicExpanded ? '접기' : '펼치기'}>
+                    {isBasicExpanded ? <ChevronUp size={20} className="text-gray-500 dark:text-gray-400" /> : <ChevronDown size={20} className="text-gray-500 dark:text-gray-400" />}
                   </button>
                 </div>
               </div>
-
-              {isAboutMeExpanded && (
+              {isBasicExpanded && (
               <div className="p-6 space-y-8">
-                {/* 서브타이틀 설정 */}
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">서브타이틀 설정</h3>
-                  <div className="space-y-2">
-                    <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">서브타이틀 텍스트</label>
-                    <input
-                      value={aboutMe?.hero_subtitle ?? ''}
-                      onChange={(e) => setAboutMe(prev => prev ? { ...prev, hero_subtitle: e.target.value } : {
-                        id: 'default', display_profile_image: true,
-                        name: null, title: null, email: null, phone: null, location: null, birth_year: null,
-                        show_email: true, show_phone: true, show_location: true, show_birth_year: true,
-                        show_resume_button: false,
-                        resume_url: null, resume_label: null,
-                        hero_subtitle: e.target.value,
-                        intro_title: null, intro_content_html: null,
-                        profile_image_url: null, side_image_url: null, updated_at: new Date().toISOString()
-                      })}
-                      placeholder="예: 안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다. 깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다."
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                    {!hasHeroSubtitleCol && (
-                      <p className="text-xs text-amber-600 dark:text-amber-400">
-                        참고: 데이터베이스 컬럼(hero_subtitle)이 아직 없어 저장 시 이 필드는 무시됩니다. 컬럼 추가 후 자동으로 저장됩니다.
-                      </p>
-                    )}
-                  </div>
-                </div>
-
                 {/* 기본 정보 */}
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">기본 정보</h3>
@@ -563,6 +617,28 @@ const AdminPagesAboutContent = () => {
                   </div>
                 </div>
 
+              </div>
+              )}
+            </section>
+
+            {/* 소개 카드 */}
+            <section className="bg-white dark:bg-gray-800 rounded-lg shadow">
+              <div 
+                className="p-6 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                onClick={toggleIntroExpanded}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"><Info size={18} /> 소개 카드</h2>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">소개 텍스트와 사이드 이미지를 관리합니다.</p>
+                  </div>
+                  <button type="button" className="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label={isIntroExpanded ? '접기' : '펼치기'}>
+                    {isIntroExpanded ? <ChevronUp size={20} className="text-gray-500 dark:text-gray-400" /> : <ChevronDown size={20} className="text-gray-500 dark:text-gray-400" />}
+                  </button>
+                </div>
+              </div>
+              {isIntroExpanded && (
+              <div className="p-6 space-y-8">
                 {/* 소개 텍스트 */}
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">소개 텍스트</h3>
@@ -799,7 +875,13 @@ const AdminPagesAboutContent = () => {
                           show_resume_button: aboutMe?.show_resume_button ?? false,
                           resume_url: aboutMe?.resume_url ?? null,
                           resume_label: aboutMe?.resume_label ?? null,
-                          ...(hasHeroSubtitleCol ? { hero_subtitle: aboutMe?.hero_subtitle ?? null } : {}),
+                          // About Hero (optional columns)
+                          ...(hasHeroSubtitleCol ? { hero_subtitle: (aboutMe as any)?.hero_subtitle ?? null } : {}),
+                          hero_title: (aboutMe as any)?.hero_title ?? null,
+                          hero_description: (aboutMe as any)?.hero_description ?? null,
+                          hero_bg_image_url: (aboutMe as any)?.hero_bg_image_url ?? null,
+                          hero_cta_label: (aboutMe as any)?.hero_cta_label ?? null,
+                          hero_cta_url: (aboutMe as any)?.hero_cta_url ?? null,
                           intro_title: aboutMe?.intro_title ?? null,
                           intro_content_html: aboutMe?.intro_content_html ?? null,
                           profile_image_url: aboutMe?.profile_image_url ?? null,
@@ -821,7 +903,7 @@ const AdminPagesAboutContent = () => {
                     className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Save size={16} />
-                    {isSaving ? '저장 중...' : 'About Me 설정 저장'}
+                    {isSaving ? '저장 중...' : 'About 설정 저장'}
                   </button>
                 </div>
               </div>

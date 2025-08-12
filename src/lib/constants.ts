@@ -30,3 +30,8 @@ export const getFallbackImage = (type: ImageType, baseUrl?: string): string => {
   const base = baseUrl || import.meta.env.BASE_URL || '/'
   return `${base}${FALLBACK_IMAGES[type].substring(1)}`
 } 
+
+// UI 라벨 상수
+export const UI_LABELS = {
+  SEND_MESSAGE: '메세지 보내기',
+} as const
