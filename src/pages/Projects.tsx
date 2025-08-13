@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar'
 import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
 import ImageWithFallback from '../components/ImageWithFallback'
+import Hero from '../components/Hero'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
 import type { Project, ProjectCategory } from '../lib/supabase'
 
@@ -131,6 +132,13 @@ const Projects = () => {
   const [categories, setCategories] = useState<ProjectCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [pageSettings, setPageSettings] = useState<{
+    hero_title?: string | null
+    hero_description?: string | null
+    hero_bg_image_url?: string | null
+    hero_cta_label?: string | null
+    hero_cta_url?: string | null
+  } | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -156,6 +164,17 @@ const Projects = () => {
           setCategories(categoriesData || [])
         }
         
+        // 페이지 설정 가져오기
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('projects_page_settings')
+          .select('*')
+          .eq('id', 'default')
+          .maybeSingle()
+
+        if (!settingsError && settingsData) {
+          setPageSettings(settingsData)
+        }
+
         // 프로젝트 데이터 가져오기 (카테고리 정보 포함)
         const { data, error } = await supabase
           .from('projects')
@@ -251,22 +270,14 @@ const Projects = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section id="projects-hero" className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12 sm:mb-16"
-          >
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-              My Projects
-            </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-4">
-              지금까지 작업한 프로젝트들을 소개합니다. 
-              각 프로젝트는 사용자 경험을 중시하며, 최신 기술 스택을 활용하여 개발되었습니다.
-            </p>
-          </motion.div>
+      <Hero
+        id="projects-hero"
+        title={pageSettings?.hero_title ?? "My Projects"}
+        description={pageSettings?.hero_description ?? "지금까지 작업한 프로젝트들을 소개합니다. 각 프로젝트는 사용자 경험을 중시하며, 최신 기술 스택을 활용하여 개발되었습니다."}
+        bgImageUrl={pageSettings?.hero_bg_image_url ?? undefined}
+        ctaLabel={pageSettings?.hero_cta_label ?? undefined}
+        ctaUrl={pageSettings?.hero_cta_url ?? undefined}
+      >
 
           {/* Filter Buttons */}
           <div className="mb-12 px-4">
@@ -326,8 +337,7 @@ const Projects = () => {
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </Hero>
 
       {/* Featured Projects */}
       {featuredProjects.length > 0 && (

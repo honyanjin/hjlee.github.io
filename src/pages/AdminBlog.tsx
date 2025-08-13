@@ -12,7 +12,8 @@ import {
   Tag,
   User,
   BarChart3,
-  FolderOpen
+  FolderOpen,
+  Star
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Breadcrumb from '../components/Breadcrumb'
@@ -96,6 +97,28 @@ const AdminBlog = () => {
     } catch (err: any) {
       setError('포스트 상태 변경에 실패했습니다.')
       console.error('Error updating post:', err)
+    }
+  }
+
+  const toggleRecommendStatus = async (post: BlogPost) => {
+    try {
+      const { error } = await supabase
+        .from('blog_posts')
+        .update({ 
+          is_recommended: !post.is_recommended
+        })
+        .eq('id', post.id)
+
+      if (error) throw error
+      
+      setPosts(posts.map(p => 
+        p.id === post.id 
+          ? { ...p, is_recommended: !p.is_recommended }
+          : p
+      ))
+    } catch (err: any) {
+      setError('추천 상태 변경에 실패했습니다.')
+      console.error('Error updating recommendation:', err)
     }
   }
 
@@ -246,6 +269,17 @@ const AdminBlog = () => {
                         title={post.is_published ? '발행 취소' : '발행'}
                       >
                         {post.is_published ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                      <button
+                        onClick={() => toggleRecommendStatus(post)}
+                        className={`p-2 transition-colors ${
+                          post.is_recommended 
+                            ? 'text-yellow-500 hover:text-yellow-600' 
+                            : 'text-gray-400 hover:text-yellow-500'
+                        }`}
+                        title={post.is_recommended ? '추천 해제' : '추천'}
+                      >
+                        <Star size={16} fill={post.is_recommended ? 'currentColor' : 'none'} />
                       </button>
                       <button
                         onClick={() => navigate(`/admin/blog/edit/${post.id}`)}

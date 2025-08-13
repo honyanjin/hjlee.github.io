@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar'
 import DotNavigation from '../components/DotNavigation'
 import SEO from '../components/SEO'
 import ImageWithFallback from '../components/ImageWithFallback'
+import Hero from '../components/Hero'
 import { supabase } from '../lib/supabase'
 
 type AboutPageSettingsT = {
@@ -186,39 +187,14 @@ const About = () => {
       
       {/* Hero Section */}
       {enabled.about && (
-      <section
-        id="about-hero"
-        className="pt-32 pb-20 px-4"
-        style={(aboutMe as any)?.hero_bg_image_url ? { backgroundImage: `url(${(aboutMe as any).hero_bg_image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
-      >
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              {(aboutMe as any)?.hero_title ?? 'About Me'}
-            </h1>
-            {(aboutMe as any)?.hero_description ? (
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                {(aboutMe as any).hero_description}
-              </p>
-            ) : (
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다. 깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다.
-              </p>
-            )}
-            {(aboutMe as any)?.hero_cta_label && (aboutMe as any)?.hero_cta_url && (
-              <div className="mt-6">
-                <a href={(aboutMe as any).hero_cta_url} className="inline-flex items-center px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  {(aboutMe as any).hero_cta_label}
-                </a>
-              </div>
-            )}
-          </motion.div>
-
+        <Hero
+          id="about-hero"
+          title={(aboutMe as any)?.hero_title ?? 'About Me'}
+          description={(aboutMe as any)?.hero_description ?? '안녕하세요! 저는 사용자 경험을 중시하는 풀스택 개발자입니다. 깔끔하고 직관적인 웹 애플리케이션을 만드는 것을 좋아합니다.'}
+          bgImageUrl={(aboutMe as any)?.hero_bg_image_url ?? undefined}
+          ctaLabel={(aboutMe as any)?.hero_cta_label ?? undefined}
+          ctaUrl={(aboutMe as any)?.hero_cta_url ?? undefined}
+        >
           {/* Profile Section */}
           <div className="grid lg:grid-cols-3 gap-12 items-stretch">
             {/* Profile Image */}
@@ -356,8 +332,7 @@ const About = () => {
               </div>
             </motion.div>
           </div>
-        </div>
-      </section>
+        </Hero>
       )}
 
       {/* Skills Section (독립 섹션) */}

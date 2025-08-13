@@ -34,6 +34,11 @@ type AboutMeSettingsT = {
   show_resume_button: boolean
   resume_url: string | null
   resume_label: string | null
+  hero_title?: string | null
+  hero_description?: string | null
+  hero_bg_image_url?: string | null
+  hero_cta_label?: string | null
+  hero_cta_url?: string | null
   hero_subtitle?: string | null
   intro_title: string | null
   intro_content_html: string | null

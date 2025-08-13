@@ -48,6 +48,7 @@ export interface BlogPost {
   image_caption_color?: string | null
   slug: string
   is_published: boolean
+  is_recommended?: boolean
   created_at: string
   updated_at: string
   published_at: string | null
