@@ -11,6 +11,9 @@ import Blog from './pages/Blog'
 import BlogPost from './pages/BlogPost'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
+const PartnerLogin = lazy(() => import('./pages/PartnerLogin'))
+const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'))
+const PartnerPage = lazy(() => import('./pages/PartnerPage'))
 
 // Admin pages (code-splitting)
 const AdminBlog = lazy(() => import('./pages/AdminBlog'))
@@ -30,6 +33,8 @@ const AdminPagesProjects = lazy(() => import('./pages/AdminPagesProjects'))
 const AdminPagesBlog = lazy(() => import('./pages/AdminPagesBlog'))
 const AdminPagesContact = lazy(() => import('./pages/AdminPagesContact'))
 const AdminMessages = lazy(() => import('./pages/AdminMessages'))
+const AdminPartners = lazy(() => import('./pages/AdminPartners'))
+const AdminPartnerPages = lazy(() => import('./pages/AdminPartnerPages'))
 
 function App() {
   return (
@@ -51,6 +56,26 @@ function App() {
             <Route id="blog-post-route" path="/blog/:postNo" element={<BlogPost />} />
             <Route id="contact-route" path="/contact" element={<Contact />} />
             <Route id="login-route" path="/login" element={<Login />} />
+            {/* Partner Routes */}
+            <Route id="partner-login-route" path="/partner/login" element={<PartnerLogin />} />
+            <Route 
+              id="partner-dashboard-route"
+              path="/partner"
+              element={
+                <ProtectedRoute requirePartner={true}>
+                  <PartnerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              id="partner-page-route"
+              path="/partner/pages/:id"
+              element={
+                <ProtectedRoute requirePartner={true}>
+                  <PartnerPage />
+                </ProtectedRoute>
+              }
+            />
             
             {/* Admin Routes */}
             <Route 
@@ -225,6 +250,28 @@ function App() {
                 <ProtectedRoute requireAdmin={true}>
                   <AdminLayout>
                     <AdminMessages />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-partners-route" 
+              path="/admin/partners" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout>
+                    <AdminPartners />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              id="admin-partner-pages-route" 
+              path="/admin/partner-pages" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout>
+                    <AdminPartnerPages />
                   </AdminLayout>
                 </ProtectedRoute>
               } 

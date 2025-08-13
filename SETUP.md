@@ -143,6 +143,28 @@ module.exports = {
 />
 ```
 
+### 파트너 기능 설정 (신규)
+
+1. Supabase SQL Editor 실행 후 다음 파일 내용을 실행하세요:
+   - `supabase/partner_schema.sql`
+
+2. 관리자 이메일 설정(프로젝트 전역 파라미터)
+   - 관리자 권한 판단은 DB 파라미터 `app.admin_email`을 사용합니다. 아래 중 하나를 실행하세요.
+
+```sql
+-- 현재 세션에만 적용 (테스트용)
+select set_config('app.admin_email', 'your_admin_email@example.com', true);
+
+-- 데이터베이스에 영구 적용 (권장)
+alter database postgres set app.admin_email to 'your_admin_email@example.com';
+```
+
+3. 정상 동작 확인 체크리스트
+   - `partner_pages`, `partner_profiles`, `partner_page_assignments` 테이블 생성 확인
+   - RLS 활성화 확인(RLS 켜짐)
+   - 관리자 토큰으로 partner 페이지 CRUD 가능 여부
+   - 일반 사용자/파트너 토큰으로는 본인에게 할당된 페이지만 SELECT 가능한지 확인
+
 ## 🚀 배포
 
 ### Vercel 배포 (선택)

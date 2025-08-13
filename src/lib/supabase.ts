@@ -223,6 +223,32 @@ export interface ProjectUpdate {
   is_published?: boolean
 }
 
+// Partner feature types
+export interface PartnerProfile {
+  user_id: string
+  name?: string | null
+  company?: string | null
+  status: 'active' | 'inactive'
+  created_at: string
+  updated_at: string
+}
+
+export interface PartnerPage {
+  id: string
+  title: string
+  content: string
+  excerpt?: string | null
+  is_published: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface PartnerPageAssignment {
+  user_id: string
+  page_id: string
+  created_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -255,6 +281,21 @@ export interface Database {
         Row: Project
         Insert: ProjectInsert
         Update: ProjectUpdate
+      }
+      partner_profiles: {
+        Row: PartnerProfile
+        Insert: Omit<PartnerProfile, 'created_at' | 'updated_at'>
+        Update: Partial<Omit<PartnerProfile, 'user_id' | 'created_at' | 'updated_at'>>
+      }
+      partner_pages: {
+        Row: PartnerPage
+        Insert: Omit<PartnerPage, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<PartnerPage, 'id' | 'created_at' | 'updated_at'>>
+      }
+      partner_page_assignments: {
+        Row: PartnerPageAssignment
+        Insert: PartnerPageAssignment
+        Update: PartnerPageAssignment
       }
     }
   }

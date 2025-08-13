@@ -14,7 +14,7 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
-const Login = () => {
+const PartnerLogin = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -33,12 +33,9 @@ const Login = () => {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
     setError('')
-    
     try {
-      // 로그인 로직만 실행
       await signIn(data.email, data.password)
-      // 관리자 화이트리스트/ENV 체크가 비동기로 반영될 수 있어 잠시 대기 후 이동
-      setTimeout(() => navigate('/admin'), 100)
+      navigate('/partner')
     } catch (err: any) {
       setError(err.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.')
     } finally {
@@ -59,13 +56,13 @@ const Login = () => {
             <Lock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            관리자 로그인
+            파트너 로그인
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            블로그 관리자 계정으로 로그인하세요
+            파트너 계정으로 로그인하세요
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <div>
@@ -82,7 +79,7 @@ const Login = () => {
                   type="email"
                   autoComplete="email"
                   className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="admin@example.com"
+                  placeholder="partner@example.com"
                 />
               </div>
               {errors.email && (
@@ -143,12 +140,12 @@ const Login = () => {
               {isLoading ? '로그인 중...' : '로그인'}
             </button>
           </div>
-
-
         </form>
       </motion.div>
     </div>
   )
 }
 
-export default Login 
+export default PartnerLogin
+
+

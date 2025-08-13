@@ -71,53 +71,45 @@ const AdminDashboard = () => {
   }, [])
 
   const fetchDashboardData = async () => {
+    setLoading(true)
+    setError('')
+
+    const withTimeout = async <T,>(p: Promise<T>, ms = 8000): Promise<T> => {
+      return await Promise.race([
+        p,
+        new Promise<T>((_res, rej) => setTimeout(() => rej(new Error('timeout')), ms))
+      ])
+    }
+
     try {
-      setLoading(true)
-      setError('')
+      const [postsRes, projectsRes, categoriesRes, projectCategoriesRes, commentsRes] = await Promise.allSettled([
+        withTimeout(
+          supabase.from('blog_posts').select('*').order('created_at', { ascending: false })
+        ),
+        withTimeout(
+          supabase.from('projects').select('*').order('created_at', { ascending: false })
+        ),
+        withTimeout(
+          supabase.from('categories').select('*')
+        ),
+        withTimeout(
+          supabase.from('project_categories').select('*')
+        ),
+        withTimeout(
+          supabase.from('comments').select('*').order('created_at', { ascending: false })
+        )
+      ])
 
-      // 블로그 포스트 통계
-      const { data: posts, error: postsError } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('created_at', { ascending: false })
+      const posts = postsRes.status === 'fulfilled' && 'data' in (postsRes.value as any) ? (postsRes.value as any).data : []
+      const projects = projectsRes.status === 'fulfilled' && 'data' in (projectsRes.value as any) ? (projectsRes.value as any).data : []
+      const categories = categoriesRes.status === 'fulfilled' && 'data' in (categoriesRes.value as any) ? (categoriesRes.value as any).data : []
+      const projectCategories = projectCategoriesRes.status === 'fulfilled' && 'data' in (projectCategoriesRes.value as any) ? (projectCategoriesRes.value as any).data : []
+      const comments = commentsRes.status === 'fulfilled' && 'data' in (commentsRes.value as any) ? (commentsRes.value as any).data : []
 
-      if (postsError) throw postsError
-
-      // 프로젝트 통계
-      const { data: projects, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (projectsError) throw projectsError
-
-      // 카테고리 통계
-      const { data: categories, error: categoriesError } = await supabase
-        .from('categories')
-        .select('*')
-
-      if (categoriesError) throw categoriesError
-
-      // 프로젝트 카테고리 통계
-      const { data: projectCategories, error: projectCategoriesError } = await supabase
-        .from('project_categories')
-        .select('*')
-
-      if (projectCategoriesError) throw projectCategoriesError
-
-      // 댓글 통계
-      const { data: comments, error: commentsError } = await supabase
-        .from('comments')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (commentsError) throw commentsError
-
-      // 통계 계산
-      const publishedPosts = posts?.filter(post => post.is_published) || []
-      const draftPosts = posts?.filter(post => !post.is_published) || []
-      const publishedProjects = projects?.filter(project => project.is_published) || []
-      const featuredProjects = projects?.filter(project => project.featured) || []
+      const publishedPosts = (posts || []).filter((post: any) => post.is_published)
+      const draftPosts = (posts || []).filter((post: any) => !post.is_published)
+      const publishedProjects = (projects || []).filter((project: any) => project.is_published)
+      const featuredProjects = (projects || []).filter((project: any) => project.featured)
 
       setStats({
         totalPosts: posts?.length || 0,
@@ -129,14 +121,13 @@ const AdminDashboard = () => {
         totalCategories: categories?.length || 0,
         totalProjectCategories: projectCategories?.length || 0,
         totalComments: comments?.length || 0,
-        recentPosts: posts?.slice(0, 5) || [],
-        recentProjects: projects?.slice(0, 5) || [],
-        recentComments: comments?.slice(0, 5) || []
+        recentPosts: (posts || []).slice(0, 5),
+        recentProjects: (projects || []).slice(0, 5),
+        recentComments: (comments || []).slice(0, 5)
       })
-
     } catch (err: any) {
-      setError('대시보드 데이터를 불러오는데 실패했습니다.')
-      console.error('Error fetching dashboard data:', err)
+      console.error('Dashboard load error:', err)
+      setError('대시보드 데이터 로딩이 지연되거나 실패했습니다. 잠시 후 다시 시도하세요.')
     } finally {
       setLoading(false)
     }

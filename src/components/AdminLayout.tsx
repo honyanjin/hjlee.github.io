@@ -110,6 +110,35 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             </div>
           )}
 
+          {/* Partner Management */}
+          <div className="mt-4">
+            <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+              파트너 관리
+            </div>
+            <div className="mt-1 ml-2 space-y-1">
+              <Link
+                to="/admin/partners"
+                className={`block px-3 py-2 rounded-md text-sm transition-colors ${
+                  isActive('/admin/partners')
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                }`}
+              >
+                파트너 프로필
+              </Link>
+              <Link
+                to="/admin/partner-pages"
+                className={`block px-3 py-2 rounded-md text-sm transition-colors ${
+                  isActive('/admin/partner-pages')
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                }`}
+              >
+                파트너 페이지
+              </Link>
+            </div>
+          </div>
+
           {/* Contact Messages */}
           <Link
             to="/admin/messages"
