@@ -17,7 +17,7 @@ import {
   FileText
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import Breadcrumb from '../components/Breadcrumb'
+import AdminLayout from '../components/AdminLayout'
 import type { Project } from '../lib/supabase'
 
 const AdminProjects = () => {
@@ -119,50 +119,35 @@ const AdminProjects = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div>
-            <Breadcrumb items={[
-              { label: '프로젝트 관리', path: '/admin/projects' }
-            ]} />
-          </div>
-          <div className="flex justify-between items-center pb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                프로젝트 관리
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/admin')}
-                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <BarChart3 size={16} />
-                대시보드
-              </button>
-              <button
-                onClick={() => navigate('/admin/projects/categories')}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Tag size={16} />
-                프로젝트 카테고리
-              </button>
-              <button
-                onClick={() => navigate('/admin/projects/new')}
-                className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                <Plus size={16} />
-                새 프로젝트
-              </button>
-            </div>
-          </div>
+    <AdminLayout>
+      <div className="p-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            프로젝트 관리
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            포트폴리오 프로젝트를 관리하고 새로운 프로젝트를 추가합니다.
+          </p>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={() => navigate('/admin/projects/categories')}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Tag size={16} />
+            프로젝트 카테고리
+          </button>
+          <button
+            onClick={() => navigate('/admin/projects/new')}
+            className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <Plus size={16} />
+            새 프로젝트
+          </button>
+        </div>
         
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
@@ -322,8 +307,8 @@ const AdminProjects = () => {
             </button>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }
 

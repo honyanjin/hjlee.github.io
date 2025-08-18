@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Upload, Trash2, Copy, Image as ImageIcon, RefreshCw, Search, Folder, ArrowRightLeft, XCircle } from 'lucide-react'
-import Breadcrumb from '../components/Breadcrumb'
+import AdminLayout from '../components/AdminLayout'
 import { supabase } from '../lib/supabase'
 import { listFiles, uploadFile, removeFile, moveFile, copyFile, getPublicUrl, isImage, createSignedUrl, sanitizeFileName, sanitizePrefix, type StorageFileItem } from '../lib/storage'
 
@@ -421,145 +421,136 @@ const AdminStorage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div>
-            <Breadcrumb items={[{ label: '스토리지 관리', path: '/admin/storage' }]} />
-          </div>
-          <div className="flex flex-col gap-4 pb-6">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">스토리지 관리</h1>
+    <AdminLayout>
+      <div className="p-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            스토리지 관리
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Supabase Storage 버킷의 파일들을 관리합니다.
+          </p>
+        </div>
+
+        {/* Controls */}
+        <div className="flex flex-col gap-3 mb-6">
+          {/* Top row: left bucket/prefix, right search/filter */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <select
+                value={activeBucket}
+                onChange={(e) => { setActiveBucket(e.target.value); setPage(0); setFiles([]); setSelected(new Set()); }}
+                className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+                {buckets.map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
+              {/* 폴더 드롭다운 */}
+              <select
+                value={prefix}
+                onChange={(e)=> setPrefix(e.target.value)}
+                className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-56"
+                aria-label="폴더 선택"
+              >
+                <option value="">/ (루트)</option>
+                {prefix && (
+                  <option value={prefix}>{`${prefix.replace(/\/+$/, '')}/ (현재)`}</option>
+                )}
+                {/* 상위(../) 옵션 제거 */}
+                {currentFolders.map(dir => (
+                  <option key={dir} value={dir+"/"}>{dir}/</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => fetchFiles(true)}
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                <RefreshCw size={16} /> 새로고침
+              </button>
             </div>
-            {/* Controls */}
-            <div className="flex flex-col gap-3">
-              {/* Top row: left bucket/prefix, right search/filter */}
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                <div className="flex items-center gap-2">
-                <select
-                  value={activeBucket}
-                  onChange={(e) => { setActiveBucket(e.target.value); setPage(0); setFiles([]); setSelected(new Set()); }}
-                  className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                >
-                  {buckets.map(b => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
-                </select>
-                  {/* 폴더 드롭다운 */}
-                  <select
-                    value={prefix}
-                    onChange={(e)=> setPrefix(e.target.value)}
-                    className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-56"
-                    aria-label="폴더 선택"
-                  >
-                    <option value="">/ (루트)</option>
-                    {prefix && (
-                      <option value={prefix}>{`${prefix.replace(/\/+$/, '')}/ (현재)`}</option>
-                    )}
-                    {/* 상위(../) 옵션 제거 */}
-                    {currentFolders.map(dir => (
-                      <option key={dir} value={dir+"/"}>{dir}/</option>
-                    ))}
-                  </select>
-                <button
-                  type="button"
-                  onClick={() => fetchFiles(true)}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  <RefreshCw size={16} /> 새로고침
-                </button>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                  <Search size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    placeholder="파일명 검색"
-                    className="pl-8 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-60"
-                    aria-label="파일명 검색"
-                  />
-                </div>
-                <select value={typeFilter} onChange={(e)=>setTypeFilter(e.target.value as any)} className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" aria-label="유형 필터">
-                  <option value="all">전체</option>
-                  <option value="image">이미지</option>
-                  <option value="other">기타</option>
-                </select>
-                </div>
-              </div>
-
-              {/* Bottom row: upload/delete/clear selection + move/copy */}
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  ref={inputRef}
-                  type="file"
-                  multiple
-                  onChange={async (e) => {
-                    const files = Array.from(e.target.files || [])
-                    for (const f of files) await handleUpload(f)
-                    if (inputRef.current) inputRef.current.value = ''
-                  }}
-                  className="hidden"
-                  accept="*/*"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  placeholder="파일명 검색"
+                  className="pl-8 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-60"
+                  aria-label="파일명 검색"
                 />
-                <button
-                  type="button"
-                  onClick={() => inputRef.current?.click()}
-                  disabled={isUploading}
-                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-                  aria-label="파일 업로드"
-                >
-                  <Upload size={16} /> {isUploading ? '업로드 중...' : '새 이미지'}
-                </button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-300 hidden md:inline">선택 항목 관리</span>
-                  <select value={destBucket} onChange={(e)=>setDestBucket(e.target.value)} disabled={selected.size===0} className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed" aria-label="대상 버킷" title={selected.size===0 ? '항목을 선택하면 활성화됩니다' : undefined}>
-                    {buckets.map(b => (<option key={b} value={b}>{b}</option>))}
-                  </select>
-                  <select value={destPrefix} onChange={(e)=>setDestPrefix(e.target.value)} disabled={selected.size===0} className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-56 disabled:opacity-50 disabled:cursor-not-allowed" aria-label="대상 프리픽스" title={selected.size===0 ? '항목을 선택하면 활성화됩니다' : undefined}>
-                    <option value="">/ (루트)</option>
-                    {prefix && <option value={prefix}>{`${prefix.replace(/\/+$/, '')}/ (현재)`}</option>}
-                    {destFolderOptions.map(full => (
-                      <option key={full} value={full+"/"}>{full}/</option>
-                    ))}
-                  </select>
-                  <button type="button" onClick={handleMoveSelected} disabled={selected.size===0 || isMoving} className="inline-flex items-center gap-2 bg-amber-600 text-white px-3 py-2 rounded-md hover:bg-amber-700 disabled:opacity-50" aria-label="이동">
-                    <ArrowRightLeft size={16} /> {isMoving ? '이동 중...' : '이동'}
-                  </button>
-                  <button type="button" onClick={handleCopySelected} disabled={selected.size===0 || isCopying} className="inline-flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 disabled:opacity-50" aria-label="복사">
-                    <Copy size={16} /> {isCopying ? '복사 중...' : '복사'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleDeleteSelected}
-                    disabled={selected.size === 0}
-                    className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 disabled:opacity-50"
-                    aria-label="삭제"
-                  >
-                    <Trash2 size={16} /> 삭제
-                  </button>
-                  <button type="button" onClick={()=>setSelected(new Set())} disabled={selected.size===0} className="inline-flex items-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50" aria-label="선택 해제">
-                    <XCircle size={16} /> 선택 해제
-                  </button>
-                </div>
               </div>
+              <select value={typeFilter} onChange={(e)=>setTypeFilter(e.target.value as any)} className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" aria-label="유형 필터">
+                <option value="all">전체</option>
+                <option value="image">이미지</option>
+                <option value="other">기타</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Bottom row: upload/delete/clear selection + move/copy */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <input
+                ref={inputRef}
+                type="file"
+                multiple
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files || [])
+                  for (const f of files) await handleUpload(f)
+                  if (inputRef.current) inputRef.current.value = ''
+                }}
+                className="hidden"
+                accept="*/*"
+              />
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                disabled={isUploading}
+                className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                aria-label="파일 업로드"
+              >
+                <Upload size={16} /> {isUploading ? '업로드 중...' : '새 이미지'}
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 dark:text-gray-300 hidden md:inline">선택 항목 관리</span>
+              <select value={destBucket} onChange={(e)=>setDestBucket(e.target.value)} disabled={selected.size===0} className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed" aria-label="대상 버킷" title={selected.size===0 ? '항목을 선택하면 활성화됩니다' : undefined}>
+                {buckets.map(b => (<option key={b} value={b}>{b}</option>))}
+              </select>
+              <select value={destPrefix} onChange={(e)=>setDestPrefix(e.target.value)} disabled={selected.size===0} className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white w-56 disabled:opacity-50 disabled:cursor-not-allowed" aria-label="대상 프리픽스" title={selected.size===0 ? '항목을 선택하면 활성화됩니다' : undefined}>
+                <option value="">/ (루트)</option>
+                {prefix && <option value={prefix}>{`${prefix.replace(/\/+$/, '')}/ (현재)`}</option>}
+                {destFolderOptions.map(full => (
+                  <option key={full} value={full+"/"}>{full}/</option>
+                ))}
+              </select>
+              <button type="button" onClick={handleMoveSelected} disabled={selected.size===0 || isMoving} className="inline-flex items-center gap-2 bg-amber-600 text-white px-3 py-2 rounded-md hover:bg-amber-700 disabled:opacity-50" aria-label="이동">
+                <ArrowRightLeft size={16} /> {isMoving ? '이동 중...' : '이동'}
+              </button>
+              <button type="button" onClick={handleCopySelected} disabled={selected.size===0 || isCopying} className="inline-flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 disabled:opacity-50" aria-label="복사">
+                <Copy size={16} /> {isCopying ? '복사 중...' : '복사'}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteSelected}
+                disabled={selected.size === 0}
+                className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 disabled:opacity-50"
+                aria-label="삭제"
+              >
+                <Trash2 size={16} /> 삭제
+              </button>
+              <button type="button" onClick={()=>setSelected(new Set())} disabled={selected.size===0} className="inline-flex items-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50" aria-label="선택 해제">
+                <XCircle size={16} /> 선택 해제
+              </button>
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Main */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {error && (
-          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
-            {error}
-          </div>
-        )}
-
+        {/* Error and Notice Messages */}
         {(error || notice) && (
           <div aria-live="polite" className="mb-4 space-y-2">
             {error && (
@@ -571,6 +562,7 @@ const AdminStorage = () => {
           </div>
         )}
 
+        {/* File List */}
         <div className="min-h-[200px]">
           {isListing && files.length === 0 ? (
             <div className="flex items-center justify-center py-12 text-gray-500 dark:text-gray-400">
@@ -700,10 +692,8 @@ const AdminStorage = () => {
             </button>
           </div>
         )}
-
-        {/* 하단 이동/복사 패널 제거됨: 헤더에 통합 */}
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }
 

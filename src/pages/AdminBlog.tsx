@@ -16,7 +16,8 @@ import {
   Star
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import Breadcrumb from '../components/Breadcrumb'
+import AdminLayout from '../components/AdminLayout'
+import AdminPageHeader from '../components/admin/AdminPageHeader'
 import type { BlogPost } from '../lib/supabase'
 
 const AdminBlog = () => {
@@ -56,8 +57,6 @@ const AdminBlog = () => {
       setLoading(false)
     }
   }
-
-
 
   const handleDeletePost = async (id: string) => {
     if (!confirm('정말로 이 포스트를 삭제하시겠습니까?')) return
@@ -131,50 +130,27 @@ const AdminBlog = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div>
-            <Breadcrumb items={[
-              { label: '블로그 관리', path: '/admin/blog' }
-            ]} />
-          </div>
-          <div className="flex justify-between items-center pb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                블로그 관리
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/admin')}
-                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <BarChart3 size={16} />
-                대시보드
-              </button>
-              <button
-                onClick={() => navigate('/admin/blog/categories')}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Tag size={16} />
-                포스트 카테고리
-              </button>
-              <button
-                onClick={() => navigate('/admin/blog/new')}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus size={16} />
-                새 포스트
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <AdminLayout>
+      <div className="p-8">
+        <AdminPageHeader
+          title="블로그 관리"
+          description="블로그 포스트를 관리하고 새로운 포스트를 작성합니다."
+        >
+          <button
+            onClick={() => navigate('/admin/blog/categories')}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Tag size={16} />
+            포스트 카테고리
+          </button>
+          <button
+            onClick={() => navigate('/admin/blog/new')}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus size={16} />
+            새 포스트
+          </button>
+        </AdminPageHeader>
         
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
@@ -212,85 +188,89 @@ const AdminBlog = () => {
                   className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    {/* Post No (왼쪽 고정) */}
-                    <div className="w-16 shrink-0">
-                      <span
-                        className="inline-flex items-center justify-center w-12 px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-mono"
-                        title="Post No"
-                      >
-                        {post.post_no}
-                      </span>
-                    </div>
-
-                    {/* 본문 */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3
-                          className="text-lg font-medium text-gray-900 dark:text-white cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
-                          onClick={() => navigate(`/blog/${post.post_no}`)}
-                          title="포스트 보기"
-                        >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                           {post.title}
                         </h3>
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            post.is_published
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                          }`}
-                        >
-                          {post.is_published ? '발행됨' : '임시저장'}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center gap-1">
-                          <User size={14} />
-                          {post.author}
+                          {post.is_recommended && (
+                            <span className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full dark:bg-yellow-900 dark:text-yellow-200">
+                              <Star size={12} />
+                              추천
+                            </span>
+                          )}
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            post.is_published 
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                          }`}>
+                            {post.is_published ? '발행됨' : '임시저장'}
+                          </span>
                         </div>
+                      </div>
+                      
+                      <p className="text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
+                        {post.excerpt}
+                      </p>
+                      
+                      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center gap-1">
                           <Calendar size={14} />
-                          {new Date(post.created_at).toLocaleDateString()}
+                          <span>
+                            {post.published_at 
+                              ? new Date(post.published_at).toLocaleDateString()
+                              : new Date(post.created_at).toLocaleDateString()
+                            }
+                          </span>
                         </div>
-                        {post.tags && post.tags.length > 0 && (
-                          <div className="flex items-center gap-1 truncate">
-                            <Tag size={14} />
-                            <span className="truncate max-w-[400px]">{post.tags.join(', ')}</span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1">
+                          <Tag size={14} />
+                          <span>{post.category}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <User size={14} />
+                          <span>{post.author}</span>
+                        </div>
                       </div>
                     </div>
-
-                    {/* 액션 */}
-                    <div className="ml-auto flex items-center gap-2">
-                      <button
-                        onClick={() => togglePublishStatus(post)}
-                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                        title={post.is_published ? '발행 취소' : '발행'}
-                      >
-                        {post.is_published ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
+                    
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleRecommendStatus(post)}
-                        className={`p-2 transition-colors ${
-                          post.is_recommended 
-                            ? 'text-yellow-500 hover:text-yellow-600' 
-                            : 'text-gray-400 hover:text-yellow-500'
+                        className={`p-2 rounded-lg transition-colors ${
+                          post.is_recommended
+                            ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400'
+                            : 'text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'
                         }`}
                         title={post.is_recommended ? '추천 해제' : '추천'}
                       >
-                        <Star size={16} fill={post.is_recommended ? 'currentColor' : 'none'} />
+                        <Star size={16} />
                       </button>
+                      
+                      <button
+                        onClick={() => togglePublishStatus(post)}
+                        className={`p-2 rounded-lg transition-colors ${
+                          post.is_published
+                            ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400'
+                            : 'text-gray-400 hover:text-green-600 dark:hover:text-green-400'
+                        }`}
+                        title={post.is_published ? '발행 취소' : '발행'}
+                      >
+                        {post.is_published ? <Eye size={16} /> : <EyeOff size={16} />}
+                      </button>
+                      
                       <button
                         onClick={() => navigate(`/admin/blog/edit/${post.id}`)}
-                        className="p-2 text-blue-600 hover:text-blue-700 transition-colors"
+                        className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                         title="편집"
                       >
                         <Edit size={16} />
                       </button>
+                      
                       <button
                         onClick={() => handleDeletePost(post.id)}
-                        className="p-2 text-red-600 hover:text-red-700 transition-colors"
+                        className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                         title="삭제"
                       >
                         <Trash2 size={16} />
@@ -302,8 +282,8 @@ const AdminBlog = () => {
             </div>
           )}
         </div>
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }
 

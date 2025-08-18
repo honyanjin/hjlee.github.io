@@ -93,9 +93,7 @@ function App() {
               path="/admin" 
               element={
                 <ProtectedRoute requireAdmin={true}>
-                  <AdminLayout>
-                    <AdminDashboard />
-                  </AdminLayout>
+                  <AdminDashboard />
                 </ProtectedRoute>
               } 
             />
@@ -115,9 +113,7 @@ function App() {
               path="/admin/pages/about" 
               element={
                 <ProtectedRoute requireAdmin={true}>
-                  <AdminLayout>
-                    <AdminPagesAbout />
-                  </AdminLayout>
+                  <AdminPagesAbout />
                 </ProtectedRoute>
               } 
             />

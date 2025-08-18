@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import AdminLayout from '../components/AdminLayout'
 import Breadcrumb from '../components/Breadcrumb'
 import type { BlogPost, Project, Category, ProjectCategory, Comment } from '../lib/supabase'
 
@@ -144,139 +145,32 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      </AdminLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div>
-            <Breadcrumb items={[]} />
-          </div>
-          <div className="flex justify-between items-center pb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                관리자 대시보드
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/')}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                <Home size={16} />
-                홈으로
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                <LogOut size={16} />
-                로그아웃
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <AdminLayout>
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+      <div className="p-8">
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md">
             {error}
           </div>
         )}
 
-        {/* Core Management Tools */}
+        {/* Page Header */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            핵심 관리 도구
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/admin/blog')}
-              className="flex items-center gap-3 p-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
-            >
-              <FileText size={24} />
-              <div className="text-left">
-                <div className="font-semibold">블로그 관리</div>
-                <div className="text-sm opacity-90">포스트 작성/편집</div>
-              </div>
-            </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/admin/storage')}
-              className="flex items-center gap-3 p-6 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-lg"
-            >
-              <Image size={24} />
-              <div className="text-left">
-                <div className="font-semibold">스토리지 관리</div>
-                <div className="text-sm opacity-90">버킷 파일 관리</div>
-              </div>
-            </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/admin/projects')}
-              className="flex items-center gap-3 p-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
-            >
-              <FolderOpen size={24} />
-              <div className="text-left">
-                <div className="font-semibold">프로젝트 관리</div>
-                <div className="text-sm opacity-90">프로젝트 작성/편집</div>
-              </div>
-            </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/admin/blog/categories')}
-              className="flex items-center gap-3 p-6 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-lg"
-            >
-              <Tag size={24} />
-              <div className="text-left">
-                <div className="font-semibold">포스트 카테고리</div>
-                <div className="text-sm opacity-90">포스트 분류/편집</div>
-              </div>
-            </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/admin/projects/categories')}
-              className="flex items-center gap-3 p-6 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors shadow-lg"
-            >
-              <Database size={24} />
-              <div className="text-left">
-                <div className="font-semibold">프로젝트 카테고리</div>
-                <div className="text-sm opacity-90">프로젝트 분류/편집</div>
-              </div>
-            </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/admin/comments')}
-              className="flex items-center gap-3 p-6 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors shadow-lg"
-            >
-              <MessageSquare size={24} />
-              <div className="text-left">
-                <div className="font-semibold">댓글 관리</div>
-                <div className="text-sm opacity-90">댓글 모니터링</div>
-              </div>
-            </motion.button>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            관리자 대시보드
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            포트폴리오 관리 현황을 한눈에 확인하세요
+          </p>
         </div>
 
         {/* Quick Actions */}
@@ -614,10 +508,8 @@ const AdminDashboard = () => {
             </div>
           </motion.div>
         </div>
-
-
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }
 
