@@ -6,12 +6,8 @@ import SEO from '../components/SEO'
 import DotNavigation from '../components/DotNavigation'
 import ImageWithFallback from '../components/ImageWithFallback'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
-import type { Project, ProjectCategory } from '../lib/supabase'
-
-// Project 타입 정의 (카테고리 정보 포함)
-interface ProjectWithCategory extends Project {
-  project_category?: ProjectCategory;
-}
+import type { ProjectCategory } from '../lib/supabase'
+import type { ProjectWithCategory } from '../types'
 
 const Home = () => {
   const [activeFilter, setActiveFilter] = useState('all')

@@ -21,6 +21,7 @@ import AdminPageHeader from '../components/admin/AdminPageHeader'
 import BlogBasicInfo from '../components/admin/blog/BlogBasicInfo'
 import BlogPublishSettings from '../components/admin/blog/BlogPublishSettings'
 import type { BlogPost, Category } from '../lib/supabase'
+import type { AdminBlogFormProps } from '../types'
 import ImageUpload from '../components/ImageUpload'
 import { ImageLibraryProvider, useImageLibrary } from '../contexts/ImageLibraryContext'
 import RichTextEditor from '../components/RichTextEditor'
@@ -36,10 +37,6 @@ const postSchema = z.object({
 })
 
 type PostFormData = z.infer<typeof postSchema>
-
-interface AdminBlogFormProps {
-  mode: 'new' | 'edit'
-}
 
 const AdminBlogFormContent: React.FC<AdminBlogFormProps> = ({ mode }) => {
   const [isLoading, setIsLoading] = useState(mode === 'edit')
@@ -57,7 +54,7 @@ const AdminBlogFormContent: React.FC<AdminBlogFormProps> = ({ mode }) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { openImageLibrary } = useImageLibrary()
+  const { open: openImageLibrary } = useImageLibrary()
 
   const methods = useForm<PostFormData>({
     resolver: zodResolver(postSchema),
@@ -79,7 +76,7 @@ const AdminBlogFormContent: React.FC<AdminBlogFormProps> = ({ mode }) => {
   }
 
   const previewUrl = mode === 'edit' && post
-    ? `${window.location.origin}/blog/${post.post_no}`
+    ? `${window.location.origin}/blog/${post.id}`
     : ''
 
   useEffect(() => {
@@ -172,8 +169,10 @@ const AdminBlogFormContent: React.FC<AdminBlogFormProps> = ({ mode }) => {
       if (redirectAfterSave) {
         navigate('/admin/blog')
       } else if (previewDraftInNewTab && result.data) {
-        const savedPost = result.data[0] || result.data
-        window.open(`/blog/${savedPost.post_no}`, '_blank')
+        const savedPost = Array.isArray(result.data) ? result.data[0] : result.data
+        if (savedPost && 'id' in savedPost) {
+          window.open(`/blog/${(savedPost as any).id}`, '_blank')
+        }
       }
     } catch (err: any) {
       setError('포스트 저장에 실패했습니다.')
@@ -270,11 +269,9 @@ const AdminBlogFormContent: React.FC<AdminBlogFormProps> = ({ mode }) => {
               </div>
               <div className="p-6">
                 <ImageUpload
-                  currentImageUrl={imageUrl}
+                  currentImage={imageUrl}
                   onImageUpload={handleImageUpload}
-                  openImageLibrary={openImageLibrary}
                   bucketName="blog-images"
-                  folderPath="hero"
                 />
               </div>
             </section>

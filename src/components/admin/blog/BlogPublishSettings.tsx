@@ -1,14 +1,7 @@
 import { useFormContext } from 'react-hook-form'
 import { ChevronDown, ChevronUp, Globe, Clock, Eye, EyeOff } from 'lucide-react'
 
-interface BlogPublishSettingsProps {
-  isCollapsed?: boolean
-  onToggleCollapse?: () => void
-  redirectAfterSave: boolean
-  setRedirectAfterSave: (value: boolean) => void
-  previewDraftInNewTab: boolean
-  setPreviewDraftInNewTab: (value: boolean) => void
-}
+import type { BlogPublishSettingsProps } from '../../../types'
 
 const BlogPublishSettings: React.FC<BlogPublishSettingsProps> = ({
   isCollapsed = true,

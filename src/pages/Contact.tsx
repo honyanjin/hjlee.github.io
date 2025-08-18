@@ -10,6 +10,13 @@ import SEO from '../components/SEO'
 import Hero from '../components/Hero'
 import { supabase } from '../lib/supabase'
 import { UI_LABELS } from '../lib/constants'
+import type { 
+  ContactSettings, 
+  ContactInfo, 
+  Social, 
+  Hour, 
+  ContactFormData 
+} from '../types'
 
 const contactSchema = z.object({
   name: z.string().min(2, '이름은 2글자 이상이어야 합니다'),
@@ -18,50 +25,12 @@ const contactSchema = z.object({
   message: z.string().min(10, '메시지는 10글자 이상이어야 합니다')
 })
 
-type ContactFormData = z.infer<typeof contactSchema>
-
-type ContactSettingsT = {
-  id: string
-  show_hero: boolean
-  hero_title: string | null
-  hero_description: string | null
-  hero_bg_image_url: string | null
-  hero_cta_label: string | null
-  hero_cta_url: string | null
-  show_form: boolean
-  show_info: boolean
-  show_socials: boolean
-  show_hours: boolean
-  success_message: string | null
-  updated_at: string
-}
-
-type ContactInfoT = {
-  id: string
-  type: string
-  label: string | null
-  value: string | null
-  link: string | null
-  icon: string | null
-  display_order: number
-}
-
-type SocialT = {
-  id: string
-  name: string
-  url: string
-  icon: any
-  color: string | null
-  display_order: number
-}
-
-type HourT = {
-  id: string
-  label: string
-  time: string
-  note: string | null
-  display_order: number
-}
+// 중앙 타입 사용 (로컬 alias는 컴포넌트 내에서의 일관성을 위해 유지)
+type ContactFormDataLocal = z.infer<typeof contactSchema>
+type ContactSettingsT = ContactSettings
+type ContactInfoT = ContactInfo
+type SocialT = Social
+type HourT = Hour
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -77,7 +46,7 @@ const Contact = () => {
     handleSubmit,
     formState: { errors },
     reset
-  } = useForm<ContactFormData>({
+  } = useForm<ContactFormDataLocal>({
     resolver: zodResolver(contactSchema)
   })
 
@@ -131,7 +100,7 @@ const Contact = () => {
     enabled.form || enabled.info || enabled.socials || enabled.hours
   ), [enabled])
 
-  const onSubmit = async (data: ContactFormData) => {
+  const onSubmit = async (data: ContactFormDataLocal) => {
     try {
       setIsSubmitting(true)
       // Call Edge Function for rate-limited submission

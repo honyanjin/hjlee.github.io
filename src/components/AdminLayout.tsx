@@ -1,10 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ChevronDown, ChevronRight, LayoutDashboard, FileCog, Mail, FileText, FolderOpen, Tag, Database } from 'lucide-react'
-
-interface AdminLayoutProps {
-  children: ReactNode
-}
+import type { AdminLayoutProps } from '../types'
 
 interface MenuItem {
   id: string

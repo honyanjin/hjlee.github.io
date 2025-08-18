@@ -1,16 +1,6 @@
 import { useState } from 'react'
 import { getDefaultImage, getFallbackImage, type ImageType } from '../lib/constants'
-
-interface ImageWithFallbackProps {
-  src?: string | null
-  alt: string
-  className?: string
-  defaultType?: ImageType
-  fallbackType?: ImageType
-  onError?: () => void
-  onLoad?: () => void
-  id?: string
-}
+import type { ImageWithFallbackProps } from '../types'
 
 const ImageWithFallback = ({
   src,

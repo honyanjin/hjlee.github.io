@@ -2,13 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useImageLibrary } from '../contexts/ImageLibraryContext'
-
-interface ImageUploadProps {
-  onImageUpload: (url: string) => void
-  currentImage?: string
-  className?: string
-  bucketName?: 'blog-images' | 'project-images'
-}
+import type { ImageUploadProps } from '../types'
 
 const ImageUpload = ({ 
   onImageUpload, 

@@ -7,7 +7,8 @@ import SEO from '../components/SEO'
 import ImageWithFallback from '../components/ImageWithFallback'
 import Hero from '../components/Hero'
 import { supabase, testSupabaseConnection } from '../lib/supabase'
-import type { Project, ProjectCategory } from '../lib/supabase'
+import type { ProjectCategory } from '../lib/supabase'
+import type { ProjectWithCategory, ProjectCardProps } from '../types'
 
 // Intersection Observer 커스텀 훅
 function useInView(threshold = 0.2) {
@@ -25,17 +26,6 @@ function useInView(threshold = 0.2) {
   }, [threshold]);
 
   return [ref, inView] as const;
-}
-
-// Project 타입 정의 (카테고리 정보 포함)
-interface ProjectWithCategory extends Project {
-  project_category?: ProjectCategory;
-}
-
-// Project Card 컴포넌트
-interface ProjectCardProps {
-  project: ProjectWithCategory;
-  index: number;
 }
 
 const ProjectCard = ({ project, index }: ProjectCardProps) => {

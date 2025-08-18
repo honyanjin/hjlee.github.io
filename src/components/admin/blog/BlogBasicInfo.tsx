@@ -2,12 +2,7 @@ import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { ChevronDown, ChevronUp, Calendar, Tag, User } from 'lucide-react'
 import type { Category } from '../../../lib/supabase'
-
-interface BlogBasicInfoProps {
-  categories: Category[]
-  isCollapsed?: boolean
-  onToggleCollapse?: () => void
-}
+import type { BlogBasicInfoProps } from '../../../types'
 
 const BlogBasicInfo: React.FC<BlogBasicInfoProps> = ({
   categories,
@@ -77,7 +72,7 @@ const BlogBasicInfo: React.FC<BlogBasicInfoProps> = ({
               placeholder="포스트 제목을 입력하세요"
             />
             {errors.title && (
-              <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+              <p className="text-red-500 text-sm mt-1">{String(errors.title.message)}</p>
             )}
           </div>
 
@@ -115,7 +110,7 @@ const BlogBasicInfo: React.FC<BlogBasicInfoProps> = ({
               ))}
             </select>
             {errors.category && (
-              <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
+              <p className="text-red-500 text-sm mt-1">{String(errors.category.message)}</p>
             )}
           </div>
 
@@ -147,7 +142,7 @@ const BlogBasicInfo: React.FC<BlogBasicInfoProps> = ({
               placeholder="포스트의 요약을 입력하세요"
             />
             {errors.excerpt && (
-              <p className="text-red-500 text-sm mt-1">{errors.excerpt.message}</p>
+              <p className="text-red-500 text-sm mt-1">{String(errors.excerpt.message)}</p>
             )}
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               블로그 목록에서 표시될 요약 내용입니다

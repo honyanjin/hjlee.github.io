@@ -7,50 +7,16 @@ import SEO from '../components/SEO'
 import ImageWithFallback from '../components/ImageWithFallback'
 import Hero from '../components/Hero'
 import { supabase } from '../lib/supabase'
+import type { 
+  AboutPageSettings, 
+  AboutMeSettings, 
+  Skill
+} from '../types'
 
-type AboutPageSettingsT = {
-  id: string
-  show_about_me: boolean
-  show_experience: boolean
-  show_education: boolean
-  show_skills?: boolean
-  updated_at: string
-}
-
-type AboutMeSettingsT = {
-  id: string
-  display_profile_image: boolean
-  name: string | null
-  title: string | null
-  email: string | null
-  phone?: string | null
-  location: string | null
-  birth_year: number | null
-  show_email: boolean
-  show_phone?: boolean
-  show_location: boolean
-  show_birth_year: boolean
-  show_resume_button: boolean
-  resume_url: string | null
-  resume_label: string | null
-  hero_subtitle?: string | null
-  intro_title: string | null
-  intro_content_html: string | null
-  profile_image_url: string | null
-  side_image_url: string | null
-  updated_at: string
-}
-
-type SkillT = {
-  id: string
-  category: string
-  skill_name: string
-  proficiency: number
-  display_order: number
-  category_order?: number
-  created_at: string
-  updated_at: string
-}
+// 중앙 타입 사용 (로컬 alias는 필요에 따라 유지)
+type AboutPageSettingsT = AboutPageSettings
+type AboutMeSettingsT = AboutMeSettings
+type SkillT = Skill
 
 type ExperienceT = {
   id: string
