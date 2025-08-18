@@ -4,12 +4,15 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { supabase } from '../lib/supabase'
 import RichTextEditor from '../components/RichTextEditor'
+import { useAuth } from '../contexts/AuthContext'
+import { ImageLibraryProvider } from '../contexts/ImageLibraryContext'
 
 interface PartnerPageRow {
   id: string
   title: string
   is_published: boolean
   created_at: string
+  created_by: string | null
 }
 
 const AdminPartnerPages = () => {
@@ -19,18 +22,24 @@ const AdminPartnerPages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editorContent, setEditorContent] = useState('')
+  const [notice, setNotice] = useState('')
+  const [modalError, setModalError] = useState('')
+  const [showPreview, setShowPreview] = useState(false)
+  const [q, setQ] = useState('')
+  const [filterPub, setFilterPub] = useState<'all' | 'pub' | 'draft'>('all')
+  const [firstAssignee, setFirstAssignee] = useState<Record<string, string>>({})
+  const { user } = useAuth()
 
   const schema = useMemo(() => z.object({
     title: z.string().min(1, '제목을 입력하세요'),
-    excerpt: z.string().optional(),
-    is_published: z.boolean().default(false)
+    is_published: z.boolean()
   }), [])
 
   type FormData = z.infer<typeof schema>
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting }, watch, setValue } = useForm<FormData>({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { title: '', excerpt: '', is_published: false }
+    defaultValues: { title: '', is_published: false as boolean }
   })
 
   const load = async () => {
@@ -38,10 +47,27 @@ const AdminPartnerPages = () => {
       setLoading(true)
       const { data, error } = await supabase
         .from('partner_pages')
-        .select('id, title, is_published, created_at')
+        .select('id, title, is_published, created_at, created_by')
         .order('created_at', { ascending: false })
       if (error) throw error
       setRows(data ?? [])
+
+      const pageIds = (data ?? []).map(r => r.id)
+      if (pageIds.length > 0) {
+        const { data: assigns } = await supabase
+          .from('partner_page_assignments')
+          .select('page_id, user_id')
+          .in('page_id', pageIds)
+        const map: Record<string, string> = {}
+        for (const a of (assigns ?? []) as any[]) {
+          const pid = a.page_id as string
+          const uid = a.user_id as string
+          if (!map[pid]) map[pid] = uid
+        }
+        setFirstAssignee(map)
+      } else {
+        setFirstAssignee({})
+      }
     } catch (e: any) {
       setError(e.message || '로딩 실패')
     } finally {
@@ -51,16 +77,26 @@ const AdminPartnerPages = () => {
 
   useEffect(() => { load() }, [])
 
+  const filteredRows = useMemo(() => {
+    return rows.filter(r => {
+      const mq = q.trim() === '' || r.title.toLowerCase().includes(q.toLowerCase()) || r.id.includes(q)
+      const mp = filterPub === 'all' ? true : filterPub === 'pub' ? r.is_published : !r.is_published
+      return mq && mp
+    })
+  }, [rows, q, filterPub])
+
   const openCreate = () => {
     setEditingId(null)
-    reset({ title: '', excerpt: '', is_published: false })
+    reset({ title: '', is_published: false })
     setEditorContent('')
     setIsModalOpen(true)
+    setModalError('')
   }
 
   const openEdit = async (id: string) => {
     try {
       setError('')
+      setModalError('')
       const { data, error } = await supabase
         .from('partner_pages')
         .select('id, title, excerpt, is_published, content')
@@ -69,7 +105,7 @@ const AdminPartnerPages = () => {
       if (error) throw error
       if (!data) return
       setEditingId(id)
-      reset({ title: data.title, excerpt: data.excerpt ?? '', is_published: !!data.is_published })
+      reset({ title: data.title, is_published: !!data.is_published })
       setEditorContent(data.content || '')
       setIsModalOpen(true)
     } catch (e: any) {
@@ -88,7 +124,6 @@ const AdminPartnerPages = () => {
           .from('partner_pages')
           .update({
             title: form.title,
-            excerpt: form.excerpt ?? null,
             is_published: form.is_published,
             content: editorContent
           })
@@ -99,16 +134,20 @@ const AdminPartnerPages = () => {
           .from('partner_pages')
           .insert({
             title: form.title,
-            excerpt: form.excerpt ?? null,
             is_published: form.is_published,
             content: editorContent
           })
         if (error) throw error
       }
       setIsModalOpen(false)
+      setEditorContent('')
+      reset({ title: '', is_published: false })
+      setNotice(editingId ? '페이지가 수정되었습니다.' : '새 페이지가 생성되었습니다.')
+      setTimeout(() => setNotice(''), 3000)
       await load()
     } catch (e: any) {
-      setError(e.message || '저장 실패')
+      const msg = e?.message || '저장 실패'
+      setModalError(msg)
     }
   }
 
@@ -140,10 +179,29 @@ const AdminPartnerPages = () => {
   }
 
   return (
+    <ImageLibraryProvider>
     <div className="p-4 sm:p-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">파트너 페이지</h1>
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-gray-700 dark:text-gray-300">총 {rows.length}개</div>
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="제목/ID 검색"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="w-64 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
+          />
+          <select
+            value={filterPub}
+            onChange={(e) => setFilterPub(e.target.value as any)}
+            className="rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
+          >
+            <option value="all">전체</option>
+            <option value="pub">발행</option>
+            <option value="draft">임시</option>
+          </select>
+        </div>
+        <div className="text-gray-700 dark:text-gray-300">총 {filteredRows.length}개</div>
         <button
           onClick={openCreate}
           className="px-3 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700"
@@ -151,6 +209,11 @@ const AdminPartnerPages = () => {
           새 페이지
         </button>
       </div>
+      {notice && (
+        <div className="mb-3 px-4 py-3 rounded bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 border border-green-200 dark:border-green-800">
+          {notice}
+        </div>
+      )}
       {loading ? (
         <div className="text-gray-700 dark:text-gray-300">로딩 중...</div>
       ) : error ? (
@@ -168,7 +231,7 @@ const AdminPartnerPages = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-              {rows.map(r => (
+               {filteredRows.map(r => (
                 <tr key={r.id}>
                   <td className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{r.id}</td>
                   <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">{r.title}</td>
@@ -179,6 +242,19 @@ const AdminPartnerPages = () => {
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">{new Date(r.created_at).toLocaleString()}</td>
                   <td className="px-4 py-2 text-sm text-right space-x-2">
+                    {(() => {
+                      const ownerUid = r.created_by || firstAssignee[r.id] || user?.id
+                      return ownerUid ? (
+                        <a
+                          href={`/partner/pages/${ownerUid}/${r.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200"
+                        >
+                          보기
+                        </a>
+                      ) : null
+                    })()}
                     <button onClick={() => togglePublish(r.id, !r.is_published)} className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200">
                       {r.is_published ? 'Unpublish' : 'Publish'}
                     </button>
@@ -200,6 +276,11 @@ const AdminPartnerPages = () => {
               <button onClick={() => setIsModalOpen(false)} className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">닫기</button>
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-4">
+              {modalError && (
+                <div className="px-4 py-3 rounded bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300 border border-red-200 dark:border-red-800">
+                  {modalError}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">제목</label>
                 <input
@@ -209,22 +290,27 @@ const AdminPartnerPages = () => {
                 />
                 {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">요약</label>
-                <textarea
-                  rows={2}
-                  className="mt-1 w-full rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
-                  {...register('excerpt')}
-                />
-              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">본문</label>
                 <RichTextEditor value={editorContent} onChange={setEditorContent} height={400} />
               </div>
-              <div className="flex items-center gap-2">
-                <input id="is_published" type="checkbox" {...register('is_published')} />
-                <label htmlFor="is_published" className="text-sm text-gray-800 dark:text-gray-200">발행</label>
+              <div className="flex items-center gap-4">
+                <label className="inline-flex items-center gap-2">
+                  <input id="is_published" type="checkbox" {...register('is_published')} />
+                  <span className="text-sm text-gray-800 dark:text-gray-200">발행</span>
+                </label>
+                <label className="inline-flex items-center gap-2">
+                  <input type="checkbox" checked={showPreview} onChange={(e) => setShowPreview(e.target.checked)} />
+                  <span className="text-sm text-gray-800 dark:text-gray-200">미리보기</span>
+                </label>
               </div>
+              {showPreview && (
+                <div className="border border-gray-200 dark:border-gray-800 rounded p-3">
+                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">미리보기</div>
+                  <article className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: editorContent }} />
+                </div>
+              )}
               <div className="pt-2">
                 <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50">
                   {isSubmitting ? '저장 중...' : '저장'}
@@ -235,6 +321,7 @@ const AdminPartnerPages = () => {
         </div>
       )}
     </div>
+    </ImageLibraryProvider>
   )
 }
 

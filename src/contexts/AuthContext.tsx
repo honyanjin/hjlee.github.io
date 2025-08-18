@@ -10,6 +10,7 @@ interface AuthContextType {
   isAdmin: boolean
   isPartner: boolean
   partnerPages: { id: string; title: string }[]
+  partnerResolved: boolean
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
 }
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAdmin, setIsAdmin] = useState(false)
   const [isPartner, setIsPartner] = useState(false)
   const [partnerPages, setPartnerPages] = useState<{ id: string; title: string }[]>([])
+  const [partnerResolved, setPartnerResolved] = useState(false)
 
   useEffect(() => {
     // 초기 세션 가져오기
@@ -57,6 +59,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } else {
         setIsPartner(false)
         setPartnerPages([])
+        setPartnerResolved(true)
       }
     }
 
@@ -81,6 +84,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         } else {
           setIsPartner(false)
           setPartnerPages([])
+          setPartnerResolved(true)
         }
       }
     )
@@ -122,6 +126,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const fetchPartnerState = async (uid: string) => {
     try {
+      setPartnerResolved(false)
       // partner_profiles 존재 여부 확인
       const { data: profile } = await supabase
         .from('partner_profiles')
@@ -156,6 +161,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } catch {
       setIsPartner(false)
       setPartnerPages([])
+    } finally {
+      setPartnerResolved(true)
     }
   }
 
@@ -166,6 +173,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isAdmin,
     isPartner,
     partnerPages,
+    partnerResolved,
     signIn,
     signOut
   }

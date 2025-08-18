@@ -14,6 +14,7 @@ import Login from './pages/Login'
 const PartnerLogin = lazy(() => import('./pages/PartnerLogin'))
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'))
 const PartnerPage = lazy(() => import('./pages/PartnerPage'))
+const PartnerNewPage = lazy(() => import('./pages/PartnerNewPage'))
 
 // Admin pages (code-splitting)
 const AdminBlog = lazy(() => import('./pages/AdminBlog'))
@@ -60,7 +61,7 @@ function App() {
             <Route id="partner-login-route" path="/partner/login" element={<PartnerLogin />} />
             <Route 
               id="partner-dashboard-route"
-              path="/partner"
+              path="/partner/:userId"
               element={
                 <ProtectedRoute requirePartner={true}>
                   <PartnerDashboard />
@@ -68,8 +69,17 @@ function App() {
               }
             />
             <Route 
+              id="partner-new-page-route"
+              path="/partner/:userId/pages/new"
+              element={
+                <ProtectedRoute requirePartner={true}>
+                  <PartnerNewPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
               id="partner-page-route"
-              path="/partner/pages/:id"
+              path="/partner/pages/:userId/:pageId"
               element={
                 <ProtectedRoute requirePartner={true}>
                   <PartnerPage />

@@ -21,7 +21,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const partnerPath = user && isPartner ? '/partner' : '/partner/login'
+  const partnerPath = user && isPartner ? `/partner/${user.id}` : '/partner/login'
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },

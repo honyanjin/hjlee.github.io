@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react'
 
 const loginSchema = z.object({
@@ -19,8 +20,15 @@ const PartnerLogin = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   
-  const { signIn } = useAuth()
+  const { signIn, user, isPartner, partnerResolved } = useAuth()
   const navigate = useNavigate()
+
+  // 이미 로그인된 파트너는 로그인 페이지 접근 시 자동 리다이렉트
+  useEffect(() => {
+    if (partnerResolved && user && isPartner) {
+      navigate(`/partner/${user.id}`, { replace: true })
+    }
+  }, [partnerResolved, user, isPartner, navigate])
 
   const {
     register,
@@ -35,7 +43,10 @@ const PartnerLogin = () => {
     setError('')
     try {
       await signIn(data.email, data.password)
-      navigate('/partner')
+      // 로그인 직후 사용자 ID를 확보해 파트너 전용 경로로 이동
+      const { data: userRes } = await supabase.auth.getUser()
+      const uid = userRes?.user?.id
+      setTimeout(() => navigate(uid ? `/partner/${uid}` : '/partner'), 100)
     } catch (err: any) {
       setError(err.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.')
     } finally {
