@@ -84,19 +84,19 @@ const AdminDashboard = () => {
     try {
       const [postsRes, projectsRes, categoriesRes, projectCategoriesRes, commentsRes] = await Promise.allSettled([
         withTimeout(
-          supabase.from('blog_posts').select('*').order('created_at', { ascending: false })
+          Promise.resolve(supabase.from('blog_posts').select('*').order('created_at', { ascending: false }))
         ),
         withTimeout(
-          supabase.from('projects').select('*').order('created_at', { ascending: false })
+          Promise.resolve(supabase.from('projects').select('*').order('created_at', { ascending: false }))
         ),
         withTimeout(
-          supabase.from('categories').select('*')
+          Promise.resolve(supabase.from('categories').select('*'))
         ),
         withTimeout(
-          supabase.from('project_categories').select('*')
+          Promise.resolve(supabase.from('project_categories').select('*'))
         ),
         withTimeout(
-          supabase.from('comments').select('*').order('created_at', { ascending: false })
+          Promise.resolve(supabase.from('comments').select('*').order('created_at', { ascending: false }))
         )
       ])
 

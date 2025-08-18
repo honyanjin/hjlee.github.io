@@ -253,7 +253,7 @@ const BlogPost = () => {
           image={post.image_url || '/og-image.jpg'}
           url={window.location.href}
           type="article"
-          publishedTime={post.published_at || post.created_at}
+          publishedTime={post.created_at}
           modifiedTime={post.updated_at}
           section={post.category}
           tags={post.tags || []}
@@ -349,7 +349,7 @@ const BlogPost = () => {
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-1 sm:gap-2">
                     <Calendar size={14} className="sm:w-4 sm:h-4" />
-                    <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
+                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2">
                     <User size={14} className="sm:w-4 sm:h-4" />

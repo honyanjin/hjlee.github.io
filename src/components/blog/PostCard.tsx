@@ -78,7 +78,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, index = 0, categories, getPos
           <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             <div className="flex items-center gap-1">
               <Calendar size={12} className="sm:w-3.5 sm:h-3.5" />
-              <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
+              <span>{new Date(post.created_at).toLocaleDateString()}</span>
             </div>
           </div>
           <h3 

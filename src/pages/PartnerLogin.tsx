@@ -151,6 +151,16 @@ const PartnerLogin = () => {
               {isLoading ? '로그인 중...' : '로그인'}
             </button>
           </div>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-200"
+            >
+              ← 포트폴리오로 돌아가기
+            </button>
+          </div>
         </form>
       </motion.div>
     </div>

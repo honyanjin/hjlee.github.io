@@ -9,6 +9,7 @@ import ShareButtons from '../components/ShareButtons'
 import SectionHeader from '../components/blog/SectionHeader'
 import PostsGrid from '../components/blog/PostsGrid'
 import RecommendedPostsCarousel from '../components/blog/RecommendedPostsCarousel'
+import AllPostsCarousel from '../components/blog/AllPostsCarousel'
 import Hero from '../components/Hero'
 import { supabase } from '../lib/supabase'
 import type { BlogPost, Category } from '../lib/supabase'
@@ -27,6 +28,15 @@ const Blog = () => {
     hero_bg_image_url?: string | null
     hero_cta_label?: string | null
     hero_cta_url?: string | null
+    featured_post_enabled?: boolean
+    featured_post_title?: string | null
+    featured_post_description?: string | null
+    recommended_posts_enabled?: boolean
+    recommended_posts_title?: string | null
+    recommended_posts_description?: string | null
+    all_posts_enabled?: boolean
+    all_posts_title?: string | null
+    all_posts_description?: string | null
   } | null>(null)
 
   // 포스트 데이터 가져오기
@@ -78,10 +88,10 @@ const Blog = () => {
 
       if (error) throw error
       
-      // published_at이 null인 경우를 고려하여 정렬
+      // created_at 기준으로 정렬
       const sortedPosts = (data || []).sort((a, b) => {
-        const aDate = a.published_at ? new Date(a.published_at) : new Date(a.created_at)
-        const bDate = b.published_at ? new Date(b.published_at) : new Date(b.created_at)
+        const aDate = new Date(a.created_at)
+        const bDate = new Date(b.created_at)
         return bDate.getTime() - aDate.getTime() // 최신순 정렬
       })
       
@@ -285,9 +295,9 @@ const Blog = () => {
       <DotNavigation
         sections={[
           'blog-hero',
-          'featured-post-section',
-          ...(recommendedPosts.length > 0 ? ['recommended-posts-section'] : []),
-          'all-posts-section',
+          ...(pageSettings?.featured_post_enabled ? ['featured-post-section'] : []),
+          ...(pageSettings?.recommended_posts_enabled && recommendedPosts.length > 0 ? ['recommended-posts-section'] : []),
+          ...(pageSettings?.all_posts_enabled ? ['all-posts-section'] : []),
         ]}
       />
       <SEO 
@@ -309,155 +319,157 @@ const Blog = () => {
       />
 
       {/* Featured Post - 반응형 개선 */}
-      <section id="featured-post-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6 bg-white dark:bg-gray-800">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            id="featured-post-header"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-8 sm:mb-12 lg:mb-16"
-          >
-            <h2 id="featured-post-title" className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
-              Featured Post
-            </h2>
-            <p id="featured-post-description" className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300">
-              최신 블로그 포스트를 확인해보세요
-            </p>
-          </motion.div>
-
-          {featuredPost ? (
+      {pageSettings?.featured_post_enabled && (
+        <section id="featured-post-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6 bg-white dark:bg-gray-800">
+          <div className="max-w-6xl mx-auto">
             <motion.div
-              id="featured-post-card"
+              id="featured-post-header"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg"
+              className="text-center mb-8 sm:mb-12 lg:mb-16"
             >
-              <div className="grid lg:grid-cols-2">
-                <div className="relative overflow-hidden h-48 sm:h-56 lg:h-auto">
-                  {featuredPost.image_url ? (
-                    <>
-                      <img 
-                        id="featured-post-image"
-                        {...getPostImageProps(featuredPost)}
-                        alt={featuredPost.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-                        onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
-                      />
-                      {featuredPost.image_caption_text && (
-                        <div className="pointer-events-none absolute inset-0 flex items-end justify-center">
-                          <div className="w-full p-3 sm:p-4 bg-gradient-to-t from-black/60 to-transparent text-center">
-                            <span
-                              className="font-semibold drop-shadow-md"
-                              style={{ color: featuredPost.image_caption_color || '#ffffff', fontSize: `${featuredPost.image_caption_size || 16}px`, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
-                            >
-                              {featuredPost.image_caption_text}
-                            </span>
+              <h2 id="featured-post-title" className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+                {pageSettings.featured_post_title ?? "Featured Post"}
+              </h2>
+              <p id="featured-post-description" className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300">
+                {pageSettings.featured_post_description ?? "최신 블로그 포스트를 확인해보세요"}
+              </p>
+            </motion.div>
+
+            {featuredPost ? (
+              <motion.div
+                id="featured-post-card"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg"
+              >
+                <div className="grid lg:grid-cols-2">
+                  <div className="relative overflow-hidden h-48 sm:h-56 lg:h-auto">
+                    {featuredPost.image_url ? (
+                      <>
+                        <img 
+                          id="featured-post-image"
+                          {...getPostImageProps(featuredPost)}
+                          alt={featuredPost.title}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                          onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
+                        />
+                        {featuredPost.image_caption_text && (
+                          <div className="pointer-events-none absolute inset-0 flex items-end justify-center">
+                            <div className="w-full p-3 sm:p-4 bg-gradient-to-t from-black/60 to-transparent text-center">
+                              <span
+                                className="font-semibold drop-shadow-md"
+                                style={{ color: featuredPost.image_caption_color || '#ffffff', fontSize: `${featuredPost.image_caption_size || 16}px`, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
+                              >
+                                {featuredPost.image_caption_text}
+                              </span>
+                            </div>
                           </div>
+                        )}
+                      </>
+                    ) : (
+                      <div 
+                        id="featured-post-image"
+                        className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        style={getBackgroundStyle(featuredPost)}
+                        onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
+                      >
+                        <div className="text-white text-center px-4">
+                          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
+                            {(() => {
+                              const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
+                              return foundCategory ? foundCategory.name.toUpperCase() : (featuredPost.category?.toUpperCase() || 'BLOG')
+                            })()}
+                          </div>
+                          <div className="text-sm sm:text-base lg:text-lg opacity-90">Blog Post</div>
                         </div>
-                      )}
-                    </>
-                  ) : (
-                    <div 
-                      id="featured-post-image"
-                      className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform duration-300 cursor-pointer"
-                      style={getBackgroundStyle(featuredPost)}
-                      onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
-                    >
-                      <div className="text-white text-center px-4">
-                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
-                          {(() => {
-                            const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
-                            return foundCategory ? foundCategory.name.toUpperCase() : (featuredPost.category?.toUpperCase() || 'BLOG')
-                          })()}
-                        </div>
-                        <div className="text-sm sm:text-base lg:text-lg opacity-90">Blog Post</div>
-                      </div>
-                    </div>
-                  )}
-                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
-                    <ShareButtons 
-                      title={featuredPost.title}
-                      url={`${window.location.origin}/blog/${featuredPost.post_no}`}
-                      description={featuredPost.excerpt}
-                      size="sm"
-                    />
-                  </div>
-                </div>
-                <div className="p-4 sm:p-6 lg:p-8 flex flex-col">
-                  {/* 상단 내용 (카테고리, 날짜, 제목, 요약, 태그) */}
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                      <span id="featured-post-category" className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
-                        {(() => {
-                          const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
-                          return foundCategory ? foundCategory.name : featuredPost.category
-                        })()}
-                      </span>
-                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
-                        <Calendar size={14} className="sm:w-4 sm:h-4" />
-                        <span id="featured-post-date" className="text-xs sm:text-sm">
-                          {new Date(featuredPost.published_at || featuredPost.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                    <h3 
-                      id="featured-post-title-text" 
-                      className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                      onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
-                    >
-                      {featuredPost.title}
-                    </h3>
-                    <p id="featured-post-excerpt" className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 line-clamp-3">
-                      {featuredPost.excerpt}
-                    </p>
-                    {featuredPost.tags && featuredPost.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
-                        {featuredPost.tags.map((tag, index) => (
-                          <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full dark:bg-gray-600 dark:text-gray-300">
-                            {tag}
-                          </span>
-                        ))}
                       </div>
                     )}
+                    <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
+                      <ShareButtons 
+                        title={featuredPost.title}
+                        url={`${window.location.origin}/blog/${featuredPost.post_no}`}
+                        description={featuredPost.excerpt}
+                        size="sm"
+                      />
+                    </div>
                   </div>
-                  
-                  {/* 하단 고정 영역 (작성자와 자세히 보기) */}
-                  <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-600">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
-                        <User size={14} className="sm:w-4 sm:h-4" />
-                        <span id="featured-post-author" className="text-xs sm:text-sm">{featuredPost.author}</span>
+                  <div className="p-4 sm:p-6 lg:p-8 flex flex-col">
+                    {/* 상단 내용 (카테고리, 날짜, 제목, 요약, 태그) */}
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                        <span id="featured-post-category" className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full dark:bg-blue-900 dark:text-blue-200">
+                          {(() => {
+                            const foundCategory = categories.find(cat => cat.slug === featuredPost.category || cat.id === featuredPost.category)
+                            return foundCategory ? foundCategory.name : featuredPost.category
+                          })()}
+                        </span>
+                        <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                          <Calendar size={14} className="sm:w-4 sm:h-4" />
+                          <span id="featured-post-date" className="text-xs sm:text-sm">
+                            {new Date(featuredPost.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
-                      <button 
-                        id="featured-post-read-more" 
+                      <h3 
+                        id="featured-post-title-text" 
+                        className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                         onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
-                        className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm sm:text-base"
                       >
-                        <span>자세히 보기</span>
-                        <ArrowRight size={14} className="sm:w-4 sm:h-4" />
-                      </button>
+                        {featuredPost.title}
+                      </h3>
+                      <p id="featured-post-excerpt" className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 line-clamp-3">
+                        {featuredPost.excerpt}
+                      </p>
+                      {featuredPost.tags && featuredPost.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
+                          {featuredPost.tags.map((tag, index) => (
+                            <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full dark:bg-gray-600 dark:text-gray-300">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* 하단 고정 영역 (작성자와 자세히 보기) */}
+                    <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-600">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                        <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                          <User size={14} className="sm:w-4 sm:h-4" />
+                          <span id="featured-post-author" className="text-xs sm:text-sm">{featuredPost.author}</span>
+                        </div>
+                        <button 
+                          id="featured-post-read-more" 
+                          onClick={() => navigate(`/blog/${featuredPost.post_no}`)}
+                          className="flex items-center gap-1 sm:gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm sm:text-base"
+                        >
+                          <span>자세히 보기</span>
+                          <ArrowRight size={14} className="sm:w-4 sm:h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
+              </motion.div>
+            ) : (
+              <div className="text-center py-8 sm:py-12">
+                <p className="text-gray-600 dark:text-gray-400">아직 발행된 포스트가 없습니다.</p>
               </div>
-            </motion.div>
-          ) : (
-            <div className="text-center py-8 sm:py-12">
-              <p className="text-gray-600 dark:text-gray-400">아직 발행된 포스트가 없습니다.</p>
-            </div>
-          )}
-        </div>
-      </section>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Recommended Posts - 반응형 개선 */}
-      {recommendedPosts.length > 0 && (
+      {pageSettings?.recommended_posts_enabled && (
         <section id="recommended-posts-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6 bg-gray-50 dark:bg-gray-700">
           <div className="max-w-6xl mx-auto">
-            <SectionHeader title="Recommended Posts" description="추천 포스트를 확인해보세요" />
+            <SectionHeader title={pageSettings.recommended_posts_title ?? "Recommended Posts"} description={pageSettings.recommended_posts_description ?? "추천 포스트를 확인해보세요"} />
             <RecommendedPostsCarousel 
               posts={recommendedPosts}
               categories={categories}
@@ -469,82 +481,84 @@ const Blog = () => {
       )}
 
       {/* All Posts - 반응형 개선 */}
-      <section id="all-posts-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6">
-        <div className="max-w-6xl mx-auto">
-          <SectionHeader title="All Posts" description="모든 블로그 포스트를 확인해보세요" />
+      {pageSettings?.all_posts_enabled && (
+        <section id="all-posts-section" className="py-12 sm:py-16 lg:py-20 px-3 sm:px-4 lg:px-6">
+          <div className="max-w-6xl mx-auto">
+            <SectionHeader title={pageSettings.all_posts_title ?? "All Posts"} description={pageSettings.all_posts_description ?? "모든 블로그 포스트를 확인해보세요"} />
 
-          {/* Search Bar - 반응형 개선 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="max-w-sm sm:max-w-md lg:max-w-lg mx-auto mb-6 sm:mb-8"
-          >
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="포스트 검색..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
-              />
-            </div>
-          </motion.div>
-
-          {/* Category Filter - 반응형 개선 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="flex flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4 mb-8 sm:mb-10 lg:mb-12 px-4"
-          >
-            <button
-              onClick={() => setActiveCategory('all')}
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                activeCategory === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-              }`}
+            {/* Search Bar - 반응형 개선 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="max-w-sm sm:max-w-md lg:max-w-lg mx-auto mb-6 sm:mb-8"
             >
-              전체
-            </button>
-            {categories.map((category) => (
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="포스트 검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
+                />
+              </div>
+            </motion.div>
+
+            {/* Category Filter - 반응형 개선 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="flex flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4 mb-8 sm:mb-10 lg:mb-12 px-4"
+            >
               <button
-                key={category.id}
-                id={`category-filter-${category.slug}`}
-                onClick={() => setActiveCategory(category.slug)}
+                onClick={() => setActiveCategory('all')}
                 className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                  activeCategory === category.slug
+                  activeCategory === 'all'
                     ? 'bg-blue-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
-                {category.name}
+                전체
               </button>
-            ))}
-          </motion.div>
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  id={`category-filter-${category.slug}`}
+                  onClick={() => setActiveCategory(category.slug)}
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+                    activeCategory === category.slug
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </motion.div>
 
-          {filteredPosts.length === 0 ? (
-            <div className="text-center py-8 sm:py-12">
-              <p className="text-gray-600 dark:text-gray-400">
-                {searchTerm || activeCategory !== 'all' 
-                  ? '검색 결과가 없습니다.' 
-                  : '아직 발행된 포스트가 없습니다.'}
-              </p>
-            </div>
-          ) : (
-            <PostsGrid 
-              posts={filteredPosts}
-              categories={categories}
-              getPostImageProps={getPostImageProps}
-              getBackgroundStyle={getBackgroundStyle}
-            />
-          )}
-        </div>
-      </section>
+            {filteredPosts.length === 0 ? (
+              <div className="text-center py-8 sm:py-12">
+                <p className="text-gray-600 dark:text-gray-400">
+                  {searchTerm || activeCategory !== 'all' 
+                    ? '검색 결과가 없습니다.' 
+                    : '아직 발행된 포스트가 없습니다.'}
+                </p>
+              </div>
+            ) : (
+              <AllPostsCarousel 
+                posts={filteredPosts}
+                categories={categories}
+                getPostImageProps={getPostImageProps}
+                getBackgroundStyle={getBackgroundStyle}
+              />
+            )}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
