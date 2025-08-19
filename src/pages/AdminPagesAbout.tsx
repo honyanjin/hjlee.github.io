@@ -11,6 +11,9 @@ import AboutExperience from '../components/admin/about/AboutExperience'
 import AboutEducation from '../components/admin/about/AboutEducation'
 import HeroSettings from '../components/HeroSettings'
 import RichTextEditor from '../components/RichTextEditor'
+import ImageUpload from '../components/ImageUpload'
+import FileUpload from '../components/FileUpload'
+import ImageWithFallback from '../components/ImageWithFallback'
 import { ImageLibraryProvider } from '../contexts/ImageLibraryContext'
 import { supabase } from '../lib/supabase'
 
@@ -101,7 +104,9 @@ const aboutMeSettingsSchema = z.object({
   resume_url: z.string().url('올바른 URL을 입력하세요').optional().or(z.literal('')),
   resume_label: z.string().optional(),
   intro_title: z.string().min(1, '소개 제목을 입력하세요'),
-  intro_content_html: z.string().min(1, '소개 내용을 입력하세요')
+  intro_content_html: z.string().min(1, '소개 내용을 입력하세요'),
+  profile_image_url: z.string().optional(),
+  side_image_url: z.string().optional()
 })
 
 type AboutMeSettingsForm = z.infer<typeof aboutMeSettingsSchema>
@@ -182,7 +187,9 @@ const AdminPagesAboutContent = () => {
           resume_url: data.resume_url || '',
           resume_label: data.resume_label || '',
           intro_title: data.intro_title || '',
-          intro_content_html: data.intro_content_html || ''
+          intro_content_html: data.intro_content_html || '',
+          profile_image_url: data.profile_image_url || '',
+          side_image_url: data.side_image_url || ''
         })
       }
 
@@ -235,6 +242,8 @@ const AdminPagesAboutContent = () => {
           resume_label: data.resume_label,
           intro_title: data.intro_title,
           intro_content_html: data.intro_content_html,
+          profile_image_url: data.profile_image_url || null,
+          side_image_url: data.side_image_url || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', aboutMeSettings?.id)
@@ -495,6 +504,8 @@ const AdminPagesAboutContent = () => {
                   </div>
                 </div>
 
+
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     소개 제목 *
@@ -510,7 +521,84 @@ const AdminPagesAboutContent = () => {
                   )}
                 </div>
 
-                                <div>
+                {/* 이미지 및 이력서 업로드 섹션 */}
+                <div className="grid md:grid-cols-3 gap-6">
+                  {/* 기본카드 이미지 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      기본카드 이미지
+                    </label>
+                    <ImageUpload
+                      onImageUpload={(url) => {
+                        setAboutMeSettings(prev => prev ? { ...prev, profile_image_url: url } : null)
+                        setValue('profile_image_url', url)
+                      }}
+                      currentImage={aboutMeSettings?.profile_image_url}
+                      bucketName="admin-pic"
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* 소개카드 이미지 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      소개카드 이미지
+                    </label>
+                    <ImageUpload
+                      onImageUpload={(url) => {
+                        setAboutMeSettings(prev => prev ? { ...prev, side_image_url: url } : null)
+                        setValue('side_image_url', url)
+                      }}
+                      currentImage={aboutMeSettings?.side_image_url}
+                      bucketName="admin-pic"
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* 이력서 설정 */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        이력서 파일
+                      </label>
+                      <FileUpload
+                        onFileUpload={(url) => {
+                          setAboutMeSettings(prev => prev ? { ...prev, resume_url: url } : null)
+                          setValue('resume_url', url)
+                        }}
+                        currentFile={aboutMeSettings?.resume_url}
+                        bucketName="resume-files"
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        버튼 텍스트
+                      </label>
+                      <input
+                        {...register('resume_label')}
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        placeholder="이력서 다운로드"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <input
+                        {...register('show_resume_button')}
+                        type="checkbox"
+                        id="show_resume_button"
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <label htmlFor="show_resume_button" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        이력서 다운로드 버튼 표시
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     소개 내용 *
                   </label>

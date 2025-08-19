@@ -292,9 +292,9 @@ export interface ImageWithFallbackProps {
 
 export interface ImageUploadProps {
   onImageUpload: (url: string) => void
-  currentImage?: string
+  currentImage?: string | null
   className?: string
-  bucketName?: 'blog-images' | 'project-images'
+  bucketName?: 'blog-images' | 'project-images' | 'admin-pic' | 'resume-files'
 }
 
 // =============================================================================

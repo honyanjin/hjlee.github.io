@@ -113,7 +113,9 @@ const ImageUpload = ({
 
   const { open } = useImageLibrary()
   const openLibrary = async () => {
-    const url = await open({ bucket: bucketName })
+    // admin-pic 버킷을 직접 전달
+    const bucket = bucketName || 'blog-images'
+    const url = await open({ bucket: bucket as any })
     if (url) onImageUpload(url)
   }
 

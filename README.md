@@ -160,6 +160,9 @@ VITE_BASE_PATH=/hjlee.github.io
 - `contact_socials`
 - `contact_hours`
 
+<details>
+<summary><strong>📊 데이터베이스 스키마 (SQL) - 클릭하여 펼치기</strong></summary>
+
 ```sql
 -- 블로그 포스트 테이블
 CREATE TABLE blog_posts (
@@ -422,6 +425,8 @@ CREATE TABLE contact_hours (
   display_order INTEGER DEFAULT 0
 );
 ```
+
+</details>
 
 **4.3 Storage 버킷 생성**
 1. Storage 섹션으로 이동
@@ -1102,7 +1107,7 @@ MIT License
 
 ## 📞 연락처
 
-이호진 - [GitHub](https://github.com/honyanjin) - hjlee.dev@gmail.com
+이호진 - [GitHub](https://github.com/honyanjin) - lhjwork2018@naver.com
 
 프로젝트 링크: [https://github.com/honyanjin/hjlee.github.io](https://github.com/honyanjin/hjlee.github.io)
 
