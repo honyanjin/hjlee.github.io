@@ -1,88 +1,75 @@
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Download } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import SEO from '../components/SEO'
 import DotNavigation from '../components/DotNavigation'
 import ImageWithFallback from '../components/ImageWithFallback'
-import { supabase, testSupabaseConnection } from '../lib/supabase'
-import type { ProjectCategory } from '../lib/supabase'
+import LoadingSpinner from '../components/common/LoadingSpinner'
+import ErrorMessage from '../components/common/ErrorMessage'
+import EmptyState from '../components/common/EmptyState'
+import { useProjects, useProjectCategories } from '../hooks/useProjects'
 import type { ProjectWithCategory } from '../types'
 
 const Home = () => {
   const [activeFilter, setActiveFilter] = useState('all')
-  const [projects, setProjects] = useState<ProjectWithCategory[]>([])
-  const [categories, setCategories] = useState<ProjectCategory[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  
+  // 새로운 훅 사용
+  const { 
+    data: projects, 
+    loading: projectsLoading, 
+    error: projectsError,
+    refetch: refetchProjects
+  } = useProjects()
+  
+  const { 
+    data: categories, 
+    loading: categoriesLoading,
+    error: categoriesError,
+    refetch: refetchCategories
+  } = useProjectCategories()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        setError(null)
+  // 전체 로딩 상태 계산
+  const loading = projectsLoading || categoriesLoading
+  
+  // 전체 에러 상태 계산
+  const error = projectsError || categoriesError
+  
+  // 재시도 함수
+  const handleRetry = () => {
+    refetchProjects()
+    refetchCategories()
+  }
+
+  // 필터링된 프로젝트 목록 (홈페이지에서는 최대 8개로 제한)
+  const filteredProjects = useMemo(() => {
+    const allProjects = projects || []
+    const filtered = activeFilter === 'all' 
+      ? allProjects 
+      : allProjects.filter(project => project.category === activeFilter)
+    
+    // 홈페이지에서는 featured 프로젝트를 우선 표시하고 최대 8개로 제한
+    return filtered
+      .sort((a, b) => {
+        // featured 프로젝트를 먼저 정렬
+        if (a.featured && !b.featured) return -1
+        if (!a.featured && b.featured) return 1
         
-        // 먼저 연결 테스트
-        const isConnected = await testSupabaseConnection()
-        if (!isConnected) {
-          throw new Error('Supabase 연결에 실패했습니다.')
+        // sort_order로 정렬
+        if (a.sort_order !== b.sort_order) {
+          return a.sort_order - b.sort_order
         }
         
-        // 프로젝트 카테고리 가져오기
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('project_categories')
-          .select('*')
-          .order('sort_order', { ascending: true })
-
-        if (categoriesError) {
-          console.error('카테고리 로딩 에러:', categoriesError)
-        } else {
-          setCategories(categoriesData || [])
-        }
-        
-        const { data, error } = await supabase
-          .from('projects')
-          .select(`
-            *,
-            project_category:project_categories(*)
-          `)
-          .eq('is_published', true)
-          .order('featured', { ascending: false }) // featured 프로젝트를 먼저
-          .order('sort_order', { ascending: true })
-          .order('created_at', { ascending: false })
-          .limit(8) // 홈페이지에서는 최대 8개 (featured + 일반 프로젝트)
+        // 생성일로 정렬 (최신순)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
+      .slice(0, 8) // 최대 8개로 제한
+  }, [projects, activeFilter])
 
 
 
-        if (error) {
-          console.error('Supabase 에러:', error)
-          throw error
-        }
-
-        setProjects(data || [])
-      } catch (err: any) {
-        console.error('프로젝트를 불러오는 중 오류가 발생했습니다:', err)
-        console.error('에러 상세 정보:', {
-          message: err.message,
-          code: err.code,
-          details: err.details,
-          hint: err.hint
-        })
-        setError(`프로젝트를 불러오는데 실패했습니다: ${err.message}`)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [])
-
-  const filteredProjects = activeFilter === 'all' 
-    ? projects 
-    : projects.filter(project => project.project_category?.slug === activeFilter)
-
-  const featuredProjects = projects.filter(project => project.featured)
-  const nonFeaturedProjects = projects.filter(project => !project.featured)
+  const featuredProjects = projects?.filter(project => project.featured) || []
+  const nonFeaturedProjects = projects?.filter(project => !project.featured) || []
 
   // 닷 네비게이션을 위한 섹션 ID들 (Featured Projects가 있을 때만 포함)
   const sections = [
@@ -718,7 +705,7 @@ const Home = () => {
               >
                 전체
               </button>
-              {categories.map((category) => (
+              {categories?.map((category) => (
                 <button
                   key={category.id}
                   id={`filter-${category.slug}-desktop`}
@@ -748,7 +735,7 @@ const Home = () => {
                 >
                   전체
                 </button>
-                {categories.map((category) => (
+                {categories?.map((category) => (
                   <button
                     key={category.id}
                     id={`filter-${category.slug}-mobile`}
@@ -768,31 +755,28 @@ const Home = () => {
 
           {/* Loading State */}
           {loading && (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">프로젝트를 불러오는 중...</p>
-            </div>
+            <LoadingSpinner 
+              size="lg" 
+              message="프로젝트를 불러오는 중..." 
+              className="py-12"
+            />
           )}
 
           {/* Error State */}
           {error && (
-            <div className="text-center py-12">
-              <div className="text-red-600 dark:text-red-400 text-xl mb-4">
-                {error}
-              </div>
-              <button 
-                onClick={() => window.location.reload()}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                다시 시도
-              </button>
-            </div>
+            <ErrorMessage 
+              message={error} 
+              onRetry={handleRetry}
+              className="py-12"
+            />
           )}
 
           {/* Projects Grid */}
           {!loading && !error && (
-            <div id="projects-grid" className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-              {filteredProjects.map((project, index) => (
+            <>
+              {filteredProjects && filteredProjects.length > 0 ? (
+                <div id="projects-grid" className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+                  {filteredProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
                   id={`project-${project.id}`}
@@ -835,18 +819,21 @@ const Home = () => {
                   </div>
                 </motion.div>
               ))}
-            </div>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && filteredProjects.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400">
-                {activeFilter !== 'all' 
-                  ? '해당 카테고리의 프로젝트가 없습니다.' 
-                  : '아직 프로젝트가 없습니다.'}
-              </p>
-            </div>
+                </div>
+              ) : (
+                <EmptyState 
+                  type="data"
+                  title={activeFilter !== 'all' ? '해당 카테고리의 프로젝트가 없습니다' : '프로젝트가 없습니다'}
+                  message={activeFilter !== 'all' 
+                    ? '다른 카테고리를 선택해보세요.' 
+                    : '아직 등록된 프로젝트가 없습니다.'}
+                  action={{
+                    label: '전체 프로젝트 보기',
+                    onClick: () => setActiveFilter('all')
+                  }}
+                />
+              )}
+            </>
           )}
         </div>
       </section>
